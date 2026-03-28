@@ -958,6 +958,7 @@
     <a href="#sec7">7. Padrões Arquiteturais</a>
     <a href="#sec8">8. Riscos e Migração</a>
     <a href="#sec9">9. Glossário</a>
+    <a href="#sec10">10. Referência Rápida</a>
   </nav>
 </aside>
 
@@ -1807,6 +1808,267 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 10 -->
+    <div class="section-card" id="sec10">
+      <div class="section-header" style="background:#1a3a5c;">
+        <div class="section-number" style="background:rgba(255,255,255,.15);">10</div>
+        <h2>Referência Rápida — Todos os Endpoints</h2>
+      </div>
+      <div class="section-body">
+
+        <p>Consolidação única de todos os endpoints mapeados neste documento, organizados por domínio. Use os botões <strong>{ } JSON</strong> para acessar exemplos de request/response sem precisar navegar pelas seções anteriores.</p>
+
+        <div class="overview-grid" style="margin:20px 0 28px;">
+          <div class="overview-card">
+            <div class="oc-label">Total de endpoints</div>
+            <div class="oc-value">19</div>
+          </div>
+          <div class="overview-card">
+            <div class="oc-label">Com payload documentado</div>
+            <div class="oc-value">17</div>
+          </div>
+          <div class="overview-card">
+            <div class="oc-label">Endpoints externos ⚠️</div>
+            <div class="oc-value">3</div>
+          </div>
+          <div class="overview-card">
+            <div class="oc-label">Em desenvolvimento 🚧</div>
+            <div class="oc-value">1</div>
+          </div>
+        </div>
+
+        <!-- AUTENTICAÇÃO -->
+        <div class="subsection-title">🔐 Autenticação</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Observação</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>PostToken</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/oauth/token</code></td>
+                <td>grant_type=client_credentials — header Authorization: Basic {base64}</td>
+              </tr>
+              <tr class="ext-url">
+                <td>PostLoginAPI <em>(externo)</em></td>
+                <td><span class="method post">POST</span></td>
+                <td><code>unimedpa.healthmap.com.br/api/v1/usuario/loginAPI</code></td>
+                <td>Auth própria do endpoint externo — ver <button class="btn-payload" onclick="openPayload('responder-avaliacao')">{ } JSON</button> aba 🔑 Auth</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- BENEFICIÁRIO -->
+        <div class="subsection-title" style="margin-top:18px;">👤 Beneficiário</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>GetBeneficiario</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/beneficiario/v1/beneficiario</code></td>
+                <td><button class="btn-payload" onclick="openPayload('beneficiario-lista')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>GetBeneficiario por ID</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/beneficiario/v1/beneficiario/{id}</code></td>
+                <td><button class="btn-payload" onclick="openPayload('beneficiario-id')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>GetBeneficiarioResumido</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/beneficiario/v1/beneficiario/dadosBeneficiarioResumido/{id}</code></td>
+                <td><button class="btn-payload" onclick="openPayload('beneficiario-resumido')">{ } JSON</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SEGURANÇA -->
+        <div class="subsection-title" style="margin-top:18px;">🛡️ Segurança</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>GetUsuario</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/seguranca/v1/usuario</code></td>
+                <td><button class="btn-payload" onclick="openPayload('usuario')">{ } JSON</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TERMOS -->
+        <div class="subsection-title" style="margin-top:18px;">📄 Termos de Aceite</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>GetAceiteTermo</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/termo/v1/termo/aceiteTermo</code></td>
+                <td><button class="btn-payload" onclick="openPayload('aceite-termo')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>GetTermoPublicadoPorEmpresa</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/termo/v1/termo/buscaTermoPublicadoPorEmpresa</code></td>
+                <td><button class="btn-payload" onclick="openPayload('termo-empresa')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>GetBuscarAceiteTermo</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/termo/v1/termo/buscarAceiteTermo</code></td>
+                <td><button class="btn-payload" onclick="openPayload('buscar-aceite')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>PostRevogaTermo</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/termo/v1/termo/revogaTermo/{idPessoa}/{idTermo}/{idEmpresa}</code></td>
+                <td><button class="btn-payload" onclick="openPayload('revoga-termo')">{ } JSON</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RISCO -->
+        <div class="subsection-title" style="margin-top:18px;">⚕️ Estratificação de Risco</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>GetMedicaoRisco</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/risco/v1/medicaoRisco</code></td>
+                <td><button class="btn-payload" onclick="openPayload('medicao-risco')">{ } JSON</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PLANO DE AÇÃO -->
+        <div class="subsection-title" style="margin-top:18px;">📋 Plano de Ação</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>GetPlanoAcao</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/planoacao/v1/planoAcao</code></td>
+                <td><button class="btn-payload" onclick="openPayload('plano-acao')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>PostProgramarAcao</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/planoacao/v1/planoAcao/programarAcao/{idCliente}</code></td>
+                <td><button class="btn-payload" onclick="openPayload('programar-acao')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>PutRealizarAcao</td>
+                <td><span class="method put">PUT</span></td>
+                <td><code>/api/planoacao/v1/planoAcao/realizarAcao</code></td>
+                <td><button class="btn-payload" onclick="openPayload('realizar-acao')">{ } JSON</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- QUESTIONÁRIOS -->
+        <div class="subsection-title" style="margin-top:18px;">📝 Questionários</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>GetQuestionario</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/questionario/v1/questionario/{id}</code></td>
+                <td><button class="btn-payload" onclick="openPayload('questionario')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>GetQuestaoRespostas</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/questionario/v1/questionario/questaoRespostas</code></td>
+                <td><button class="btn-payload" onclick="openPayload('questao-respostas')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>PostResponderQuestaoAvulsa</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td>
+                <td><button class="btn-payload" onclick="openPayload('responder-questao')">{ } JSON</button></td>
+              </tr>
+              <tr class="dev-url">
+                <td>PostQuestaoUltimaResposta <span class="badge-dev">🚧 Em desenvolvimento</span></td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/questionario/v1/questionario/questaoUltimaResposta</code></td>
+                <td><button class="btn-payload" onclick="openPayload('questao-ultima-resposta')">{ } JSON</button></td>
+              </tr>
+              <tr class="ext-url">
+                <td>PostResponderAvaliacao <em>(externo)</em></td>
+                <td><span class="method post">POST</span></td>
+                <td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td>
+                <td><button class="btn-payload" onclick="openPayload('responder-avaliacao')">{ } JSON</button></td>
+              </tr>
+              <tr class="ext-url">
+                <td>GetDadosQuestionariosSintetico <em>(externo)</em></td>
+                <td><span class="method get">GET</span></td>
+                <td><code>unimedpa.healthmap.com.br/api/v1/consultas/dadosQuestionariosSintetico</code></td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- INTERNAÇÃO -->
+        <div class="subsection-title" style="margin-top:18px;">🏥 Internação</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>PostListarAlertasInternacao</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/internacao/v1/listarAlertasInternacao</code></td>
+                <td><button class="btn-payload" onclick="openPayload('alertas-internacao')">{ } JSON</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EXTERNO SEM PAYLOAD -->
+        <div class="subsection-title" style="margin-top:18px;">⚠️ Outros Endpoints Externos</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Observação</th></tr></thead>
+            <tbody>
+              <tr class="ext-url">
+                <td>GetListarAcoes <em>(externo)</em></td>
+                <td><span class="method get">GET</span></td>
+                <td><code>unimedpa.healthmap.com.br/api/v1/relatorio/listar-acoes</code></td>
+                <td>Contrato não documentado — levantar com time Healthmap</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout info" style="margin-top:20px;">
+          <strong>📌 Legenda</strong>
+          Linhas em <span style="background:#fffbea;padding:1px 6px;border-radius:3px;font-size:12px;">amarelo</span> = em desenvolvimento &nbsp;|&nbsp;
+          Linhas em <span style="background:#fff4e8;padding:1px 6px;border-radius:3px;font-size:12px;">laranja</span> = endpoint externo (fora do Swagger principal) &nbsp;|&nbsp;
+          <strong>—</strong> = payload ainda não documentado
+        </div>
+
       </div>
     </div>
 
