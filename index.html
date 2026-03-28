@@ -226,6 +226,15 @@
       color: #1a3a5c; word-break: break-all;
     }
     .ext-url code { color: #7a3000; background: #fff4e8; border-color: #e8c890; }
+    .dev-url td { background: #fffbea; }
+    .dev-url code { color: #6b4c00; background: #fff8dc; border-color: #f0d060; border-style: dashed; }
+    .badge-dev {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 700; letter-spacing: .4px;
+      padding: 2px 8px; border-radius: 10px;
+      background: #fff3cd; color: #856404; border: 1px solid #f0c040;
+      vertical-align: middle; margin-left: 6px;
+    }
 
     /* ── CALLOUT ── */
     .callout {
@@ -1045,6 +1054,12 @@
                   <td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td>
                   <td>Body: <code>ResponderQuestaoDTO</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } JSON</button></td>
                 </tr>
+                <tr class="dev-url">
+                  <td>PostQuestaoUltimaResposta <span class="badge-dev">🚧 Em desenvolvimento</span></td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/questionario/v1/questionario/questaoUltimaResposta</code></td>
+                  <td>Body: <code>{ idCliente, idQuestionario }</code> — retorna última avaliação respondida <button class="btn-payload" onclick="openPayload('questao-ultima-resposta')">{ } JSON</button></td>
+                </tr>
                 <tr class="ext-url">
                   <td>PostResponderAvaliacao <em>(externo)</em></td>
                   <td><span class="method post">POST</span></td>
@@ -1224,6 +1239,7 @@
               <tr><td><code>GET /api/questionario/v1/questionario/{id}</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
               <tr><td><code>GET .../questionario/questaoRespostas</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
               <tr><td><code>POST .../responderQuestaoAvulsa</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr style="background:#fffbea"><td><code>POST .../questaoUltimaResposta</code> <span class="badge-dev">🚧 Dev</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
               <tr><td><code>POST /api/internacao/v1/listarAlertasInternacao</code></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
               <tr><td><code>GET /api/seguranca/v1/usuario</code></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
               <tr class="ext-url"><td><code>POST unimedpa…/responderAvaliacao ⚠️</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
@@ -1526,6 +1542,12 @@ const payloads = {
     request: { headers: H, pathParams: { id: 98765 } },
     response: { id: 6001, nome: "Avaliação de Saúde Inicial", descricao: "Questionário de cadastro", versao: 1, ativo: true, questoes: [{ id: 7001, texto: "Possui alergias?", tipo: "SIM_NAO", obrigatoria: true }] }
   },
+  'questao-ultima-resposta': {
+    title: 'POST /api/questionario/v1/questionario/questaoUltimaResposta',
+    sub: 'Questionários — última avaliação respondida 🚧 Em desenvolvimento',
+    request: { headers: { ...H, "Content-Type": "application/json" }, body: { idCliente: "12345", idQuestionario: "789" } },
+    response: { idQuestionario: "789", nomeQuestionario: "Avaliação de Saúde Inicial", dataQuestionarioRespondido: "2026-02-05T14:32:00", questoes: [ { nomeQuestao: "Você pratica atividade física regularmente?", resposta: "Sim, três vezes por semana" }, { nomeQuestao: "Possui alguma doença crônica diagnosticada?", resposta: "Não" }, { nomeQuestao: "Faz uso contínuo de medicamentos?", resposta: "Sim, anti-hipertensivo" } ] }
+  },
   'questao-respostas': {
     title: 'GET /api/questionario/v1/questionario/questaoRespostas',
     sub: 'Questionários — respostas/alternativas',
@@ -1693,7 +1715,7 @@ const diagTipsPartial = [
   { key: 'Beneficiário', tip: 'Endpoints de Beneficiário:\nGET /api/beneficiario/v1/beneficiario\nGET /api/beneficiario/v1/beneficiario/{id}\nGET .../dadosBeneficiarioResumido/{id}' },
   { key: 'Plano de Ação', tip: 'Endpoints de Plano de Ação:\nGET /api/planoacao/v1/planoAcao\nPOST .../programarAcao/{idCliente}\nPUT .../realizarAcao' },
   { key: 'Risco', tip: 'Endpoints de Risco:\nGET /api/risco/v1/medicaoRisco\nEstratificação de risco por paciente.' },
-  { key: 'Questionário', tip: 'Endpoints de Questionários:\nGET /api/questionario/v1/questionario/{id}\nGET .../questaoRespostas\nPOST .../responderQuestaoAvulsa' },
+  { key: 'Questionário', tip: 'Endpoints de Questionários:\nGET /api/questionario/v1/questionario/{id}\nGET .../questaoRespostas\nPOST .../responderQuestaoAvulsa\n🚧 POST .../questaoUltimaResposta (em dev)' },
   { key: 'Internação', tip: 'Endpoints de Internação:\nPOST /api/internacao/v1/listarAlertasInternacao' },
   { key: 'Segurança', tip: 'Endpoints de Segurança:\nGET /api/seguranca/v1/usuario' },
   { key: 'Programa', tip: 'Endpoints de Programa:\nGET /api/programa/v1/programa' },
