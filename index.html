@@ -384,20 +384,20 @@
     .modal-overlay.open { display: flex; }
     .modal-box {
       background: #fff; border-radius: 10px;
-      width: 100%; max-width: 680px; max-height: 82vh;
+      width: 100%; max-width: 720px; max-height: 84vh;
       display: flex; flex-direction: column;
       box-shadow: 0 12px 50px rgba(0,0,0,.35);
       animation: modalIn .18s ease;
     }
     @keyframes modalIn { from { transform: scale(.95); opacity:0; } to { transform: scale(1); opacity:1; } }
     .modal-head {
-      padding: 14px 18px; background: var(--blue-dark); color: #fff;
+      padding: 14px 18px 0; background: var(--blue-dark); color: #fff;
       border-radius: 10px 10px 0 0;
-      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
     }
     .modal-head-title { font-size: 13px; font-weight: 600; }
     .modal-head-sub { font-size: 11px; color: #7faac8; margin-top: 2px; }
-    .modal-head-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .modal-head-actions { display: flex; gap: 8px; flex-shrink: 0; padding-bottom: 14px; }
     .modal-btn {
       background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2);
       color: #fff; border-radius: 6px; padding: 4px 12px;
@@ -405,20 +405,40 @@
     }
     .modal-btn:hover { background: rgba(255,255,255,.25); }
     .modal-btn.close { padding: 4px 10px; font-size: 15px; }
+    /* ── tabs ── */
+    .modal-tabs {
+      display: flex; background: var(--blue-dark);
+      padding: 0 18px; gap: 2px;
+    }
+    .modal-tab {
+      padding: 8px 18px; font-size: 12px; font-weight: 600;
+      color: #7faac8; border: none; background: transparent;
+      cursor: pointer; border-radius: 6px 6px 0 0;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, background .15s;
+    }
+    .modal-tab:hover { color: #fff; background: rgba(255,255,255,.07); }
+    .modal-tab.active {
+      color: #fff; background: #1e2836;
+      border-bottom-color: var(--blue-mid);
+    }
     .modal-body { overflow-y: auto; flex: 1; border-radius: 0 0 10px 10px; }
+    .json-panel { display: none; }
+    .json-panel.active { display: block; }
     pre.json-view {
       margin: 0; padding: 20px;
       font-family: 'Cascadia Code','Consolas',monospace;
       font-size: 12px; line-height: 1.7;
       background: #1e2836; color: #cdd6f4;
-      border-radius: 0 0 10px 10px;
       white-space: pre-wrap; word-break: break-word;
+      min-height: 120px;
     }
-    .jk { color: #89dceb; }   /* key */
-    .js { color: #a6e3a1; }   /* string */
-    .jn { color: #fab387; }   /* number */
-    .jb { color: #cba6f7; }   /* boolean */
-    .jl { color: #7f849c; }   /* null */
+    .json-panel:last-child pre.json-view { border-radius: 0 0 10px 10px; }
+    .jk { color: #89dceb; }
+    .js { color: #a6e3a1; }
+    .jn { color: #fab387; }
+    .jb { color: #cba6f7; }
+    .jl { color: #7f849c; }
 
     /* ── SCROLL TOP ── */
     #scroll-top {
@@ -1293,7 +1313,7 @@
 <div class="modal-overlay" id="payloadModal" onclick="closeModal(event)">
   <div class="modal-box">
     <div class="modal-head">
-      <div>
+      <div style="padding-bottom:14px;">
         <div class="modal-head-title" id="modalTitle">Payload</div>
         <div class="modal-head-sub" id="modalSub"></div>
       </div>
@@ -1302,169 +1322,120 @@
         <button class="modal-btn close" onclick="closeModal()">✕</button>
       </div>
     </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-request" onclick="switchTab('request')">📤 Envio</button>
+      <button class="modal-tab" id="tab-response" onclick="switchTab('response')">📥 Retorno</button>
+    </div>
     <div class="modal-body">
-      <pre class="json-view" id="modalBody"></pre>
+      <div class="json-panel active" id="panel-request">
+        <pre class="json-view" id="bodyRequest"></pre>
+      </div>
+      <div class="json-panel" id="panel-response">
+        <pre class="json-view" id="bodyResponse"></pre>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
 /* ── PAYLOADS ── */
+const H = { Authorization: "Bearer {token}", KeyDS: "production" };
 const payloads = {
   'beneficiario-lista': {
     title: 'GET /api/beneficiario/v1/beneficiario',
-    sub: 'Retorno: Page<Usuario>',
-    json: {
-      content: [{
-        id: 12345, nome: "João Silva", cpf: "12345678901",
-        email: "joao@example.com", tipo: "BENEFICIARIO", status: "ATIVO",
-        numeroCarteirinha: "ABC123456", idExterno: "EXT001"
-      }],
-      totalElements: 100, totalPages: 10, number: 0, size: 10
-    }
+    sub: 'Beneficiário — listagem paginada',
+    request: { headers: H, queryParams: { cpf: "12345678900", email: "joao@example.com", id: 12345, nome: "João Silva", numeroCarteirinha: "123456789", status: "ATIVO", tipo: "BENEFICIARIO", offset: 0, pageSize: 20 } },
+    response: { content: [{ id: 12345, nome: "João Silva", cpf: "12345678901", email: "joao@example.com", tipo: "BENEFICIARIO", status: "ATIVO", numeroCarteirinha: "ABC123456", idExterno: "EXT001" }], totalElements: 100, totalPages: 10, number: 0, size: 10 }
   },
   'beneficiario-id': {
     title: 'GET /api/beneficiario/v1/beneficiario/{id}',
-    sub: 'Retorno: Usuario',
-    json: {
-      id: 12345, nome: "João Silva", cpf: "12345678901",
-      email: "joao@example.com", tipo: "BENEFICIARIO", status: "ATIVO",
-      numeroCarteirinha: "ABC123456", idExterno: "EXT001",
-      dataNascimento: "1990-05-15", telefone: "51999999999"
-    }
+    sub: 'Beneficiário — por ID',
+    request: { headers: H, pathParams: { id: 12345 } },
+    response: { id: 12345, nome: "João Silva", cpf: "12345678901", email: "joao@example.com", tipo: "BENEFICIARIO", status: "ATIVO", numeroCarteirinha: "ABC123456", idExterno: "EXT001", dataNascimento: "1990-05-15", telefone: "51999999999" }
   },
   'beneficiario-resumido': {
     title: 'GET /api/beneficiario/v1/beneficiario/dadosBeneficiarioResumido/{id}',
-    sub: 'Retorno: BeneficiarioResumidoDTO',
-    json: {
-      id: 12345, nome: "João Silva", cpf: "12345678901",
-      numeroCarteirinha: "ABC123456", email: "joao@example.com",
-      dataNascimento: "1990-05-15", status: "ATIVO"
-    }
+    sub: 'Beneficiário — dados resumidos',
+    request: { headers: H, pathParams: { id: 12345 } },
+    response: { id: 12345, nome: "João Silva", cpf: "12345678901", numeroCarteirinha: "ABC123456", email: "joao@example.com", dataNascimento: "1990-05-15", status: "ATIVO" }
   },
   'medicao-risco': {
     title: 'GET /api/risco/v1/medicaoRisco',
-    sub: 'Retorno: Page<MedicaoRisco>',
-    json: {
-      content: [{
-        id: 5001, idCliente: 12345, statusRisco: "ALTO",
-        dataAvaliacao: "2026-02-20T10:30:00",
-        descricao: "Risco cardiovascular elevado"
-      }],
-      totalElements: 50, totalPages: 5, number: 0, size: 10
-    }
+    sub: 'Risco — estratificação por paciente',
+    request: { headers: H, queryParams: { idCliente: 12345, status: "ATIVO", offset: 0, pageSize: 20 } },
+    response: { content: [{ id: 5001, idCliente: 12345, statusRisco: "ALTO", dataAvaliacao: "2026-02-20T10:30:00", descricao: "Risco cardiovascular elevado" }], totalElements: 50, totalPages: 5, number: 0, size: 10 }
   },
   'plano-acao': {
     title: 'GET /api/planoacao/v1/planoAcao',
-    sub: 'Retorno: Page<PlanoAcao>',
-    json: {
-      content: [{
-        id: 3001, idCliente: 12345, status: "ATIVO",
-        descricao: "Plano de ação cardiovascular",
-        dataInicio: "2026-01-01T00:00:00",
-        dataFim: "2026-12-31T23:59:59",
-        statusAcao: "EM_PROGRESSO"
-      }],
-      totalElements: 25, totalPages: 3, number: 0, size: 10
-    }
+    sub: 'Plano de Ação — listagem',
+    request: { headers: H, queryParams: { id: 3001, idCliente: 12345, status: "ATIVO", statusAcao: "PENDENTE", offset: 0, size: 20, semLimite: false } },
+    response: { content: [{ id: 3001, idCliente: 12345, status: "ATIVO", descricao: "Plano de ação cardiovascular", dataInicio: "2026-01-01T00:00:00", dataFim: "2026-12-31T23:59:59", statusAcao: "EM_PROGRESSO" }], totalElements: 25, totalPages: 3, number: 0, size: 10 }
   },
   'programar-acao': {
     title: 'POST /api/planoacao/v1/planoAcao/programarAcao/{idCliente}',
-    sub: 'Request Body: AcaoPlanoAcaoDTO',
-    json: {
-      idAcao: 2001, dataAgendamento: "2026-03-15T14:00:00",
-      descricao: "Consulta de acompanhamento", tipo: "CONSULTA"
-    }
+    sub: 'Plano de Ação — programar ação',
+    request: { headers: { ...H, "Content-Type": "application/json" }, pathParams: { idCliente: 12345 }, body: { idAcao: 101, descricao: "Realizar consulta", dataAgendamento: "2026-03-15T10:30:00", dataLimite: "2026-03-31T23:59:59", prioridade: "ALTA", status: "PENDENTE", idProfissional: 54321, observacoes: "Seguimento clínico" } },
+    response: { sucesso: true, mensagem: "Ação programada com sucesso" }
   },
   'realizar-acao': {
     title: 'PUT /api/planoacao/v1/planoAcao/realizarAcao',
-    sub: 'Request Body: RealizarAcaoDTO',
-    json: {
-      idAcao: 2001, dataRealizacao: "2026-03-15T14:30:00",
-      resultado: "CONCLUIDA", observacoes: "Ação executada com sucesso"
-    }
+    sub: 'Plano de Ação — marcar como realizada',
+    request: { headers: { ...H, "Content-Type": "application/json" }, body: { idAcaoPlanoAcao: 67890, idCliente: 12345, dataRealizacao: "2026-03-15T15:45:00", resultado: "CONCLUIDO", observacoes: "Ação finalizada com sucesso", arquivos: [] } },
+    response: { sucesso: true, mensagem: "Ação realizada com sucesso" }
   },
   'questionario': {
     title: 'GET /api/questionario/v1/questionario/{id}',
-    sub: 'Retorno: Questionario',
-    json: {
-      id: 6001, nome: "Avaliação de Saúde Inicial",
-      descricao: "Questionário de cadastro", versao: 1, ativo: true,
-      questoes: [{
-        id: 7001, texto: "Possui alergias?",
-        tipo: "SIM_NAO", obrigatoria: true
-      }]
-    }
+    sub: 'Questionários — obter questionário',
+    request: { headers: H, pathParams: { id: 98765 } },
+    response: { id: 6001, nome: "Avaliação de Saúde Inicial", descricao: "Questionário de cadastro", versao: 1, ativo: true, questoes: [{ id: 7001, texto: "Possui alergias?", tipo: "SIM_NAO", obrigatoria: true }] }
   },
   'questao-respostas': {
     title: 'GET /api/questionario/v1/questionario/questaoRespostas',
-    sub: 'Retorno: Page<QuestaoResposta>',
-    json: {
-      content: [{
-        idQuestao: 7001, codigoBeneficiario: 12345, resposta: "SIM",
-        dataResposta: "2026-02-20T10:15:00", codigoExterno: "EXT001"
-      }],
-      totalElements: 150, totalPages: 15, number: 0, size: 10
-    }
+    sub: 'Questionários — respostas/alternativas',
+    request: { headers: H, queryParams: { idQuestao: 54321, codigoBeneficiario: 12345, codigoExterno: "EXT002", dataInicioResposta: "2026-01-01", dataFimResposta: "2026-03-31", trazerUltimaQuestaoRespondida: true, offset: 0, pageSize: 50 } },
+    response: { content: [{ idQuestao: 7001, codigoBeneficiario: 12345, resposta: "SIM", dataResposta: "2026-02-20T10:15:00", codigoExterno: "EXT001" }], totalElements: 150, totalPages: 15, number: 0, size: 10 }
   },
   'responder-questao': {
     title: 'POST /api/questionario/v1/questionario/responderQuestaoAvulsa',
-    sub: 'Request Body: ResponderQuestaoDTO',
-    json: {
-      idQuestao: 7001, idCliente: 12345,
-      resposta: "SIM", dataResposta: "2026-02-20T10:15:00"
-    }
+    sub: 'Questionários — responder questão avulsa',
+    request: { headers: { ...H, "Content-Type": "application/json" }, body: { idQuestao: 54321, idCliente: 12345, resposta: "sim", respostaTexto: "Descrição detalhada", respostaValor: 8.5, dataResposta: "2026-03-15T14:30:00", idDispositivoIntegracao: 99999 } },
+    response: { sucesso: true, mensagem: "Questão respondida com sucesso" }
   },
   'aceite-termo': {
     title: 'GET /api/termo/v1/termo/aceiteTermo',
-    sub: 'Retorno: Boolean / TermoAceite',
-    json: { aceito: true }
+    sub: 'Termo de Aceite — consultar aceite',
+    request: { headers: H, queryParams: { idPessoa: 12345, idTermo: 67890 } },
+    response: { aceito: true }
   },
   'termo-empresa': {
     title: 'GET /api/termo/v1/termo/buscaTermoPublicadoPorEmpresa',
-    sub: 'Retorno: Termo',
-    json: {
-      id: 8001, titulo: "Termo de Consentimento",
-      conteudo: "Consentimento para coleta e uso de dados de saúde...",
-      versao: 1, dataPublicacao: "2026-01-01T00:00:00", ativo: true
-    }
+    sub: 'Termo de Aceite — buscar por empresa',
+    request: { headers: H, queryParams: { idEmpresa: 11111 } },
+    response: { id: 8001, titulo: "Termo de Consentimento", conteudo: "Consentimento para coleta e uso de dados de saúde...", versao: 1, dataPublicacao: "2026-01-01T00:00:00", ativo: true }
   },
   'buscar-aceite': {
     title: 'GET /api/termo/v1/termo/buscarAceiteTermo',
-    sub: 'Retorno: TermoAceite',
-    json: {
-      id: 9001, idPessoa: 12345, idTermo: 8001,
-      dataAceite: "2026-02-15T09:30:00", versaoTermo: 1
-    }
+    sub: 'Termo de Aceite — buscar aceite',
+    request: { headers: H, queryParams: { idPessoa: 12345, idTermo: 67890 } },
+    response: { id: 9001, idPessoa: 12345, idTermo: 8001, dataAceite: "2026-02-15T09:30:00", versaoTermo: 1 }
   },
   'revoga-termo': {
     title: 'POST /api/termo/v1/termo/revogaTermo/{idPessoa}/{idTermo}/{idEmpresa}',
-    sub: 'Retorno: 200 OK',
-    json: { sucesso: true, mensagem: "Termo revogado com sucesso" }
+    sub: 'Termo de Aceite — revogar aceite',
+    request: { headers: { ...H, "Content-Type": "application/json" }, pathParams: { idPessoa: 12345, idTermo: 67890, idEmpresa: 11111 } },
+    response: { sucesso: true, mensagem: "Termo revogado com sucesso" }
   },
   'alertas-internacao': {
     title: 'POST /api/internacao/v1/listarAlertasInternacao',
-    sub: 'Retorno: InternacaoDTO',
-    json: {
-      totalRegistros: 45, pagina: 1, itensPorPagina: 10,
-      internacoes: [{
-        id: 4001, idPaciente: 12345,
-        dataInternacao: "2026-02-10T08:00:00",
-        dataSaida: "2026-02-17T16:30:00",
-        motivo: "Cirurgia programada", unidade: "UTI"
-      }]
-    }
+    sub: 'Internação — listar alertas',
+    request: { headers: { ...H, "Content-Type": "application/json" }, queryParams: { idGestor: 54321, dataInternacao: "2026-01-01", dataSaida: "2026-03-31", pagina: 1, itensPorPagina: 25 } },
+    response: { totalRegistros: 45, pagina: 1, itensPorPagina: 25, internacoes: [{ id: 4001, idPaciente: 12345, dataInternacao: "2026-02-10T08:00:00", dataSaida: "2026-02-17T16:30:00", motivo: "Cirurgia programada", unidade: "UTI" }] }
   },
   'usuario': {
     title: 'GET /api/seguranca/v1/usuario',
-    sub: 'Retorno: Page<Usuario>',
-    json: {
-      content: [{
-        id: 11001, nome: "Dr. Carlos Santos", cpf: "98765432101",
-        email: "carlos@healthmap.com.br", tipo: "PROFISSIONAL", status: "ATIVO"
-      }],
-      totalElements: 200, totalPages: 20, number: 0, size: 10
-    }
+    sub: 'Segurança — listagem de usuários',
+    request: { headers: H, queryParams: { cpf: "98765432101", email: "carlos@healthmap.com.br", id: 11001, nome: "Carlos Santos", status: "ATIVO", tipo: "PROFISSIONAL", offset: 0, pageSize: 20 } },
+    response: { content: [{ id: 11001, nome: "Dr. Carlos Santos", cpf: "98765432101", email: "carlos@healthmap.com.br", tipo: "PROFISSIONAL", status: "ATIVO" }], totalElements: 200, totalPages: 20, number: 0, size: 10 }
   }
 };
 
@@ -1481,14 +1452,26 @@ function syntaxHighlight(json) {
   });
 }
 
+let activeTab = 'request';
+
 function openPayload(key) {
   const p = payloads[key];
   if (!p) return;
   document.getElementById('modalTitle').textContent = p.title;
   document.getElementById('modalSub').textContent = p.sub;
-  document.getElementById('modalBody').innerHTML = syntaxHighlight(p.json);
+  document.getElementById('bodyRequest').innerHTML = syntaxHighlight(p.request);
+  document.getElementById('bodyResponse').innerHTML = syntaxHighlight(p.response);
+  switchTab('request');
   document.getElementById('payloadModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  ['request','response'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+    document.getElementById('panel-'+t).classList.toggle('active', t === tab);
+  });
 }
 
 function closeModal(e) {
@@ -1498,9 +1481,9 @@ function closeModal(e) {
 }
 
 function copyPayload() {
-  const text = document.getElementById('modalBody').textContent;
+  const text = document.getElementById('panel-'+activeTab).querySelector('pre').textContent;
   navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.modal-btn');
+    const btn = document.querySelector('.modal-head-actions .modal-btn');
     btn.textContent = '✓ Copiado!';
     setTimeout(() => btn.textContent = '⎘ Copiar', 1500);
   });
