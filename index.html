@@ -462,6 +462,78 @@
     }
     #scroll-top.visible { display: flex; }
 
+    /* ── AUTH OVERLAY ── */
+    #auth-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      background: linear-gradient(135deg, #0d1f33 0%, #1a3a5c 100%);
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .4s ease;
+    }
+    #auth-overlay.hide {
+      opacity: 0; pointer-events: none;
+    }
+    #auth-card {
+      background: #fff; border-radius: 16px;
+      padding: 44px 40px 36px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.45);
+      text-align: center;
+    }
+    #auth-card .auth-logo {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+      color: #7fa8c8; margin-bottom: 4px;
+    }
+    #auth-card .auth-title {
+      font-size: 20px; font-weight: 700; color: #1a3a5c;
+      margin-bottom: 2px;
+    }
+    #auth-card .auth-sub {
+      font-size: 13px; color: #64748b; margin-bottom: 28px;
+    }
+    #auth-card .auth-badge {
+      display: inline-block; background: #eef5fb; color: #2E75B6;
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 10px; margin-bottom: 24px; border: 1px solid #c8dff0;
+    }
+    .auth-field {
+      position: relative; margin-bottom: 16px;
+    }
+    .auth-field input {
+      width: 100%; padding: 12px 44px 12px 16px;
+      border: 1.5px solid #d1dbe8; border-radius: 8px;
+      font-size: 15px; color: #1a3a5c; outline: none;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      transition: border-color .2s;
+      letter-spacing: 2px;
+    }
+    .auth-field input:focus { border-color: #2E75B6; }
+    .auth-field input.err { border-color: #e24b4a; background: #fff5f5; }
+    .auth-field .eye-btn {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: #94a3b8;
+      font-size: 16px; padding: 2px;
+    }
+    .auth-field .eye-btn:hover { color: #1a3a5c; }
+    #auth-submit {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #2E75B6, #1a3a5c);
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #auth-submit:hover { opacity: .9; }
+    #auth-submit:active { transform: scale(.98); }
+    #auth-submit:disabled { opacity: .6; cursor: not-allowed; }
+    #auth-error {
+      margin-top: 12px; font-size: 13px; color: #c0392b;
+      min-height: 18px; display: none;
+    }
+    #auth-error.show { display: block; }
+    #auth-card .auth-footer {
+      margin-top: 24px; font-size: 11px; color: #94a3b8;
+    }
+
     /* ══════════════════════════════════════
        DIAGRAM SECTION — dynamic multi-tab
     ══════════════════════════════════════ */
@@ -558,6 +630,25 @@
   </style>
 </head>
 <body>
+
+<!-- AUTH OVERLAY -->
+<div id="auth-overlay">
+  <div id="auth-card">
+    <div class="auth-logo">Unimed POA</div>
+    <div class="auth-title">CBV × Healthmap</div>
+    <div class="auth-sub">Documento de Arquitetura</div>
+    <div class="auth-badge">🔒 Acesso restrito</div>
+    <div class="auth-field">
+      <input type="password" id="auth-pw" placeholder="Senha de acesso"
+             autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doAuth()" />
+      <button class="eye-btn" type="button" onclick="toggleEye()" id="eye-btn" title="Mostrar/ocultar">👁</button>
+    </div>
+    <button id="auth-submit" onclick="doAuth()">Entrar</button>
+    <div id="auth-error">❌ Senha incorreta. Tente novamente.</div>
+    <div class="auth-footer">Fourge Tech · Documento interno</div>
+  </div>
+</div>
 
 <!-- SIDEBAR -->
 <aside id="sidebar">
@@ -1681,6 +1772,64 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
     });
   }, { rootMargin: '-20% 0px -70% 0px' });
   sections.forEach(s => observer.observe(s));
+
+/* ══════════════════════════════════════════════════════
+   AUTH — SHA-256 gate (senha nunca armazenada em texto)
+══════════════════════════════════════════════════════ */
+const _H = 'a618fc8fb2dcb8eec5c628538b908013ae140ac8ae7e6c3b11a6f5adad18e3b5';
+
+async function _sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256',
+    new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doAuth() {
+  const pw   = document.getElementById('auth-pw').value;
+  const btn  = document.getElementById('auth-submit');
+  const err  = document.getElementById('auth-error');
+  const inp  = document.getElementById('auth-pw');
+  if (!pw) { inp.classList.add('err'); inp.focus(); return; }
+  btn.disabled = true;
+  btn.textContent = '…';
+  const hash = await _sha256(pw);
+  if (hash === _H) {
+    sessionStorage.setItem('_a', '1');
+    const ov = document.getElementById('auth-overlay');
+    ov.classList.add('hide');
+    setTimeout(() => ov.remove(), 450);
+    document.body.style.overflow = '';
+  } else {
+    inp.classList.add('err');
+    err.classList.add('show');
+    inp.value = '';
+    inp.focus();
+    setTimeout(() => { inp.classList.remove('err'); err.classList.remove('show'); }, 2500);
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+}
+
+function toggleEye() {
+  const inp = document.getElementById('auth-pw');
+  const btn = document.getElementById('eye-btn');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
+// Check session on load — skip overlay if already authed this session
+(function checkAuth() {
+  if (sessionStorage.getItem('_a') === '1') {
+    const ov = document.getElementById('auth-overlay');
+    if (ov) ov.remove();
+    document.body.style.overflow = '';
+  } else {
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('auth-pw')?.focus(), 100);
+  }
+})();
 
 /* ══════════════════════════════════════════════════════
    DIAGRAM — multi-tab, zoom/pan, tooltips, migration mode
