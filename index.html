@@ -116,6 +116,22 @@
       border-radius: 20px; padding: 4px 14px; font-size: 12px; color: #daeeff;
     }
     .chip-icon { font-size: 13px; }
+    #btn-export {
+      display: inline-flex; align-items: center; gap: 7px;
+      margin-left: auto;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.35);
+      border-radius: 20px; color: #fff;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .2s, border-color .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-export:hover {
+      background: rgba(255,255,255,.28);
+      border-color: rgba(255,255,255,.7);
+    }
+    #btn-export:active { transform: scale(.97); }
 
     /* ── CONTENT ── */
     #content { padding: 40px 48px; width: 100%; }
@@ -343,13 +359,74 @@
     #page-footer .footer-bottom a:hover { color: #9dc4e8; }
 
     /* ── PRINT ── */
+    @page { size: A4; margin: 1.4cm 1.2cm 1.6cm; }
+
     @media print {
-      #sidebar, #menu-toggle { display: none !important; }
+      /* Forçar cores de fundo */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+      /* Esconder tudo que não é conteúdo */
+      #auth-overlay, #sidebar, #menu-toggle, #sb-toggle,
+      #scroll-top, .btn-payload, .diag-tabs, .diag-toolbar,
+      .diag-wrapper, .diag-tooltip, .modal-overlay,
+      #btn-export { display: none !important; }
+
+      /* Layout sem sidebar */
+      body { background: #fff !important; }
       #main { margin-left: 0 !important; }
-      #content { padding: 20px; }
-      .section-card { box-shadow: none; border: 1px solid #ccc; }
-      .table-wrap { overflow: visible; }
-      table { min-width: unset; }
+      #content { padding: 16px 0 !important; width: 100% !important; }
+
+      /* Header impresso — mantém gradiente */
+      #page-header {
+        padding: 28px 24px 22px !important;
+        margin-bottom: 16px;
+        border-radius: 0 !important;
+        break-after: avoid;
+      }
+      #page-header h1 { font-size: 22px !important; }
+
+      /* Section cards */
+      .section-card {
+        box-shadow: none !important;
+        border: 1px solid #c8d6e0 !important;
+        border-radius: 6px !important;
+        break-inside: avoid;
+        margin-bottom: 14px !important;
+      }
+      .section-header { break-after: avoid; }
+
+      /* Tabelas */
+      .table-wrap { overflow: visible !important; max-height: none !important; }
+      table { min-width: unset !important; width: 100% !important; font-size: 11px !important; }
+      th, td { padding: 5px 8px !important; }
+      tr { break-inside: avoid; }
+      thead { display: table-header-group; }
+
+      /* Evitar quebra em blocos importantes */
+      .subsection, .risk-card, .overview-card { break-inside: avoid; }
+
+      /* Forçar quebra antes de seção nova */
+      .section-card + .section-card { break-before: auto; }
+
+      /* Diagramas — mostrar apenas o painel ativo como imagem estática */
+      .diag-panel { display: none !important; }
+      .diag-panel.active {
+        display: block !important;
+        padding: 0 !important;
+        break-inside: avoid;
+      }
+      .diag-panel.active svg {
+        width: 100% !important;
+        max-height: 22cm;
+      }
+      #diagCanvas { transform: none !important; }
+
+      /* Callouts e badges */
+      .callout { break-inside: avoid; }
+      code { background: #f0f4f8 !important; border: 1px solid #d0dde8 !important; }
+
+      /* Rodapé de impressão */
+      #page-footer { margin-top: 8px; border-top: 1px solid #e0e0e0; }
     }
 
     /* ── RESPONSIVE ── */
@@ -696,6 +773,9 @@
       <span class="chip"><span class="chip-icon">📅</span> 28/03/2026</span>
       <span class="chip"><span class="chip-icon">🏥</span> Unimed POA</span>
       <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+      <button id="btn-export" onclick="exportPDF()" title="Exportar como PDF">
+        <span>📄</span> Exportar PDF
+      </button>
     </div>
   </header>
 
@@ -1772,6 +1852,22 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
     });
   }, { rootMargin: '-20% 0px -70% 0px' });
   sections.forEach(s => observer.observe(s));
+
+/* ══════════════════════════════════════════════════════
+   EXPORT PDF — window.print() com título dinâmico
+══════════════════════════════════════════════════════ */
+function exportPDF() {
+  const prev = document.title;
+  document.title = 'Arquitetura CBV × Healthmap — Integrações';
+  // Garante que o canvas do diagrama não está transformado
+  const canvas = document.getElementById('diagCanvas');
+  const prevTransform = canvas ? canvas.style.transform : '';
+  if (canvas) canvas.style.transform = '';
+  window.print();
+  // Restaura após print
+  document.title = prev;
+  if (canvas) canvas.style.transform = prevTransform;
+}
 
 /* ══════════════════════════════════════════════════════
    AUTH — SHA-256 gate (senha nunca armazenada em texto)
