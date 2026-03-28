@@ -360,15 +360,20 @@
 
     /* ── PAYLOAD BUTTON ── */
     .btn-payload {
-      display: inline-flex; align-items: center; gap: 4px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
       background: var(--blue-pale); border: 1px solid var(--blue-main);
-      color: var(--blue-main); border-radius: 12px;
-      padding: 2px 10px; font-size: 11px; font-weight: 600;
-      cursor: pointer; margin-left: 6px;
-      transition: background .15s, color .15s;
-      white-space: nowrap;
+      color: var(--blue-main); border-radius: 6px;
+      width: 60px; height: 22px;
+      font-size: 10.5px; font-weight: 700;
+      cursor: pointer; margin-left: 8px;
+      transition: background .15s, color .15s, box-shadow .15s;
+      white-space: nowrap; flex-shrink: 0;
+      vertical-align: middle; letter-spacing: .3px;
     }
-    .btn-payload:hover { background: var(--blue-main); color: #fff; }
+    .btn-payload:hover {
+      background: var(--blue-main); color: #fff;
+      box-shadow: 0 2px 6px rgba(46,117,182,.3);
+    }
 
     /* ── MODAL ── */
     .modal-overlay {
@@ -742,28 +747,28 @@
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/termo/v1/termo/aceiteTermo</code></td>
                   <td><code>idPessoa</code>, <code>idTermo</code> (query)</td>
-                  <td>Boolean / Objeto aceite <button class="btn-payload" onclick="openPayload('aceite-termo')">{ } ver</button></td>
+                  <td>Boolean / Objeto aceite <button class="btn-payload" onclick="openPayload('aceite-termo')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>GetBuscaTermoPublicadoPorEmpresa</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/termo/v1/termo/buscaTermoPublicadoPorEmpresa</code></td>
                   <td><code>idEmpresa</code> (query)</td>
-                  <td>Lista de termos publicados <button class="btn-payload" onclick="openPayload('termo-empresa')">{ } ver</button></td>
+                  <td>Lista de termos publicados <button class="btn-payload" onclick="openPayload('termo-empresa')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>GetBuscarAceiteTermo</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/termo/v1/termo/buscarAceiteTermo</code></td>
                   <td><code>idPessoa</code>, <code>idTermo</code> (query)</td>
-                  <td>Dados do aceite <button class="btn-payload" onclick="openPayload('buscar-aceite')">{ } ver</button></td>
+                  <td>Dados do aceite <button class="btn-payload" onclick="openPayload('buscar-aceite')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>PostRevogaTermo</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/termo/v1/termo/revogaTermo/{idPessoa}/{idTermo}/{idEmpresa}</code></td>
                   <td><code>idPessoa</code>, <code>idTermo</code>, <code>idEmpresa</code> (path)</td>
-                  <td>Confirmação <button class="btn-payload" onclick="openPayload('revoga-termo')">{ } ver</button></td>
+                  <td>Confirmação <button class="btn-payload" onclick="openPayload('revoga-termo')">{ } JSON</button></td>
                 </tr>
               </tbody>
             </table>
@@ -781,21 +786,21 @@
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/beneficiario/v1/beneficiario</code></td>
                   <td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>numeroCarteirinha</code>, <code>pageSize</code></td>
-                  <td>Page&lt;Usuario&gt; <button class="btn-payload" onclick="openPayload('beneficiario-lista')">{ } ver</button></td>
+                  <td>Page&lt;Usuario&gt; <button class="btn-payload" onclick="openPayload('beneficiario-lista')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>GetBeneficiario por ID</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/beneficiario/v1/beneficiario/{id}</code></td>
                   <td><code>id</code> (path)</td>
-                  <td>Objeto Usuario <button class="btn-payload" onclick="openPayload('beneficiario-id')">{ } ver</button></td>
+                  <td>Objeto Usuario <button class="btn-payload" onclick="openPayload('beneficiario-id')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>GetBeneficiarioResumido</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/beneficiario/v1/beneficiario/dadosBeneficiarioResumido/{id}</code></td>
                   <td><code>id</code> (path)</td>
-                  <td>BeneficiarioResumidoDTO <button class="btn-payload" onclick="openPayload('beneficiario-resumido')">{ } ver</button></td>
+                  <td>BeneficiarioResumidoDTO <button class="btn-payload" onclick="openPayload('beneficiario-resumido')">{ } JSON</button></td>
                 </tr>
               </tbody>
             </table>
@@ -817,7 +822,7 @@
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/risco/v1/medicaoRisco</code></td>
                   <td><code>idCliente</code>, <code>status</code>, <code>pageSize</code> (query)</td>
-                  <td>Page&lt;MedicaoRisco&gt; <button class="btn-payload" onclick="openPayload('medicao-risco')">{ } ver</button></td>
+                  <td>Page&lt;MedicaoRisco&gt; <button class="btn-payload" onclick="openPayload('medicao-risco')">{ } JSON</button></td>
                 </tr>
               </tbody>
             </table>
@@ -840,19 +845,19 @@
                   <td>PostProgramarAcao</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/planoacao/v1/planoAcao/programarAcao/{idCliente}</code></td>
-                  <td>Body: <code>AcaoPlanoAcaoDTO</code> <button class="btn-payload" onclick="openPayload('programar-acao')">{ } ver</button></td>
+                  <td>Body: <code>AcaoPlanoAcaoDTO</code> <button class="btn-payload" onclick="openPayload('programar-acao')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>PostProgramarAcaoLista</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/planoacao/v1/planoAcao/programarAcao/{idCliente}</code></td>
-                  <td>Body: lista de <code>AcaoPlanoAcaoDTO</code> <button class="btn-payload" onclick="openPayload('programar-acao')">{ } ver</button></td>
+                  <td>Body: lista de <code>AcaoPlanoAcaoDTO</code> <button class="btn-payload" onclick="openPayload('programar-acao')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>PutRealizarAcao</td>
                   <td><span class="method put">PUT</span></td>
                   <td><code>/api/planoacao/v1/planoAcao/realizarAcao</code></td>
-                  <td>Body: <code>RealizarAcaoDTO</code> <button class="btn-payload" onclick="openPayload('realizar-acao')">{ } ver</button></td>
+                  <td>Body: <code>RealizarAcaoDTO</code> <button class="btn-payload" onclick="openPayload('realizar-acao')">{ } JSON</button></td>
                 </tr>
               </tbody>
             </table>
@@ -869,19 +874,19 @@
                   <td>GetQuestionario</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/questionario/v1/questionario/{id}</code></td>
-                  <td><code>id</code> (path) <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td>
+                  <td><code>id</code> (path) <button class="btn-payload" onclick="openPayload('questionario')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>GetQuestaoRespostas</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/questionario/v1/questionario/questaoRespostas</code></td>
-                  <td><code>idQuestao</code>, <code>dataInicioResposta</code>, <code>dataFimResposta</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td>
+                  <td><code>idQuestao</code>, <code>dataInicioResposta</code>, <code>dataFimResposta</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } JSON</button></td>
                 </tr>
                 <tr>
                   <td>PostResponderQuestaoAvulsa</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td>
-                  <td>Body: <code>ResponderQuestaoDTO</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td>
+                  <td>Body: <code>ResponderQuestaoDTO</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } JSON</button></td>
                 </tr>
                 <tr class="ext-url">
                   <td>PostResponderAvaliacao <em>(externo)</em></td>
@@ -927,8 +932,8 @@
             <table>
               <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th></tr></thead>
               <tbody>
-                <tr><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('beneficiario-lista')">{ } ver</button></td></tr>
-                <tr><td>GetUsuario</td><td><span class="method get">GET</span></td><td><code>/api/seguranca/v1/usuario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('usuario')">{ } ver</button></td></tr>
+                <tr><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('beneficiario-lista')">{ } JSON</button></td></tr>
+                <tr><td>GetUsuario</td><td><span class="method get">GET</span></td><td><code>/api/seguranca/v1/usuario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('usuario')">{ } JSON</button></td></tr>
               </tbody>
             </table>
           </div>
@@ -962,7 +967,7 @@
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/internacao/v1/listarAlertasInternacao</code></td>
                   <td><code>dataInternacao</code>, <code>dataSaida</code>, <code>idGestor</code>, <code>pagina</code>, <code>itensPorPagina</code></td>
-                  <td>InternacaoDTO <button class="btn-payload" onclick="openPayload('alertas-internacao')">{ } ver</button></td>
+                  <td>InternacaoDTO <button class="btn-payload" onclick="openPayload('alertas-internacao')">{ } JSON</button></td>
                 </tr>
               </tbody>
             </table>
@@ -979,9 +984,9 @@
               <tbody>
                 <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
                 <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td></tr>
-                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td></tr>
-                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } JSON</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } JSON</button></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } JSON</button></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>GetDadosQuestionariosSintetico</td><td><span class="method get">GET</span></td><td><code>unimedpa.healthmap.com.br/api/v1/consultas/dadosQuestionariosSintetico</code></td></tr>
               </tbody>
@@ -999,9 +1004,9 @@
               <tbody>
                 <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
                 <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td></tr>
-                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td></tr>
-                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } JSON</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } JSON</button></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } JSON</button></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
               </tbody>
             </table>
@@ -1018,9 +1023,9 @@
               <tbody>
                 <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
                 <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td></tr>
-                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td></tr>
-                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } JSON</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } JSON</button></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } JSON</button></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
               </tbody>
             </table>
