@@ -156,6 +156,88 @@
     }
     #btn-dashboard:active { transform: scale(.97); }
 
+    /* ── CHANGELOG MODAL ── */
+    #changelog-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 500;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #changelog-overlay.open { display: flex; }
+    #changelog-box {
+      background: #fff; border-radius: 12px;
+      width: 100%; max-width: 640px; max-height: 82vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 12px 50px rgba(0,0,0,.35);
+      animation: modalIn .18s ease;
+      overflow: hidden;
+    }
+    #changelog-head {
+      background: var(--blue-dark); color: #fff;
+      padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    #changelog-head h3 { font-size: 15px; font-weight: 600; }
+    #changelog-head .cl-sub { font-size: 11px; color: #7faac8; margin-top: 2px; }
+    #changelog-close {
+      background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; border-radius: 6px; padding: 4px 10px;
+      font-size: 16px; cursor: pointer; line-height: 1;
+    }
+    #changelog-close:hover { background: rgba(255,255,255,.25); }
+    #changelog-body { overflow-y: auto; padding: 24px 28px; flex: 1; }
+
+    /* timeline */
+    .cl-timeline { position: relative; padding-left: 24px; }
+    .cl-timeline::before {
+      content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px;
+      width: 2px; background: var(--blue-light);
+    }
+    .cl-entry { position: relative; margin-bottom: 28px; }
+    .cl-entry:last-child { margin-bottom: 0; }
+    .cl-dot {
+      position: absolute; left: -21px; top: 4px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--blue-main);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--blue-main);
+    }
+    .cl-dot.current { background: #276027; box-shadow: 0 0 0 2px #276027; }
+    .cl-version {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-bottom: 6px;
+    }
+    .cl-ver-badge {
+      font-size: 11px; font-weight: 700; padding: 2px 9px;
+      border-radius: 10px; background: var(--blue-light);
+      color: var(--blue-dark); border: 1px solid #b0cfe8;
+    }
+    .cl-ver-badge.current {
+      background: #e2f4e8; color: #276027; border-color: #68c97a;
+    }
+    .cl-date { font-size: 11px; color: #94a3b8; font-weight: 500; }
+    .cl-title { font-size: 13px; font-weight: 700; color: var(--blue-dark); margin-bottom: 6px; }
+    .cl-items { list-style: none; padding: 0; margin: 0; }
+    .cl-items li {
+      font-size: 12.5px; color: #475569; line-height: 1.6;
+      padding: 2px 0 2px 16px; position: relative;
+    }
+    .cl-items li::before {
+      content: '›'; position: absolute; left: 4px;
+      color: var(--blue-main); font-weight: 700;
+    }
+    #btn-history {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 20px; color: rgba(255,255,255,.75);
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background .2s, color .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-history:hover { background: rgba(255,255,255,.22); color: #fff; }
+
     /* ── CONTENT ── */
     #content { padding: 40px 48px; width: 100%; }
 
@@ -391,8 +473,8 @@
       /* Esconder tudo que não é conteúdo */
       #auth-overlay, #home-overlay, #sidebar, #menu-toggle, #sb-toggle,
       #scroll-top, .btn-payload, .diag-tabs, .diag-toolbar,
-      .diag-wrapper, .diag-tooltip, .modal-overlay,
-      #btn-export, #btn-dashboard { display: none !important; }
+      .diag-wrapper, .diag-tooltip, .modal-overlay, #changelog-overlay,
+      #btn-export, #btn-dashboard, #btn-history { display: none !important; }
 
       /* Layout sem sidebar */
       body { background: #fff !important; }
@@ -974,10 +1056,11 @@
     <h1>Integrações CBV com Healthmap</h1>
     <div class="subtitle">Referência para Migração ao Sistema Tabia</div>
     <div class="meta">
-      <span class="chip"><span class="chip-icon">📋</span> Versão 1.0</span>
+      <span class="chip" style="cursor:pointer;" onclick="openChangelog()" title="Ver histórico de alterações"><span class="chip-icon">📋</span> Versão 1.0</span>
       <span class="chip"><span class="chip-icon">📅</span> 28/03/2026</span>
       <span class="chip"><span class="chip-icon">🏥</span> Unimed POA</span>
       <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+      <button id="btn-history" onclick="openChangelog()" title="Histórico de alterações">📋 Histórico</button>
       <button id="btn-dashboard" onclick="goHome()" title="Voltar ao dashboard">
         ← Dashboard
       </button>
@@ -2097,6 +2180,106 @@
 <!-- SCROLL TOP -->
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+<!-- MODAL CHANGELOG -->
+<div id="changelog-overlay" onclick="if(event.target===this)closeChangelog()">
+  <div id="changelog-box">
+    <div id="changelog-head">
+      <div>
+        <h3>📋 Histórico de Alterações</h3>
+        <div class="cl-sub">Documento de Arquitetura — Integrações CBV × Healthmap</div>
+      </div>
+      <button id="changelog-close" onclick="closeChangelog()">✕</button>
+    </div>
+    <div id="changelog-body">
+      <div class="cl-timeline">
+
+        <!-- v1.0 -->
+        <div class="cl-entry">
+          <div class="cl-dot current"></div>
+          <div class="cl-version">
+            <span class="cl-ver-badge current">v1.0</span>
+            <span class="cl-date">28/03/2026</span>
+          </div>
+          <div class="cl-title">Publicação oficial — Wiki Técnica Fourge Tech</div>
+          <ul class="cl-items">
+            <li>Seção 10: Referência Rápida com todos os 19 endpoints consolidados por domínio</li>
+            <li>Endpoint externo <code>PostResponderAvaliacao</code> documentado com auth própria (loginAPI)</li>
+            <li>Novo endpoint em desenvolvimento: <code>PostQuestaoUltimaResposta</code></li>
+            <li>Publicação na plataforma Wiki Técnica com acesso por senha (SHA-256)</li>
+            <li>Link de acesso público para visitantes (<code>?acesso=visitante</code>)</li>
+          </ul>
+        </div>
+
+        <!-- v0.4 -->
+        <div class="cl-entry">
+          <div class="cl-dot"></div>
+          <div class="cl-version">
+            <span class="cl-ver-badge">v0.4</span>
+            <span class="cl-date">14/03/2026</span>
+          </div>
+          <div class="cl-title">Payloads JSON e endpoints externos</div>
+          <ul class="cl-items">
+            <li>Adição de payloads JSON (Envio/Retorno) para todos os endpoints mapeados</li>
+            <li>Identificação e documentação dos 3 endpoints externos fora do Swagger principal</li>
+            <li>Matriz consolidada de APIs por subsistema (Seção 5)</li>
+            <li>Seção 6: Endpoints externos — <code>responderAvaliacao</code>, <code>dadosQuestionariosSintetico</code>, <code>listar-acoes</code></li>
+          </ul>
+        </div>
+
+        <!-- v0.3 -->
+        <div class="cl-entry">
+          <div class="cl-dot"></div>
+          <div class="cl-version">
+            <span class="cl-ver-badge">v0.3</span>
+            <span class="cl-date">21/02/2026</span>
+          </div>
+          <div class="cl-title">Subsistemas clínicos e diagramas de arquitetura</div>
+          <ul class="cl-items">
+            <li>Mapeamento dos subsistemas: Auditoria Clínica, Transição do Cuidado e SAT (TEA)</li>
+            <li>Inclusão dos diagramas: Macro Arquitetura e Integração Detalhada (SVG interativos)</li>
+            <li>Seção 7: Padrões arquiteturais identificados</li>
+            <li>Seção 8: Riscos de migração e recomendações para o projeto Tabia</li>
+          </ul>
+        </div>
+
+        <!-- v0.2 -->
+        <div class="cl-entry">
+          <div class="cl-dot"></div>
+          <div class="cl-version">
+            <span class="cl-ver-badge">v0.2</span>
+            <span class="cl-date">05/02/2026</span>
+          </div>
+          <div class="cl-title">Expansão do mapeamento — módulos assistenciais</div>
+          <ul class="cl-items">
+            <li>Mapeamento completo de Beneficiário, Termos de Aceite, Risco e Plano de Ação</li>
+            <li>Mapeamento do subsistema Viver Bem (Questionários e endpoints de resposta)</li>
+            <li>Mapeamento do subsistema BackOffice (internação, gestão assistencial)</li>
+            <li>Seção 9: Glossário técnico de termos e siglas</li>
+          </ul>
+        </div>
+
+        <!-- v0.1 -->
+        <div class="cl-entry">
+          <div class="cl-dot"></div>
+          <div class="cl-version">
+            <span class="cl-ver-badge">v0.1</span>
+            <span class="cl-date">10/01/2026</span>
+          </div>
+          <div class="cl-title">Kickoff — estrutura inicial do documento</div>
+          <ul class="cl-items">
+            <li>Criação do documento de arquitetura de integrações CBV × Healthmap</li>
+            <li>Definição do escopo: mapeamento para migração ao sistema Tabia</li>
+            <li>Levantamento inicial dos subsistemas: Viver Bem, BackOffice, Cockpit Navegação</li>
+            <li>Documentação do fluxo de autenticação OAuth2 (<code>/oauth/token</code>)</li>
+            <li>Identificação das URLs de produção e homologação</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL PAYLOAD -->
 <div class="modal-overlay" id="payloadModal" onclick="closeModal(event)">
   <div class="modal-box">
@@ -2349,7 +2532,16 @@ function copyPayload() {
   });
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeChangelog(); } });
+
+function openChangelog() {
+  document.getElementById('changelog-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeChangelog() {
+  document.getElementById('changelog-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
   // Sidebar toggle
   function toggleSidebar() {
