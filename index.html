@@ -294,10 +294,33 @@
     /* ── FOOTER ── */
     #page-footer {
       background: var(--blue-dark); color: #6a8fa8;
-      text-align: center; padding: 18px 24px;
+      padding: 24px 48px 18px;
       font-size: 12px;
       margin-left: 0;
     }
+    #page-footer .footer-top {
+      display: flex; flex-wrap: wrap;
+      justify-content: space-between; align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding-bottom: 16px; margin-bottom: 14px;
+    }
+    #page-footer .footer-brand { display: flex; align-items: center; gap: 10px; }
+    #page-footer .footer-brand .brand-name {
+      font-size: 15px; font-weight: 700; color: #fff; letter-spacing: .5px;
+    }
+    #page-footer .footer-brand .brand-sub {
+      font-size: 10px; color: #5a7a96; text-transform: uppercase; letter-spacing: 1px;
+    }
+    #page-footer .footer-badge {
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px; padding: 4px 14px; font-size: 11px; color: #9dc4e8;
+    }
+    #page-footer .footer-bottom {
+      text-align: center; font-size: 11px; color: #4a6a82; line-height: 1.7;
+    }
+    #page-footer .footer-bottom a { color: #5a8aaa; text-decoration: none; }
+    #page-footer .footer-bottom a:hover { color: #9dc4e8; }
 
     /* ── PRINT ── */
     @media print {
@@ -1040,7 +1063,21 @@
   </div><!-- /content -->
 
   <footer id="page-footer">
-    Documento gerado em 28/03/2026 &nbsp;|&nbsp; Unimed PA — Modelo Assistencial &nbsp;|&nbsp; Referência Healthmap → Tabia
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div>
+          <div class="brand-name">Fourge Tech</div>
+          <div class="brand-sub">Tecnologia &amp; Inovação</div>
+        </div>
+      </div>
+      <span class="footer-badge">Documento de Arquitetura — v1.0</span>
+    </div>
+    <div class="footer-bottom">
+      Documento gerado em 28/03/2026 &nbsp;|&nbsp; Unimed PA — Modelo Assistencial &nbsp;|&nbsp; Referência Healthmap → Tabia
+      <br/>
+      &copy; 2026 <strong style="color:#6a8fa8">Fourge Tech</strong>. Todos os direitos reservados.
+      Uso restrito — documento de uso interno. Não reproduzir sem autorização.
+    </div>
   </footer>
 
 </div><!-- /main -->
