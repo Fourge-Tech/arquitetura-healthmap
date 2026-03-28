@@ -289,6 +289,17 @@
       border-radius: 20px; padding: 6px 16px;
       font-size: 12.5px; font-weight: 600;
       border: 1px solid #b0cfe8;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background .2s, box-shadow .2s, transform .2s;
+    }
+    .system-pill:hover {
+      background: var(--blue-main);
+      color: #fff;
+      border-color: var(--blue-main);
+      box-shadow: 0 4px 12px rgba(46,117,182,.25);
+      transform: translateY(-2px);
     }
 
     /* ── FOOTER ── */
@@ -608,12 +619,12 @@
         <div class="subsection">
           <div class="subsection-title">2.2 Subsistemas do Modelo Assistencial</div>
           <div class="system-pills">
-            <span class="system-pill">1. Plataforma Viver Bem</span>
-            <span class="system-pill">2. BackOffice / Redes de Valor</span>
-            <span class="system-pill">3. Cockpit da Navegação</span>
-            <span class="system-pill">4. Cockpit da Auditoria Clínica</span>
-            <span class="system-pill">5. Transição do Cuidado</span>
-            <span class="system-pill">6. SAT (TEA)</span>
+            <a href="#sec4-1" class="system-pill">1. Plataforma Viver Bem</a>
+            <a href="#sec4-2" class="system-pill">2. BackOffice / Redes de Valor</a>
+            <a href="#sec4-3" class="system-pill">3. Cockpit da Navegação</a>
+            <a href="#sec4-4" class="system-pill">4. Cockpit da Auditoria Clínica</a>
+            <a href="#sec4-5" class="system-pill">5. Transição do Cuidado</a>
+            <a href="#sec4-6" class="system-pill">6. SAT (TEA)</a>
           </div>
         </div>
 
