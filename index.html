@@ -358,6 +358,63 @@
       .overview-grid { grid-template-columns: 1fr; }
     }
 
+    /* ── PAYLOAD BUTTON ── */
+    .btn-payload {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--blue-pale); border: 1px solid var(--blue-main);
+      color: var(--blue-main); border-radius: 12px;
+      padding: 2px 10px; font-size: 11px; font-weight: 600;
+      cursor: pointer; margin-left: 6px;
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .btn-payload:hover { background: var(--blue-main); color: #fff; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 500;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 10px;
+      width: 100%; max-width: 680px; max-height: 82vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 12px 50px rgba(0,0,0,.35);
+      animation: modalIn .18s ease;
+    }
+    @keyframes modalIn { from { transform: scale(.95); opacity:0; } to { transform: scale(1); opacity:1; } }
+    .modal-head {
+      padding: 14px 18px; background: var(--blue-dark); color: #fff;
+      border-radius: 10px 10px 0 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .modal-head-title { font-size: 13px; font-weight: 600; }
+    .modal-head-sub { font-size: 11px; color: #7faac8; margin-top: 2px; }
+    .modal-head-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .modal-btn {
+      background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; border-radius: 6px; padding: 4px 12px;
+      font-size: 12px; cursor: pointer; transition: background .15s;
+    }
+    .modal-btn:hover { background: rgba(255,255,255,.25); }
+    .modal-btn.close { padding: 4px 10px; font-size: 15px; }
+    .modal-body { overflow-y: auto; flex: 1; border-radius: 0 0 10px 10px; }
+    pre.json-view {
+      margin: 0; padding: 20px;
+      font-family: 'Cascadia Code','Consolas',monospace;
+      font-size: 12px; line-height: 1.7;
+      background: #1e2836; color: #cdd6f4;
+      border-radius: 0 0 10px 10px;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .jk { color: #89dceb; }   /* key */
+    .js { color: #a6e3a1; }   /* string */
+    .jn { color: #fab387; }   /* number */
+    .jb { color: #cba6f7; }   /* boolean */
+    .jl { color: #7f849c; }   /* null */
+
     /* ── SCROLL TOP ── */
     #scroll-top {
       position: fixed; bottom: 24px; right: 24px;
@@ -685,28 +742,28 @@
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/termo/v1/termo/aceiteTermo</code></td>
                   <td><code>idPessoa</code>, <code>idTermo</code> (query)</td>
-                  <td>Boolean / Objeto aceite</td>
+                  <td>Boolean / Objeto aceite <button class="btn-payload" onclick="openPayload('aceite-termo')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>GetBuscaTermoPublicadoPorEmpresa</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/termo/v1/termo/buscaTermoPublicadoPorEmpresa</code></td>
                   <td><code>idEmpresa</code> (query)</td>
-                  <td>Lista de termos publicados</td>
+                  <td>Lista de termos publicados <button class="btn-payload" onclick="openPayload('termo-empresa')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>GetBuscarAceiteTermo</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/termo/v1/termo/buscarAceiteTermo</code></td>
                   <td><code>idPessoa</code>, <code>idTermo</code> (query)</td>
-                  <td>Dados do aceite</td>
+                  <td>Dados do aceite <button class="btn-payload" onclick="openPayload('buscar-aceite')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>PostRevogaTermo</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/termo/v1/termo/revogaTermo/{idPessoa}/{idTermo}/{idEmpresa}</code></td>
                   <td><code>idPessoa</code>, <code>idTermo</code>, <code>idEmpresa</code> (path)</td>
-                  <td>Confirmação</td>
+                  <td>Confirmação <button class="btn-payload" onclick="openPayload('revoga-termo')">{ } ver</button></td>
                 </tr>
               </tbody>
             </table>
@@ -724,21 +781,21 @@
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/beneficiario/v1/beneficiario</code></td>
                   <td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>numeroCarteirinha</code>, <code>pageSize</code></td>
-                  <td>Page&lt;Usuario&gt;</td>
+                  <td>Page&lt;Usuario&gt; <button class="btn-payload" onclick="openPayload('beneficiario-lista')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>GetBeneficiario por ID</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/beneficiario/v1/beneficiario/{id}</code></td>
                   <td><code>id</code> (path)</td>
-                  <td>Objeto Usuario</td>
+                  <td>Objeto Usuario <button class="btn-payload" onclick="openPayload('beneficiario-id')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>GetBeneficiarioResumido</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/beneficiario/v1/beneficiario/dadosBeneficiarioResumido/{id}</code></td>
                   <td><code>id</code> (path)</td>
-                  <td>BeneficiarioResumidoDTO</td>
+                  <td>BeneficiarioResumidoDTO <button class="btn-payload" onclick="openPayload('beneficiario-resumido')">{ } ver</button></td>
                 </tr>
               </tbody>
             </table>
@@ -760,7 +817,7 @@
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/risco/v1/medicaoRisco</code></td>
                   <td><code>idCliente</code>, <code>status</code>, <code>pageSize</code> (query)</td>
-                  <td>Page&lt;MedicaoRisco&gt;</td>
+                  <td>Page&lt;MedicaoRisco&gt; <button class="btn-payload" onclick="openPayload('medicao-risco')">{ } ver</button></td>
                 </tr>
               </tbody>
             </table>
@@ -783,19 +840,19 @@
                   <td>PostProgramarAcao</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/planoacao/v1/planoAcao/programarAcao/{idCliente}</code></td>
-                  <td>Body: <code>AcaoPlanoAcaoDTO</code></td>
+                  <td>Body: <code>AcaoPlanoAcaoDTO</code> <button class="btn-payload" onclick="openPayload('programar-acao')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>PostProgramarAcaoLista</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/planoacao/v1/planoAcao/programarAcao/{idCliente}</code></td>
-                  <td>Body: lista de <code>AcaoPlanoAcaoDTO</code></td>
+                  <td>Body: lista de <code>AcaoPlanoAcaoDTO</code> <button class="btn-payload" onclick="openPayload('programar-acao')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>PutRealizarAcao</td>
                   <td><span class="method put">PUT</span></td>
                   <td><code>/api/planoacao/v1/planoAcao/realizarAcao</code></td>
-                  <td>Body: <code>RealizarAcaoDTO</code></td>
+                  <td>Body: <code>RealizarAcaoDTO</code> <button class="btn-payload" onclick="openPayload('realizar-acao')">{ } ver</button></td>
                 </tr>
               </tbody>
             </table>
@@ -812,19 +869,19 @@
                   <td>GetQuestionario</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/questionario/v1/questionario/{id}</code></td>
-                  <td><code>id</code> (path)</td>
+                  <td><code>id</code> (path) <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>GetQuestaoRespostas</td>
                   <td><span class="method get">GET</span></td>
                   <td><code>/api/questionario/v1/questionario/questaoRespostas</code></td>
-                  <td><code>idQuestao</code>, <code>dataInicioResposta</code>, <code>dataFimResposta</code>, <code>pageSize</code></td>
+                  <td><code>idQuestao</code>, <code>dataInicioResposta</code>, <code>dataFimResposta</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td>
                 </tr>
                 <tr>
                   <td>PostResponderQuestaoAvulsa</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td>
-                  <td>Body: <code>ResponderQuestaoDTO</code></td>
+                  <td>Body: <code>ResponderQuestaoDTO</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td>
                 </tr>
                 <tr class="ext-url">
                   <td>PostResponderAvaliacao <em>(externo)</em></td>
@@ -870,8 +927,8 @@
             <table>
               <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th></tr></thead>
               <tbody>
-                <tr><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code></td></tr>
-                <tr><td>GetUsuario</td><td><span class="method get">GET</span></td><td><code>/api/seguranca/v1/usuario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code></td></tr>
+                <tr><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('beneficiario-lista')">{ } ver</button></td></tr>
+                <tr><td>GetUsuario</td><td><span class="method get">GET</span></td><td><code>/api/seguranca/v1/usuario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code> <button class="btn-payload" onclick="openPayload('usuario')">{ } ver</button></td></tr>
               </tbody>
             </table>
           </div>
@@ -898,13 +955,14 @@
           <div class="subsection-title" style="margin-top:16px;">4.3.4 Alertas de Internação <span class="tag">AlertasInternacao</span></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Body (campos)</th></tr></thead>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Body (campos)</th><th>Retorno</th></tr></thead>
               <tbody>
                 <tr>
                   <td>PostListarAlertasInternacao</td>
                   <td><span class="method post">POST</span></td>
                   <td><code>/api/internacao/v1/listarAlertasInternacao</code></td>
                   <td><code>dataInternacao</code>, <code>dataSaida</code>, <code>idGestor</code>, <code>pagina</code>, <code>itensPorPagina</code></td>
+                  <td>InternacaoDTO <button class="btn-payload" onclick="openPayload('alertas-internacao')">{ } ver</button></td>
                 </tr>
               </tbody>
             </table>
@@ -921,9 +979,9 @@
               <tbody>
                 <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
                 <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code></td></tr>
-                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>GetDadosQuestionariosSintetico</td><td><span class="method get">GET</span></td><td><code>unimedpa.healthmap.com.br/api/v1/consultas/dadosQuestionariosSintetico</code></td></tr>
               </tbody>
@@ -941,9 +999,9 @@
               <tbody>
                 <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
                 <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code></td></tr>
-                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
               </tbody>
             </table>
@@ -960,9 +1018,9 @@
               <tbody>
                 <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
                 <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code></td></tr>
-                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code></td></tr>
-                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code> <button class="btn-payload" onclick="openPayload('questionario')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code> <button class="btn-payload" onclick="openPayload('questao-respostas')">{ } ver</button></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-questao')">{ } ver</button></td></tr>
                 <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
               </tbody>
             </table>
@@ -1226,7 +1284,225 @@
 <!-- SCROLL TOP -->
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+<!-- MODAL PAYLOAD -->
+<div class="modal-overlay" id="payloadModal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-head-title" id="modalTitle">Payload</div>
+        <div class="modal-head-sub" id="modalSub"></div>
+      </div>
+      <div class="modal-head-actions">
+        <button class="modal-btn" onclick="copyPayload()">⎘ Copiar</button>
+        <button class="modal-btn close" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <pre class="json-view" id="modalBody"></pre>
+    </div>
+  </div>
+</div>
+
 <script>
+/* ── PAYLOADS ── */
+const payloads = {
+  'beneficiario-lista': {
+    title: 'GET /api/beneficiario/v1/beneficiario',
+    sub: 'Retorno: Page<Usuario>',
+    json: {
+      content: [{
+        id: 12345, nome: "João Silva", cpf: "12345678901",
+        email: "joao@example.com", tipo: "BENEFICIARIO", status: "ATIVO",
+        numeroCarteirinha: "ABC123456", idExterno: "EXT001"
+      }],
+      totalElements: 100, totalPages: 10, number: 0, size: 10
+    }
+  },
+  'beneficiario-id': {
+    title: 'GET /api/beneficiario/v1/beneficiario/{id}',
+    sub: 'Retorno: Usuario',
+    json: {
+      id: 12345, nome: "João Silva", cpf: "12345678901",
+      email: "joao@example.com", tipo: "BENEFICIARIO", status: "ATIVO",
+      numeroCarteirinha: "ABC123456", idExterno: "EXT001",
+      dataNascimento: "1990-05-15", telefone: "51999999999"
+    }
+  },
+  'beneficiario-resumido': {
+    title: 'GET /api/beneficiario/v1/beneficiario/dadosBeneficiarioResumido/{id}',
+    sub: 'Retorno: BeneficiarioResumidoDTO',
+    json: {
+      id: 12345, nome: "João Silva", cpf: "12345678901",
+      numeroCarteirinha: "ABC123456", email: "joao@example.com",
+      dataNascimento: "1990-05-15", status: "ATIVO"
+    }
+  },
+  'medicao-risco': {
+    title: 'GET /api/risco/v1/medicaoRisco',
+    sub: 'Retorno: Page<MedicaoRisco>',
+    json: {
+      content: [{
+        id: 5001, idCliente: 12345, statusRisco: "ALTO",
+        dataAvaliacao: "2026-02-20T10:30:00",
+        descricao: "Risco cardiovascular elevado"
+      }],
+      totalElements: 50, totalPages: 5, number: 0, size: 10
+    }
+  },
+  'plano-acao': {
+    title: 'GET /api/planoacao/v1/planoAcao',
+    sub: 'Retorno: Page<PlanoAcao>',
+    json: {
+      content: [{
+        id: 3001, idCliente: 12345, status: "ATIVO",
+        descricao: "Plano de ação cardiovascular",
+        dataInicio: "2026-01-01T00:00:00",
+        dataFim: "2026-12-31T23:59:59",
+        statusAcao: "EM_PROGRESSO"
+      }],
+      totalElements: 25, totalPages: 3, number: 0, size: 10
+    }
+  },
+  'programar-acao': {
+    title: 'POST /api/planoacao/v1/planoAcao/programarAcao/{idCliente}',
+    sub: 'Request Body: AcaoPlanoAcaoDTO',
+    json: {
+      idAcao: 2001, dataAgendamento: "2026-03-15T14:00:00",
+      descricao: "Consulta de acompanhamento", tipo: "CONSULTA"
+    }
+  },
+  'realizar-acao': {
+    title: 'PUT /api/planoacao/v1/planoAcao/realizarAcao',
+    sub: 'Request Body: RealizarAcaoDTO',
+    json: {
+      idAcao: 2001, dataRealizacao: "2026-03-15T14:30:00",
+      resultado: "CONCLUIDA", observacoes: "Ação executada com sucesso"
+    }
+  },
+  'questionario': {
+    title: 'GET /api/questionario/v1/questionario/{id}',
+    sub: 'Retorno: Questionario',
+    json: {
+      id: 6001, nome: "Avaliação de Saúde Inicial",
+      descricao: "Questionário de cadastro", versao: 1, ativo: true,
+      questoes: [{
+        id: 7001, texto: "Possui alergias?",
+        tipo: "SIM_NAO", obrigatoria: true
+      }]
+    }
+  },
+  'questao-respostas': {
+    title: 'GET /api/questionario/v1/questionario/questaoRespostas',
+    sub: 'Retorno: Page<QuestaoResposta>',
+    json: {
+      content: [{
+        idQuestao: 7001, codigoBeneficiario: 12345, resposta: "SIM",
+        dataResposta: "2026-02-20T10:15:00", codigoExterno: "EXT001"
+      }],
+      totalElements: 150, totalPages: 15, number: 0, size: 10
+    }
+  },
+  'responder-questao': {
+    title: 'POST /api/questionario/v1/questionario/responderQuestaoAvulsa',
+    sub: 'Request Body: ResponderQuestaoDTO',
+    json: {
+      idQuestao: 7001, idCliente: 12345,
+      resposta: "SIM", dataResposta: "2026-02-20T10:15:00"
+    }
+  },
+  'aceite-termo': {
+    title: 'GET /api/termo/v1/termo/aceiteTermo',
+    sub: 'Retorno: Boolean / TermoAceite',
+    json: { aceito: true }
+  },
+  'termo-empresa': {
+    title: 'GET /api/termo/v1/termo/buscaTermoPublicadoPorEmpresa',
+    sub: 'Retorno: Termo',
+    json: {
+      id: 8001, titulo: "Termo de Consentimento",
+      conteudo: "Consentimento para coleta e uso de dados de saúde...",
+      versao: 1, dataPublicacao: "2026-01-01T00:00:00", ativo: true
+    }
+  },
+  'buscar-aceite': {
+    title: 'GET /api/termo/v1/termo/buscarAceiteTermo',
+    sub: 'Retorno: TermoAceite',
+    json: {
+      id: 9001, idPessoa: 12345, idTermo: 8001,
+      dataAceite: "2026-02-15T09:30:00", versaoTermo: 1
+    }
+  },
+  'revoga-termo': {
+    title: 'POST /api/termo/v1/termo/revogaTermo/{idPessoa}/{idTermo}/{idEmpresa}',
+    sub: 'Retorno: 200 OK',
+    json: { sucesso: true, mensagem: "Termo revogado com sucesso" }
+  },
+  'alertas-internacao': {
+    title: 'POST /api/internacao/v1/listarAlertasInternacao',
+    sub: 'Retorno: InternacaoDTO',
+    json: {
+      totalRegistros: 45, pagina: 1, itensPorPagina: 10,
+      internacoes: [{
+        id: 4001, idPaciente: 12345,
+        dataInternacao: "2026-02-10T08:00:00",
+        dataSaida: "2026-02-17T16:30:00",
+        motivo: "Cirurgia programada", unidade: "UTI"
+      }]
+    }
+  },
+  'usuario': {
+    title: 'GET /api/seguranca/v1/usuario',
+    sub: 'Retorno: Page<Usuario>',
+    json: {
+      content: [{
+        id: 11001, nome: "Dr. Carlos Santos", cpf: "98765432101",
+        email: "carlos@healthmap.com.br", tipo: "PROFISSIONAL", status: "ATIVO"
+      }],
+      totalElements: 200, totalPages: 20, number: 0, size: 10
+    }
+  }
+};
+
+function syntaxHighlight(json) {
+  const str = JSON.stringify(json, null, 2);
+  return str.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+    if (/^"/.test(match)) {
+      if (/:$/.test(match)) return `<span class="jk">${match}</span>`;
+      return `<span class="js">${match}</span>`;
+    }
+    if (/true|false/.test(match)) return `<span class="jb">${match}</span>`;
+    if (/null/.test(match)) return `<span class="jl">${match}</span>`;
+    return `<span class="jn">${match}</span>`;
+  });
+}
+
+function openPayload(key) {
+  const p = payloads[key];
+  if (!p) return;
+  document.getElementById('modalTitle').textContent = p.title;
+  document.getElementById('modalSub').textContent = p.sub;
+  document.getElementById('modalBody').innerHTML = syntaxHighlight(p.json);
+  document.getElementById('payloadModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('payloadModal') && e.type === 'click') return;
+  document.getElementById('payloadModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function copyPayload() {
+  const text = document.getElementById('modalBody').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.modal-btn');
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => btn.textContent = '⎘ Copiar', 1500);
+  });
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
   // Sidebar toggle
   function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
