@@ -17,8 +17,7 @@
       --gray-border: #c8d6e0;
       --gray-text:   #444;
       --white:       #fff;
-      --sidebar-w:        260px;
-      --sidebar-w-mini:    42px;
+      --sidebar-w:   260px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,35 +38,12 @@
       color: #cde;
       position: fixed;
       top: 0; left: 0; bottom: 0;
-      overflow: hidden;
-      white-space: nowrap;
+      overflow-y: auto;
       z-index: 100;
-      transition: width .25s cubic-bezier(.4,0,.2,1), transform .3s;
+      transition: transform .3s;
       display: flex;
       flex-direction: column;
     }
-    /* Collapsed (desktop) */
-    body.sb-collapsed #sidebar { width: var(--sidebar-w-mini); }
-    body.sb-collapsed #main   { margin-left: var(--sidebar-w-mini); }
-
-    /* Collapse toggle button */
-    #sb-toggle {
-      display: flex; align-items: center; gap: 10px;
-      width: 100%; padding: 11px 0 11px 11px;
-      border: none; background: rgba(255,255,255,.05);
-      color: #7fa8c8; cursor: pointer; font-size: 12.5px;
-      text-align: left; white-space: nowrap; flex-shrink: 0;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      transition: background .15s, color .15s;
-    }
-    #sb-toggle:hover { background: rgba(255,255,255,.12); color: #fff; }
-    #sb-toggle .sbt-icon {
-      font-size: 17px; flex-shrink: 0;
-      width: 20px; text-align: center;
-      display: inline-block;
-      transition: transform .25s cubic-bezier(.4,0,.2,1);
-    }
-    body.sb-collapsed #sb-toggle .sbt-icon { transform: rotate(180deg); }
     #sidebar-logo {
       padding: 24px 20px 16px;
       border-bottom: 1px solid rgba(255,255,255,.1);
@@ -112,7 +88,6 @@
       margin-left: var(--sidebar-w);
       flex: 1;
       min-width: 0;
-      transition: margin-left .25s cubic-bezier(.4,0,.2,1);
     }
 
     /* ── HEADER ── */
@@ -360,7 +335,7 @@
 
     /* ── PRINT ── */
     @media print {
-      #sidebar, #menu-toggle, #sb-toggle { display: none !important; }
+      #sidebar, #menu-toggle { display: none !important; }
       #main { margin-left: 0 !important; }
       #content { padding: 20px; }
       .section-card { box-shadow: none; border: 1px solid #ccc; }
@@ -370,11 +345,10 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      #sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; }
+      #sidebar { transform: translateX(-100%); }
       #sidebar.open { transform: translateX(0); }
       #menu-toggle { display: flex; align-items: center; justify-content: center; }
-      #sb-toggle { display: none; }
-      #main { margin-left: 0 !important; }
+      #main { margin-left: 0; }
       #page-header { padding: 60px 24px 28px; }
       #page-header h1 { font-size: 22px; }
       #content { padding: 24px 16px; }
@@ -578,10 +552,6 @@
 
 <!-- SIDEBAR -->
 <aside id="sidebar">
-  <button id="sb-toggle" onclick="collapseSidebar()" title="Recolher/expandir menu">
-    <span class="sbt-icon">‹</span>
-    <span class="sbt-text">Recolher menu</span>
-  </button>
   <div id="sidebar-logo">
     <div class="org">Unimed POA</div>
     <div class="title">CBV × Healthmap</div>
@@ -1658,7 +1628,7 @@ function copyPayload() {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  // ── Mobile hamburger (small screens) ──
+  // Sidebar toggle
   function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
   }
@@ -1669,22 +1639,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
       sidebar.classList.remove('open');
     }
   });
-
-  // ── Desktop collapse/expand ──
-  function collapseSidebar() {
-    const collapsed = document.body.classList.toggle('sb-collapsed');
-    localStorage.setItem('sb-collapsed', collapsed ? '1' : '0');
-    const txt = document.querySelector('#sb-toggle .sbt-text');
-    if (txt) txt.textContent = collapsed ? 'Expandir menu' : 'Recolher menu';
-  }
-  // Restore on load
-  (function initSidebar() {
-    if (localStorage.getItem('sb-collapsed') === '1') {
-      document.body.classList.add('sb-collapsed');
-      const txt = document.querySelector('#sb-toggle .sbt-text');
-      if (txt) txt.textContent = 'Expandir menu';
-    }
-  })();
 
   // Scroll top button
   window.addEventListener('scroll', function() {
