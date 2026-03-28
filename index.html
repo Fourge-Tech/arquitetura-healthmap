@@ -641,13 +641,21 @@
     /* ── AUTH OVERLAY ── */
     #auth-overlay {
       position: fixed; inset: 0; z-index: 99999;
-      background: linear-gradient(135deg, #0d1f33 0%, #1a3a5c 100%);
-      display: flex; align-items: center; justify-content: center;
-      transition: opacity .4s ease;
+      background: rgba(13,31,51,.88);
+      display: none; align-items: center; justify-content: center;
+      transition: opacity .3s ease;
+      backdrop-filter: blur(4px);
     }
-    #auth-overlay.hide {
-      opacity: 0; pointer-events: none;
+    #auth-overlay.show { display: flex; }
+    #auth-overlay.hide { opacity: 0; pointer-events: none; }
+    #auth-cancel {
+      position: absolute; top: 20px; right: 24px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; border-radius: 8px; padding: 6px 14px;
+      font-size: 12px; cursor: pointer; font-family: 'Segoe UI', Arial, sans-serif;
+      transition: background .15s;
     }
+    #auth-cancel:hover { background: rgba(255,255,255,.22); }
     #auth-card {
       background: #fff; border-radius: 16px;
       padding: 44px 40px 36px;
@@ -849,6 +857,7 @@
 
 <!-- AUTH OVERLAY -->
 <div id="auth-overlay">
+  <button id="auth-cancel" onclick="cancelAuth()">← Voltar</button>
   <div id="auth-card">
     <div class="auth-logo">Unimed POA</div>
     <div class="auth-title">CBV × Healthmap</div>
@@ -2020,11 +2029,18 @@ async function doAuth() {
   const hash = await _sha256(pw);
   if (hash === _H) {
     sessionStorage.setItem('_a', '1');
+    sessionStorage.setItem('_p', _pendingProject || 'cbv');
+    // fecha auth
     const ov = document.getElementById('auth-overlay');
     ov.classList.add('hide');
-    setTimeout(() => ov.remove(), 450);
+    setTimeout(() => ov.remove(), 350);
+    // fecha home com pequeno delay
+    const ho = document.getElementById('home-overlay');
+    if (ho) {
+      setTimeout(() => { ho.classList.add('hide'); }, 150);
+      setTimeout(() => ho.remove(), 550);
+    }
     document.body.style.overflow = '';
-    // home overlay fica visível automaticamente
   } else {
     inp.classList.add('err');
     err.classList.add('show');
@@ -2044,27 +2060,36 @@ function toggleEye() {
   btn.textContent = show ? '🙈' : '👁';
 }
 
-// Abrir projeto selecionado
+// Clique no card → mostra auth
+let _pendingProject = null;
 function openProject(id) {
-  sessionStorage.setItem('_p', id);
-  const ho = document.getElementById('home-overlay');
-  if (!ho) return;
-  ho.classList.add('hide');
-  setTimeout(() => ho.remove(), 420);
+  _pendingProject = id;
+  const ov = document.getElementById('auth-overlay');
+  ov.classList.add('show');
+  document.getElementById('auth-pw').value = '';
+  document.getElementById('auth-error').classList.remove('show');
+  document.getElementById('auth-submit').disabled = false;
+  document.getElementById('auth-submit').textContent = 'Entrar';
+  setTimeout(() => document.getElementById('auth-pw')?.focus(), 80);
 }
 
-// Check session on load
+// Cancelar auth → voltar à home
+function cancelAuth() {
+  const ov = document.getElementById('auth-overlay');
+  ov.classList.add('hide');
+  setTimeout(() => { ov.classList.remove('show','hide'); }, 320);
+}
+
+// Check session on load — pula direto ao conteúdo se já autenticou e escolheu projeto
 (function checkAuth() {
   const authed  = sessionStorage.getItem('_a') === '1';
   const project = sessionStorage.getItem('_p');
-  if (authed) {
+  if (authed && project) {
     document.getElementById('auth-overlay')?.remove();
-    if (project) document.getElementById('home-overlay')?.remove();
+    document.getElementById('home-overlay')?.remove();
     document.body.style.overflow = '';
-  } else {
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('auth-pw')?.focus(), 100);
   }
+  // caso contrário: home visível, auth oculto — fluxo normal
 })();
 
 /* ══════════════════════════════════════════════════════
