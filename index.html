@@ -119,6 +119,10 @@
       border-radius: 20px; padding: 4px 14px; font-size: 12px; color: #daeeff;
     }
     .chip-icon { font-size: 13px; }
+    .chip.chip-guest {
+      background: rgba(255,180,0,.18); border-color: rgba(255,180,0,.4);
+      color: #ffe08a; font-weight: 600;
+    }
     #btn-export {
       display: inline-flex; align-items: center; gap: 7px;
       margin-left: auto;
@@ -2135,8 +2139,31 @@ function cancelAuth() {
   setTimeout(() => { ov.classList.remove('show','hide'); }, 320);
 }
 
-// Check session on load — pula direto ao conteúdo se já autenticou e escolheu projeto
+// ── MODO VISITANTE (link direto sem senha) ──────────────────────────────────
+// Acesso via: ?acesso=visitante
+// Qualquer pessoa com o link entra direto sem home nem senha.
+let _guestMode = false;
+
 (function checkAuth() {
+  const params  = new URLSearchParams(window.location.search);
+  const isGuest = params.get('acesso') === 'visitante';
+
+  if (isGuest) {
+    _guestMode = true;
+    // Oculta overlays instantaneamente
+    const ov = document.getElementById('auth-overlay');
+    if (ov) { ov.classList.remove('show'); }
+    const ho = document.getElementById('home-overlay');
+    if (ho) { ho.classList.add('hide'); }
+    document.body.style.overflow = '';
+    // Mostra badge "Visitante" no header e esconde botão Dashboard
+    document.addEventListener('DOMContentLoaded', _applyGuestUI);
+    // DOMContentLoaded pode já ter ocorrido (script inline)
+    if (document.readyState !== 'loading') _applyGuestUI();
+    return;
+  }
+
+  // Sessão autenticada existente → pula direto ao conteúdo
   const authed  = sessionStorage.getItem('_a') === '1';
   const project = sessionStorage.getItem('_p');
   if (authed && project) {
@@ -2149,8 +2176,25 @@ function cancelAuth() {
   // caso contrário: home visível, auth oculto — fluxo normal
 })();
 
-// Voltar ao dashboard (home overlay)
+function _applyGuestUI() {
+  // Esconde botão ← Dashboard (não faz sentido para visitante)
+  const db = document.getElementById('btn-dashboard');
+  if (db) db.style.display = 'none';
+  // Insere chip "Visitante" na linha de meta do header
+  const meta = document.querySelector('#page-header .meta');
+  if (meta) {
+    const chip = document.createElement('span');
+    chip.className = 'chip chip-guest';
+    chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+    // Insere antes do botão Exportar PDF
+    const exportBtn = document.getElementById('btn-export');
+    meta.insertBefore(chip, exportBtn);
+  }
+}
+
+// Voltar ao dashboard (home overlay) — desabilitado em modo visitante
 function goHome() {
+  if (_guestMode) return;
   sessionStorage.removeItem('_p');
   const ho = document.getElementById('home-overlay');
   if (ho) {
