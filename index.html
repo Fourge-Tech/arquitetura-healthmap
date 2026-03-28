@@ -245,9 +245,17 @@
       border: 1px solid var(--gray-border);
       border-radius: 8px; padding: 16px;
       border-top: 4px solid var(--blue-main);
+      transition: box-shadow .2s, transform .2s;
+      cursor: default;
+    }
+    .risk-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      transform: translateY(-2px);
     }
     .risk-card.high { border-top-color: var(--red-note); }
+    .risk-card.high:hover { box-shadow: 0 4px 16px rgba(192,0,0,.15); }
     .risk-card.medium { border-top-color: #e8a020; }
+    .risk-card.medium:hover { box-shadow: 0 4px 16px rgba(232,160,32,.15); }
     .risk-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; color: var(--blue-dark); }
     .risk-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px; }
     .risk-label.r { color: var(--red-note); }
