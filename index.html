@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arquitetura — Integrações CBV × Healthmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --blue-dark:   #1a3a5c;
@@ -132,6 +135,22 @@
       border-color: rgba(255,255,255,.7);
     }
     #btn-export:active { transform: scale(.97); }
+    #btn-dashboard {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.1);
+      border: 1.5px solid rgba(255,255,255,.25);
+      border-radius: 20px; color: rgba(255,255,255,.8);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .2s, border-color .2s, color .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-dashboard:hover {
+      background: rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.6);
+      color: #fff;
+    }
+    #btn-dashboard:active { transform: scale(.97); }
 
     /* ── CONTENT ── */
     #content { padding: 40px 48px; width: 100%; }
@@ -366,10 +385,10 @@
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
       /* Esconder tudo que não é conteúdo */
-      #auth-overlay, #sidebar, #menu-toggle, #sb-toggle,
+      #auth-overlay, #home-overlay, #sidebar, #menu-toggle, #sb-toggle,
       #scroll-top, .btn-payload, .diag-tabs, .diag-toolbar,
       .diag-wrapper, .diag-tooltip, .modal-overlay,
-      #btn-export { display: none !important; }
+      #btn-export, #btn-dashboard { display: none !important; }
 
       /* Layout sem sidebar */
       body { background: #fff !important; }
@@ -543,45 +562,57 @@
     #home-overlay {
       position: fixed; inset: 0; z-index: 9997;
       display: flex; flex-direction: column;
-      background: #f0f4f8;
+      background: #000;
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
       transition: opacity .4s ease;
     }
     #home-overlay.hide { opacity: 0; pointer-events: none; }
 
     .home-header {
-      background: linear-gradient(135deg, #0d1f33 0%, #1a3a5c 60%, #2E75B6 100%);
-      padding: 24px 48px;
+      background: #000;
+      padding: 22px 48px;
       display: flex; align-items: center; justify-content: space-between;
       flex-shrink: 0;
-      border-bottom: 1px solid rgba(255,255,255,.1);
+      border-bottom: 1px solid rgba(255,0,189,.25);
     }
-    .home-logo { display: flex; align-items: center; gap: 14px; }
-    .home-logo-icon {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, #2E75B6, #4a90d9);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 900; color: #fff;
-      letter-spacing: -1px; box-shadow: 0 2px 8px rgba(0,0,0,.3);
-      flex-shrink: 0;
+    .home-logo { display: flex; align-items: center; gap: 16px; }
+    .home-logo img {
+      height: 38px; width: auto; display: block;
     }
-    .home-logo-name { font-size: 20px; font-weight: 700; color: #fff; line-height: 1.2; }
-    .home-logo-tagline { font-size: 11px; color: #7fa8c8; letter-spacing: .5px; }
-    .home-header-right { font-size: 12px; color: #7fa8c8; display: flex; align-items: center; gap: 8px; }
-    .home-header-right span { color: #9dc4e8; }
+    .home-logo-sep {
+      width: 1px; height: 32px; background: rgba(255,255,255,.18); flex-shrink: 0;
+    }
+    .home-logo-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: 1.5px; text-transform: uppercase; }
+    .home-header-right {
+      font-size: 12px; color: rgba(255,255,255,.45);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .home-header-right span { color: #FF00BD; font-weight: 600; }
 
     .home-body {
-      flex: 1; overflow-y: auto; padding: 48px 56px;
+      flex: 1; overflow-y: auto; padding: 56px 64px;
+      background: #0a0a0a;
     }
-    .home-welcome { margin-bottom: 40px; }
+    .home-welcome { margin-bottom: 48px; }
     .home-welcome h2 {
-      font-size: 26px; font-weight: 700; color: #1a3a5c; margin-bottom: 8px;
+      font-size: 30px; font-weight: 800; color: #fff;
+      margin-bottom: 10px; letter-spacing: -.5px;
     }
-    .home-welcome p { font-size: 15px; color: #64748b; max-width: 560px; }
+    .home-welcome h2 span { color: #FF00BD; }
+    .home-welcome p { font-size: 15px; color: rgba(255,255,255,.55); max-width: 560px; line-height: 1.7; }
+    .home-tagline {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #FF00BD;
+      margin-bottom: 20px;
+    }
+    .home-tagline::before {
+      content: ''; display: block; width: 24px; height: 2px; background: #FF00BD;
+    }
 
     .home-section-label {
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 16px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: rgba(255,255,255,.3); margin-bottom: 20px;
     }
     .projects-grid {
       display: grid;
@@ -589,8 +620,8 @@
       gap: 20px;
     }
     .project-card {
-      background: #fff; border-radius: 14px;
-      border: 1.5px solid #e2e8f0;
+      background: #111; border-radius: 16px;
+      border: 1.5px solid rgba(255,255,255,.1);
       padding: 28px; cursor: pointer;
       transition: transform .2s ease, box-shadow .2s ease, border-color .2s;
       display: flex; flex-direction: column; gap: 10px;
@@ -598,45 +629,55 @@
     }
     .project-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(26,58,92,.12);
-      border-color: #2E75B6;
+      box-shadow: 0 16px 40px rgba(255,0,189,.18);
+      border-color: #FF00BD;
     }
     .project-card--new {
-      border-style: dashed; background: #f8fafc;
+      border-style: dashed; background: #0d0d0d;
       align-items: center; justify-content: center;
-      cursor: default; opacity: .6;
+      cursor: default; opacity: .4;
     }
-    .project-card--new:hover { transform: none; box-shadow: none; border-color: #cbd5e1; }
+    .project-card--new:hover { transform: none; box-shadow: none; border-color: rgba(255,255,255,.1); }
 
     .pc-top { display: flex; align-items: center; justify-content: space-between; }
     .pc-icon {
       width: 44px; height: 44px; border-radius: 10px;
-      background: linear-gradient(135deg, #1a3a5c, #2E75B6);
+      background: linear-gradient(135deg, #FF00BD 0%, #c000a0 100%);
       display: flex; align-items: center; justify-content: center;
       font-size: 20px; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(255,0,189,.35);
     }
     .pc-badge {
       font-size: 10px; font-weight: 700; padding: 3px 10px;
-      border-radius: 10px; background: #fff8dc; color: #856404;
-      border: 1px solid #f0c040;
+      border-radius: 10px; background: rgba(255,200,0,.12); color: #f0c040;
+      border: 1px solid rgba(255,200,0,.3);
     }
-    .pc-badge.active { background: #e2f4e8; color: #276027; border-color: #68c97a; }
-    .pc-title { font-size: 17px; font-weight: 700; color: #1a3a5c; }
-    .pc-sub { font-size: 12px; color: #64748b; margin-top: -4px; }
-    .pc-desc { font-size: 13px; color: #475569; line-height: 1.6; flex: 1; }
+    .pc-badge.active { background: rgba(100,200,100,.12); color: #68c97a; border-color: rgba(100,200,100,.3); }
+    .pc-title { font-size: 17px; font-weight: 700; color: #fff; }
+    .pc-sub { font-size: 12px; color: rgba(255,255,255,.4); margin-top: -4px; }
+    .pc-desc { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.6; flex: 1; }
     .pc-meta {
       display: flex; flex-wrap: wrap; gap: 10px;
-      font-size: 11px; color: #94a3b8;
-      border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: 4px;
+      font-size: 11px; color: rgba(255,255,255,.3);
+      border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; margin-top: 4px;
     }
     .pc-open {
-      font-size: 13px; font-weight: 600; color: #2E75B6;
+      font-size: 13px; font-weight: 600; color: #FF00BD;
       display: flex; align-items: center; gap: 4px;
       margin-top: 4px;
     }
     .pc-new-icon {
-      font-size: 32px; color: #94a3b8; font-weight: 300; line-height: 1;
+      font-size: 32px; color: rgba(255,255,255,.25); font-weight: 300; line-height: 1;
     }
+
+    .home-footer {
+      background: #000; border-top: 1px solid rgba(255,255,255,.07);
+      padding: 16px 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .home-footer-left { font-size: 11px; color: rgba(255,255,255,.25); }
+    .home-footer-right { font-size: 11px; color: rgba(255,255,255,.2); }
 
     /* ── AUTH OVERLAY ── */
     #auth-overlay {
@@ -807,23 +848,30 @@
 <div id="home-overlay">
   <div class="home-header">
     <div class="home-logo">
-      <div class="home-logo-icon">F</div>
-      <div>
-        <div class="home-logo-name">Fourge Tech</div>
-        <div class="home-logo-tagline">Plataforma de Documentação Técnica</div>
+      <img src="https://static.wixstatic.com/media/5260f0_a329a67eb58d46fc82e19b6e1a67d6e2~mv2.png"
+           alt="Fourge Tech"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <!-- fallback text logo se imagem falhar -->
+      <div style="display:none;align-items:center;gap:8px;">
+        <div style="width:34px;height:34px;background:#FF00BD;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;">F</div>
+        <span style="font-size:18px;font-weight:800;color:#fff;font-family:'Montserrat',sans-serif;letter-spacing:-.5px;">Fourge Tech</span>
       </div>
+      <div class="home-logo-sep"></div>
+      <div class="home-logo-label">Wiki Técnica</div>
     </div>
     <div class="home-header-right">
-      🔒 Acesso interno &nbsp;·&nbsp; <span>Wiki Técnica</span>
+      🔒 Acesso interno &nbsp;·&nbsp; <span>Documentação Interna</span>
     </div>
   </div>
+
   <div class="home-body">
     <div class="home-welcome">
-      <h2>👋 Bem-vindo à Wiki Técnica</h2>
+      <div class="home-tagline">Tecnologia a serviço dos negócios do futuro</div>
+      <h2>Bem-vindo à <span>Wiki Técnica</span></h2>
       <p>Selecione um projeto abaixo para acessar a documentação de arquitetura, mapeamento de integrações e referências técnicas.</p>
     </div>
 
-    <div class="home-section-label">Projetos</div>
+    <div class="home-section-label">Projetos disponíveis</div>
     <div class="projects-grid">
 
       <!-- Projeto 1: CBV × Healthmap -->
@@ -847,11 +895,16 @@
       <!-- Placeholder -->
       <div class="project-card project-card--new">
         <div class="pc-new-icon">+</div>
-        <div class="pc-title" style="color:#94a3b8;font-size:15px;">Novo Projeto</div>
+        <div class="pc-title" style="color:rgba(255,255,255,.3);font-size:15px;">Novo Projeto</div>
         <div class="pc-sub">Em breve</div>
       </div>
 
     </div>
+  </div>
+
+  <div class="home-footer">
+    <div class="home-footer-left">© 2026 Fourge Tech · Tecnopuc, Porto Alegre RS</div>
+    <div class="home-footer-right">contato@fourge.com.br &nbsp;·&nbsp; +55 51 99530-6281</div>
   </div>
 </div>
 
@@ -921,6 +974,9 @@
       <span class="chip"><span class="chip-icon">📅</span> 28/03/2026</span>
       <span class="chip"><span class="chip-icon">🏥</span> Unimed POA</span>
       <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+      <button id="btn-dashboard" onclick="goHome()" title="Voltar ao dashboard">
+        ← Dashboard
+      </button>
       <button id="btn-export" onclick="exportPDF()" title="Exportar como PDF">
         <span>📄</span> Exportar PDF
       </button>
@@ -2033,12 +2089,11 @@ async function doAuth() {
     // fecha auth
     const ov = document.getElementById('auth-overlay');
     ov.classList.add('hide');
-    setTimeout(() => ov.remove(), 350);
-    // fecha home com pequeno delay
+    setTimeout(() => { ov.classList.remove('show','hide'); }, 350);
+    // fecha home com pequeno delay (mantém no DOM para permitir voltar)
     const ho = document.getElementById('home-overlay');
     if (ho) {
       setTimeout(() => { ho.classList.add('hide'); }, 150);
-      setTimeout(() => ho.remove(), 550);
     }
     document.body.style.overflow = '';
   } else {
@@ -2085,12 +2140,24 @@ function cancelAuth() {
   const authed  = sessionStorage.getItem('_a') === '1';
   const project = sessionStorage.getItem('_p');
   if (authed && project) {
-    document.getElementById('auth-overlay')?.remove();
-    document.getElementById('home-overlay')?.remove();
+    const ov = document.getElementById('auth-overlay');
+    if (ov) { ov.classList.remove('show'); }
+    const ho = document.getElementById('home-overlay');
+    if (ho) { ho.classList.add('hide'); }
     document.body.style.overflow = '';
   }
   // caso contrário: home visível, auth oculto — fluxo normal
 })();
+
+// Voltar ao dashboard (home overlay)
+function goHome() {
+  sessionStorage.removeItem('_p');
+  const ho = document.getElementById('home-overlay');
+  if (ho) {
+    ho.classList.remove('hide');
+    window.scrollTo(0, 0);
+  }
+}
 
 /* ══════════════════════════════════════════════════════
    DIAGRAM — multi-tab, zoom/pan, tooltips, migration mode
