@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arquitetura — Integrações Modelo Assistencial × Healthmap</title>
+  <style>
+    :root {
+      --blue-dark:   #1a3a5c;
+      --blue-main:   #2E75B6;
+      --blue-mid:    #4a90d9;
+      --blue-light:  #D5E8F0;
+      --blue-pale:   #eef5fb;
+      --green-yes:   #E2EFDA;
+      --green-text:  #375623;
+      --red-note:    #c00000;
+      --gray-border: #c8d6e0;
+      --gray-text:   #444;
+      --white:       #fff;
+      --sidebar-w:   260px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      color: var(--gray-text);
+      background: #f0f4f8;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--blue-dark);
+      color: #cde;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform .3s;
+      display: flex;
+      flex-direction: column;
+    }
+    #sidebar-logo {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    #sidebar-logo .org { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #7fa8c8; }
+    #sidebar-logo .title { font-size: 15px; font-weight: 700; color: #fff; margin-top: 4px; line-height: 1.3; }
+    #sidebar-logo .badge {
+      display: inline-block; margin-top: 8px;
+      background: var(--blue-mid); color: #fff;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    }
+    #sidebar nav { padding: 12px 0; flex: 1; }
+    #sidebar nav a {
+      display: block; padding: 8px 20px;
+      color: #a8c4dc; text-decoration: none;
+      font-size: 12.5px; line-height: 1.4;
+      border-left: 3px solid transparent;
+      transition: all .15s;
+    }
+    #sidebar nav a:hover,
+    #sidebar nav a.active {
+      color: #fff;
+      background: rgba(255,255,255,.07);
+      border-left-color: var(--blue-mid);
+    }
+    #sidebar nav .nav-section {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: #5a7a96; padding: 16px 20px 4px; font-weight: 600;
+    }
+    #sidebar nav a.sub { padding-left: 32px; font-size: 12px; }
+
+    /* ── HAMBURGER ── */
+    #menu-toggle {
+      display: none;
+      position: fixed; top: 12px; left: 12px; z-index: 200;
+      background: var(--blue-main); border: none; border-radius: 6px;
+      color: #fff; width: 38px; height: 38px; cursor: pointer; font-size: 18px;
+    }
+
+    /* ── MAIN ── */
+    #main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── HEADER ── */
+    #page-header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
+      color: #fff;
+      padding: 48px 48px 36px;
+    }
+    #page-header .label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+      color: #9dc4e8; margin-bottom: 8px;
+    }
+    #page-header h1 {
+      font-size: 28px; font-weight: 700; line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    #page-header .subtitle {
+      font-size: 16px; color: #b8d8f0; margin-bottom: 20px;
+    }
+    #page-header .meta {
+      display: flex; flex-wrap: wrap; gap: 12px;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px; padding: 4px 14px; font-size: 12px; color: #daeeff;
+    }
+    .chip-icon { font-size: 13px; }
+
+    /* ── CONTENT ── */
+    #content { padding: 40px 48px; max-width: 1200px; }
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .section-header {
+      background: var(--blue-main);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-number {
+      background: rgba(255,255,255,.2);
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; flex-shrink: 0;
+    }
+    .section-header h2 { font-size: 16px; font-weight: 600; }
+    .section-body { padding: 24px; }
+
+    /* ── SUB SECTION ── */
+    .subsection { margin-bottom: 24px; }
+    .subsection:last-child { margin-bottom: 0; }
+    .subsection-title {
+      font-size: 14px; font-weight: 700; color: var(--blue-dark);
+      border-bottom: 2px solid var(--blue-light);
+      padding-bottom: 6px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tag {
+      background: var(--blue-light); color: var(--blue-dark);
+      font-size: 10px; font-weight: 600; padding: 2px 8px;
+      border-radius: 4px; text-transform: uppercase; letter-spacing: .5px;
+    }
+
+    p { line-height: 1.7; margin-bottom: 10px; color: var(--gray-text); }
+
+    /* ── LISTS ── */
+    ul, ol { padding-left: 22px; margin-bottom: 12px; }
+    li { line-height: 1.8; }
+
+    /* ── TABLES ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--gray-border);
+      margin-bottom: 16px;
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 12.5px; min-width: 500px;
+    }
+    thead tr { background: var(--blue-main); color: #fff; }
+    thead th {
+      padding: 10px 14px; text-align: left;
+      font-weight: 600; white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,.15);
+    }
+    thead th:last-child { border-right: none; }
+    tbody tr:nth-child(even) { background: var(--blue-pale); }
+    tbody tr:hover { background: #dceef8; }
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--gray-border);
+      border-right: 1px solid var(--gray-border);
+      vertical-align: top; line-height: 1.5;
+    }
+    tbody td:last-child { border-right: none; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* sim / não badges */
+    .sim {
+      background: var(--green-yes); color: var(--green-text);
+      font-weight: 600; font-size: 11px;
+      padding: 2px 10px; border-radius: 10px;
+      display: inline-block; text-align: center;
+    }
+    .nao {
+      color: #aaa; font-size: 11px; display: inline-block;
+      text-align: center;
+    }
+
+    /* method badges */
+    .method {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px; letter-spacing: .5px;
+    }
+    .get  { background: #e3f4e3; color: #276027; }
+    .post { background: #fff0d6; color: #7a4a00; }
+    .put  { background: #e8e0f4; color: #3d1f7a; }
+    .del  { background: #fde8e8; color: #8b0000; }
+
+    /* endpoint code */
+    code {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 11.5px;
+      background: #f0f4f8;
+      border: 1px solid #d0dde8;
+      padding: 1px 6px; border-radius: 4px;
+      color: #1a3a5c; word-break: break-all;
+    }
+    .ext-url code { color: #7a3000; background: #fff4e8; border-color: #e8c890; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-left: 4px solid;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px; margin: 16px 0;
+      font-size: 13px; line-height: 1.6;
+    }
+    .callout.info  { border-color: var(--blue-main); background: var(--blue-pale); color: #1a3a5c; }
+    .callout.warn  { border-color: #e8a020; background: #fff8ec; color: #6a3a00; }
+    .callout.danger { border-color: var(--red-note); background: #fff0f0; color: #6a0000; }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    /* ── RISK CARDS ── */
+    .risk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .risk-card {
+      border: 1px solid var(--gray-border);
+      border-radius: 8px; padding: 16px;
+      border-top: 4px solid var(--blue-main);
+    }
+    .risk-card.high { border-top-color: var(--red-note); }
+    .risk-card.medium { border-top-color: #e8a020; }
+    .risk-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; color: var(--blue-dark); }
+    .risk-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px; }
+    .risk-label.r { color: var(--red-note); }
+    .risk-label.m { color: #276027; }
+    .risk-text { font-size: 12px; line-height: 1.5; margin-bottom: 8px; }
+
+    /* ── ENV PILLS ── */
+    .env-prd { background: #e3f4e3; color: #276027; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+    .env-hmg { background: #fff0d6; color: #7a4a00; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+    /* ── OVERVIEW CARDS ── */
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .overview-card {
+      border: 1px solid var(--gray-border);
+      border-radius: 8px; padding: 16px;
+      background: var(--blue-pale);
+    }
+    .overview-card .oc-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--blue-main); font-weight: 600; }
+    .overview-card .oc-value { font-size: 13px; font-weight: 600; color: var(--blue-dark); margin-top: 4px; word-break: break-all; }
+
+    /* ── SYSTEMS LIST ── */
+    .system-pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .system-pill {
+      background: var(--blue-light); color: var(--blue-dark);
+      border-radius: 20px; padding: 6px 16px;
+      font-size: 12.5px; font-weight: 600;
+      border: 1px solid #b0cfe8;
+    }
+
+    /* ── FOOTER ── */
+    #page-footer {
+      background: var(--blue-dark); color: #6a8fa8;
+      text-align: center; padding: 18px 24px;
+      font-size: 12px;
+      margin-left: 0;
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      #sidebar, #menu-toggle { display: none !important; }
+      #main { margin-left: 0 !important; }
+      #content { padding: 20px; }
+      .section-card { box-shadow: none; border: 1px solid #ccc; }
+      .table-wrap { overflow: visible; }
+      table { min-width: unset; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      #sidebar { transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #menu-toggle { display: flex; align-items: center; justify-content: center; }
+      #main { margin-left: 0; }
+      #page-header { padding: 60px 24px 28px; }
+      #page-header h1 { font-size: 22px; }
+      #content { padding: 24px 16px; }
+    }
+    @media (max-width: 600px) {
+      .risk-grid { grid-template-columns: 1fr; }
+      .overview-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── SCROLL TOP ── */
+    #scroll-top {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--blue-main); color: #fff;
+      border: none; border-radius: 50%;
+      width: 40px; height: 40px; font-size: 18px;
+      cursor: pointer; display: none;
+      align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      z-index: 50;
+    }
+    #scroll-top.visible { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div id="sidebar-logo">
+    <div class="org">Unimed PA</div>
+    <div class="title">Modelo Assistencial × Healthmap</div>
+    <span class="badge">Migração → Tabia</span>
+  </div>
+  <nav>
+    <div class="nav-section">Documento</div>
+    <a href="#sec1">1. Objetivo</a>
+    <a href="#sec2">2. Visão Geral</a>
+    <a href="#sec3">3. Autenticação</a>
+    <div class="nav-section">APIs por Sistema</div>
+    <a href="#sec4">4. Mapeamento de APIs</a>
+    <a href="#sec4-1" class="sub">4.1 Viver Bem</a>
+    <a href="#sec4-2" class="sub">4.2 BackOffice</a>
+    <a href="#sec4-3" class="sub">4.3 Cockpit Navegação</a>
+    <a href="#sec4-4" class="sub">4.4 Auditoria Clínica</a>
+    <a href="#sec4-5" class="sub">4.5 Transição do Cuidado</a>
+    <a href="#sec4-6" class="sub">4.6 SAT (TEA)</a>
+    <div class="nav-section">Referência</div>
+    <a href="#sec5">5. Matriz Consolidada</a>
+    <a href="#sec6">6. Endpoints Externos</a>
+    <a href="#sec7">7. Padrões Arquiteturais</a>
+    <a href="#sec8">8. Riscos e Migração</a>
+    <a href="#sec9">9. Glossário</a>
+  </nav>
+</aside>
+
+<!-- HAMBURGER -->
+<button id="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- HEADER -->
+  <header id="page-header">
+    <div class="label">Documento de Arquitetura</div>
+    <h1>Integrações do Modelo Assistencial com Healthmap</h1>
+    <div class="subtitle">Referência para Migração ao Sistema Tabia</div>
+    <div class="meta">
+      <span class="chip"><span class="chip-icon">📋</span> Versão 1.0</span>
+      <span class="chip"><span class="chip-icon">📅</span> 28/03/2026</span>
+      <span class="chip"><span class="chip-icon">🏥</span> Unimed PA</span>
+      <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- SEÇÃO 1 -->
+    <div class="section-card" id="sec1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Objetivo</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Este documento mapeia todas as integrações existentes entre o sistema <strong>Modelo Assistencial (Unimed PA)</strong>
+          e a plataforma <strong>Healthmap</strong>, fornecendo uma base estruturada para a futura migração dessas integrações
+          para o sistema <strong>Tabia</strong>.
+        </p>
+        <p>O documento cobre:</p>
+        <ul>
+          <li>Inventário completo de APIs Healthmap consumidas pelo Modelo Assistencial</li>
+          <li>Mapeamento por subsistema/módulo</li>
+          <li>Parâmetros, contratos e fluxos de cada integração</li>
+          <li>Endpoints externos identificados (fora do Swagger principal)</li>
+          <li>Considerações e riscos para a migração ao Tabia</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 2 -->
+    <div class="section-card" id="sec2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Visão Geral da Arquitetura Atual</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="subsection">
+          <div class="subsection-title">2.1 Plataforma Healthmap</div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">URL Base — Produção</div>
+              <div class="oc-value">healthmapv3-api-unimedpa-prd .healthmap.com.br</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">URL Base — Homologação</div>
+              <div class="oc-value">unimedpa.hmg.healthmap.com.br</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">URL Complementar — Produção</div>
+              <div class="oc-value">unimedpa.healthmap.com.br</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Versão da API</div>
+              <div class="oc-value">1.11.96-20260224</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Autenticação</div>
+              <div class="oc-value">OAuth2 — Bearer Token</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Headers Obrigatórios</div>
+              <div class="oc-value">Authorization + KeyDS</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">2.2 Subsistemas do Modelo Assistencial</div>
+          <div class="system-pills">
+            <span class="system-pill">1. Plataforma Viver Bem</span>
+            <span class="system-pill">2. BackOffice / Redes de Valor</span>
+            <span class="system-pill">3. Cockpit da Navegação</span>
+            <span class="system-pill">4. Cockpit da Auditoria Clínica</span>
+            <span class="system-pill">5. Transição do Cuidado</span>
+            <span class="system-pill">6. SAT (TEA)</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEÇÃO 3 -->
+    <div class="section-card" id="sec3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Autenticação — Compartilhada por Todos os Subsistemas</h2>
+      </div>
+      <div class="section-body">
+        <p>Todos os subsistemas utilizam o mesmo mecanismo OAuth2 para obter o token de acesso à API Healthmap.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Operação</th><th>Método</th><th>Endpoint</th><th>Tag Swagger</th>
+            </tr></thead>
+            <tbody><tr>
+              <td>PostToken – Obter token</td>
+              <td><span class="method post">POST</span></td>
+              <td><code>/oauth/token</code></td>
+              <td>autenticacao-resource</td>
+            </tr></tbody>
+          </table>
+        </div>
+        <div class="callout info">
+          <strong>ℹ️ Observação</strong>
+          O token Bearer deve ser enviado no header <code>Authorization</code> em todas as requisições.
+          O header <code>KeyDS</code> identifica o ambiente (PRD ou HMG).
+          Para integrações com terceiros (Mobile Saúde), existe também o endpoint
+          <code>/api/thirdparty/mobilesaude/seguranca/v1/autenticacao/oauth/token</code>.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 4 -->
+    <div class="section-card" id="sec4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Mapeamento de APIs por Subsistema</h2>
+      </div>
+      <div class="section-body">
+
+        <!-- 4.1 -->
+        <div class="subsection" id="sec4-1">
+          <div class="subsection-title">4.1 Plataforma Viver Bem</div>
+          <p>Aplicação voltada ao beneficiário para acompanhamento de saúde, aceitação de termos, questionários e planos de ação.</p>
+
+          <div class="subsection-title" style="margin-top:18px;">
+            4.1.1 Termo de Aceite <span class="tag">TermoDeAceite</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>GetAceiteTermo</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/termo/v1/termo/aceiteTermo</code></td>
+                  <td><code>idPessoa</code>, <code>idTermo</code> (query)</td>
+                  <td>Boolean / Objeto aceite</td>
+                </tr>
+                <tr>
+                  <td>GetBuscaTermoPublicadoPorEmpresa</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/termo/v1/termo/buscaTermoPublicadoPorEmpresa</code></td>
+                  <td><code>idEmpresa</code> (query)</td>
+                  <td>Lista de termos publicados</td>
+                </tr>
+                <tr>
+                  <td>GetBuscarAceiteTermo</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/termo/v1/termo/buscarAceiteTermo</code></td>
+                  <td><code>idPessoa</code>, <code>idTermo</code> (query)</td>
+                  <td>Dados do aceite</td>
+                </tr>
+                <tr>
+                  <td>PostRevogaTermo</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/termo/v1/termo/revogaTermo/{idPessoa}/{idTermo}/{idEmpresa}</code></td>
+                  <td><code>idPessoa</code>, <code>idTermo</code>, <code>idEmpresa</code> (path)</td>
+                  <td>Confirmação</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">
+            4.1.2 Beneficiário <span class="tag">Beneficiario</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>GetBeneficiario</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/beneficiario/v1/beneficiario</code></td>
+                  <td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>numeroCarteirinha</code>, <code>pageSize</code></td>
+                  <td>Page&lt;Usuario&gt;</td>
+                </tr>
+                <tr>
+                  <td>GetBeneficiario por ID</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/beneficiario/v1/beneficiario/{id}</code></td>
+                  <td><code>id</code> (path)</td>
+                  <td>Objeto Usuario</td>
+                </tr>
+                <tr>
+                  <td>GetBeneficiarioResumido</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/beneficiario/v1/beneficiario/dadosBeneficiarioResumido/{id}</code></td>
+                  <td><code>id</code> (path)</td>
+                  <td>BeneficiarioResumidoDTO</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>ℹ️ Ambientes</strong>
+            A URL <code>https://unimedpa.hmg.healthmap.com.br/api/v1/beneficiario</code> é o mesmo contrato no ambiente de homologação <span class="env-hmg">HMG</span>.
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">
+            4.1.3 Risco / Estratificação – Mapa da Saúde <span class="tag">Risco</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>GetMedicaoRisco</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/risco/v1/medicaoRisco</code></td>
+                  <td><code>idCliente</code>, <code>status</code>, <code>pageSize</code> (query)</td>
+                  <td>Page&lt;MedicaoRisco&gt;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">
+            4.1.4 Plano de Ação <span class="tag">PlanoDeAcao</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros / Body</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>GetPlanoAcao</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/planoacao/v1/planoAcao</code></td>
+                  <td><code>id</code>, <code>idCliente</code>, <code>status</code>, <code>statusAcao</code> (query)</td>
+                </tr>
+                <tr>
+                  <td>PostProgramarAcao</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/planoacao/v1/planoAcao/programarAcao/{idCliente}</code></td>
+                  <td>Body: <code>AcaoPlanoAcaoDTO</code></td>
+                </tr>
+                <tr>
+                  <td>PostProgramarAcaoLista</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/planoacao/v1/planoAcao/programarAcao/{idCliente}</code></td>
+                  <td>Body: lista de <code>AcaoPlanoAcaoDTO</code></td>
+                </tr>
+                <tr>
+                  <td>PutRealizarAcao</td>
+                  <td><span class="method put">PUT</span></td>
+                  <td><code>/api/planoacao/v1/planoAcao/realizarAcao</code></td>
+                  <td>Body: <code>RealizarAcaoDTO</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">
+            4.1.5 Questionários <span class="tag">Questionarios</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros / Observação</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>GetQuestionario</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/questionario/v1/questionario/{id}</code></td>
+                  <td><code>id</code> (path)</td>
+                </tr>
+                <tr>
+                  <td>GetQuestaoRespostas</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/questionario/v1/questionario/questaoRespostas</code></td>
+                  <td><code>idQuestao</code>, <code>dataInicioResposta</code>, <code>dataFimResposta</code>, <code>pageSize</code></td>
+                </tr>
+                <tr>
+                  <td>PostResponderQuestaoAvulsa</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td>
+                  <td>Body: <code>ResponderQuestaoDTO</code></td>
+                </tr>
+                <tr class="ext-url">
+                  <td>PostResponderAvaliacao <em>(externo)</em></td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td>
+                  <td>⚠️ Fora do Swagger principal — ver seção 6</td>
+                </tr>
+                <tr class="ext-url">
+                  <td>GetDadosQuestionariosSintetico <em>(externo)</em></td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>unimedpa.healthmap.com.br/api/v1/consultas/dadosQuestionariosSintetico</code></td>
+                  <td>⚠️ Fora do Swagger principal — ver seção 6</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /4.1 -->
+
+        <!-- 4.2 -->
+        <div class="subsection" id="sec4-2">
+          <div class="subsection-title">4.2 BackOffice / Redes de Valor</div>
+          <p>Sistema interno de gestão e operação das redes de valor, utilizando dados de beneficiários e estratificação de risco.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Domínio</th><th>Operação</th><th>Método</th><th>Endpoint</th></tr></thead>
+              <tbody>
+                <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
+                <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
+                <tr><td>Risco</td><td>GetMedicaoRisco</td><td><span class="method get">GET</span></td><td><code>/api/risco/v1/medicaoRisco</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">Para detalhes de parâmetros, ver seções 4.1.2 e 4.1.3.</div>
+        </div>
+
+        <!-- 4.3 -->
+        <div class="subsection" id="sec4-3">
+          <div class="subsection-title">4.3 Cockpit da Navegação</div>
+          <p>Painel de navegação clínica para gestores, com visão de ações, riscos, alertas de internação e dados de usuário.</p>
+
+          <div class="subsection-title" style="margin-top:16px;">4.3.1 Beneficiário / Usuário</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th></tr></thead>
+              <tbody>
+                <tr><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code></td></tr>
+                <tr><td>GetUsuario</td><td><span class="method get">GET</span></td><td><code>/api/seguranca/v1/usuario</code></td><td><code>cpf</code>, <code>email</code>, <code>id</code>, <code>nome</code>, <code>pageSize</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:16px;">4.3.2 Plano de Ação</div>
+          <p>Mesmas operações da seção 4.1.4, acrescidas de:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Observação</th></tr></thead>
+              <tbody>
+                <tr class="ext-url">
+                  <td>ListarAcoes <em>(externo)</em></td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>unimedpa.healthmap.com.br/api/v1/relatorio/listar-acoes</code></td>
+                  <td>⚠️ Fora do Swagger principal — ver seção 6</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:16px;">4.3.3 Risco / Estratificação</div>
+          <p>Mesmo endpoint da seção 4.1.3: <code>GET /api/risco/v1/medicaoRisco</code></p>
+
+          <div class="subsection-title" style="margin-top:16px;">4.3.4 Alertas de Internação <span class="tag">AlertasInternacao</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Body (campos)</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>PostListarAlertasInternacao</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/internacao/v1/listarAlertasInternacao</code></td>
+                  <td><code>dataInternacao</code>, <code>dataSaida</code>, <code>idGestor</code>, <code>pagina</code>, <code>itensPorPagina</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><!-- /4.3 -->
+
+        <!-- 4.4 -->
+        <div class="subsection" id="sec4-4">
+          <div class="subsection-title">4.4 Cockpit da Auditoria Clínica</div>
+          <p>Ferramenta para auditores clínicos consultarem dados de beneficiários e aplicarem questionários.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Domínio</th><th>Operação</th><th>Método</th><th>Endpoint</th></tr></thead>
+              <tbody>
+                <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
+                <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td></tr>
+                <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
+                <tr class="ext-url"><td>Questionários (externo)</td><td>GetDadosQuestionariosSintetico</td><td><span class="method get">GET</span></td><td><code>unimedpa.healthmap.com.br/api/v1/consultas/dadosQuestionariosSintetico</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4.5 -->
+        <div class="subsection" id="sec4-5">
+          <div class="subsection-title">4.5 Transição do Cuidado</div>
+          <p>Módulo para acompanhamento de pacientes em transição entre níveis de cuidado, com aplicação de questionários.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Domínio</th><th>Operação</th><th>Método</th><th>Endpoint</th></tr></thead>
+              <tbody>
+                <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
+                <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td></tr>
+                <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4.6 -->
+        <div class="subsection" id="sec4-6">
+          <div class="subsection-title">4.6 SAT (TEA)</div>
+          <p>Sistema de Acompanhamento Terapêutico para Transtorno do Espectro Autista, com aplicação de questionários específicos.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Domínio</th><th>Operação</th><th>Método</th><th>Endpoint</th></tr></thead>
+              <tbody>
+                <tr><td>Autenticação</td><td>PostToken</td><td><span class="method post">POST</span></td><td><code>/oauth/token</code></td></tr>
+                <tr><td>Beneficiário</td><td>GetBeneficiario</td><td><span class="method get">GET</span></td><td><code>/api/beneficiario/v1/beneficiario</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestionario</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/{id}</code></td></tr>
+                <tr><td>Questionários</td><td>GetQuestaoRespostas</td><td><span class="method get">GET</span></td><td><code>/api/questionario/v1/questionario/questaoRespostas</code></td></tr>
+                <tr><td>Questionários</td><td>PostResponderQuestaoAvulsa</td><td><span class="method post">POST</span></td><td><code>/api/questionario/v1/questionario/responderQuestaoAvulsa</code></td></tr>
+                <tr class="ext-url"><td>Questionários (externo)</td><td>PostResponderAvaliacao</td><td><span class="method post">POST</span></td><td><code>unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /sec4 -->
+
+    <!-- SEÇÃO 5 — MATRIZ -->
+    <div class="section-card" id="sec5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>Matriz Consolidada — Subsistema × Endpoint</h2>
+      </div>
+      <div class="section-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Endpoint</th>
+              <th>Viver Bem</th>
+              <th>BackOffice</th>
+              <th>Cockpit Nav.</th>
+              <th>Auditoria</th>
+              <th>Transição</th>
+              <th>SAT (TEA)</th>
+            </tr></thead>
+            <tbody>
+              <tr><td><code>POST /oauth/token</code></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr><td><code>GET /api/beneficiario/v1/beneficiario</code></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr><td><code>GET /api/risco/v1/medicaoRisco</code></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>GET /api/termo/v1/termo/aceiteTermo</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>GET .../buscaTermoPublicadoPorEmpresa</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>GET /api/termo/v1/termo/buscarAceiteTermo</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>POST .../revogaTermo/{...}</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>GET /api/planoacao/v1/planoAcao</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>POST .../planoAcao/programarAcao</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>PUT .../planoAcao/realizarAcao</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>GET /api/questionario/v1/questionario/{id}</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr><td><code>GET .../questionario/questaoRespostas</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr><td><code>POST .../responderQuestaoAvulsa</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr><td><code>POST /api/internacao/v1/listarAlertasInternacao</code></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr><td><code>GET /api/seguranca/v1/usuario</code></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr class="ext-url"><td><code>POST unimedpa…/responderAvaliacao ⚠️</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr class="ext-url"><td><code>GET unimedpa…/dadosQuestionariosSintetico ⚠️</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+              <tr class="ext-url"><td><code>GET unimedpa…/relatorio/listar-acoes ⚠️</code></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout warn">
+          <strong>⚠️ Linhas destacadas</strong>
+          Endpoints em fundo laranja são hospedados em subdomínio diferente (<code>unimedpa.healthmap.com.br</code>) e não constam no Swagger principal. Ver seção 6.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 6 -->
+    <div class="section-card" id="sec6">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>Endpoints Externos — Fora do Swagger Principal</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Os endpoints abaixo são consumidos pelo Modelo Assistencial mas estão hospedados em subdomínio diferente
+          (<code>unimedpa.healthmap.com.br</code>) e <strong>não constam no Swagger principal</strong>.
+          Requerem documentação adicional antes da migração.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>URL Completa</th><th>Subsistemas</th><th>Ambiente</th><th>Observação</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>https://unimedpa.hmg.healthmap.com.br/api/v1/beneficiario</code></td>
+                <td>Viver Bem, BackOffice</td>
+                <td><span class="env-hmg">HMG</span></td>
+                <td>Mesmo contrato do endpoint PRD — ambiente de homologação</td>
+              </tr>
+              <tr>
+                <td><code>https://unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td>
+                <td>Viver Bem, Auditoria, Transição, SAT</td>
+                <td><span class="env-prd">PRD</span></td>
+                <td>Resposta de avaliação completa — contrato distinto do <code>responderQuestaoAvulsa</code></td>
+              </tr>
+              <tr>
+                <td><code>https://unimedpa.healthmap.com.br/api/v1/consultas/dadosQuestionariosSintetico</code></td>
+                <td>Viver Bem, Auditoria</td>
+                <td><span class="env-prd">PRD</span></td>
+                <td>Dados sintéticos/sumarizados de questionários respondidos</td>
+              </tr>
+              <tr>
+                <td><code>https://unimedpa.healthmap.com.br/api/v1/relatorio/listar-acoes</code></td>
+                <td>Cockpit Navegação</td>
+                <td><span class="env-prd">PRD</span></td>
+                <td>Relatório de ações — visão gerencial/BI</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout danger">
+          <strong>🚨 Ação Requerida antes da Migração</strong>
+          Levantar contratos completos (request/response schemas) e documentação específica desses 3 endpoints externos junto ao time Healthmap antes do início da migração para o Tabia.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 7 -->
+    <div class="section-card" id="sec7">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2>Padrões Arquiteturais Identificados</h2>
+      </div>
+      <div class="section-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Padrão</th><th>Descrição</th><th>Impacto na Migração</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>7.1</strong></td>
+                <td>Autenticação OAuth2</td>
+                <td>Todos os subsistemas compartilham o mesmo endpoint <code>/oauth/token</code>. Header <code>KeyDS</code> distingue os ambientes PRD/HMG.</td>
+                <td>O Tabia precisará oferecer mecanismo equivalente ou será necessário um adapter/gateway de autenticação.</td>
+              </tr>
+              <tr>
+                <td><strong>7.2</strong></td>
+                <td>Versionamento de API</td>
+                <td>Padrão <code>/api/{domínio}/v1/{recurso}</code> em todos os endpoints do Swagger principal.</td>
+                <td>Verificar se o Tabia segue o mesmo padrão ou requer ajuste nas chamadas.</td>
+              </tr>
+              <tr>
+                <td><strong>7.3</strong></td>
+                <td>Paginação</td>
+                <td>Respostas de listagem retornam objeto <code>Page&lt;T&gt;</code> com campos <code>pageSize</code>, <code>offset</code> e <code>pageNumber</code>.</td>
+                <td>Se o Tabia usar paginação por cursor ou modelo diferente, será necessário adaptar a camada de consumo.</td>
+              </tr>
+              <tr>
+                <td><strong>7.4</strong></td>
+                <td>Endpoints Transversais</td>
+                <td>Beneficiário, Risco e Autenticação são utilizados por todos os 6 subsistemas.</td>
+                <td><strong>Alto risco:</strong> mudança impacta toda a plataforma simultaneamente. Exige prioridade no planejamento.</td>
+              </tr>
+              <tr>
+                <td><strong>7.5</strong></td>
+                <td>Dois Backends em Produção</td>
+                <td><code>healthmapv3-api-unimedpa-prd…</code> (principal, Swagger disponível) e <code>unimedpa.healthmap.com.br</code> (complementar, sem Swagger).</td>
+                <td>A migração deve cobrir ambos os backends. O complementar exige levantamento adicional.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 8 -->
+    <div class="section-card" id="sec8">
+      <div class="section-header">
+        <div class="section-number">8</div>
+        <h2>Considerações e Riscos para Migração ao Tabia</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="subsection">
+          <div class="subsection-title">8.1 Riscos Identificados</div>
+          <div class="risk-grid">
+            <div class="risk-card high">
+              <div class="risk-title">Risco 1 — Endpoints sem Swagger</div>
+              <div class="risk-label r">Risco</div>
+              <div class="risk-text">4 endpoints em <code>unimedpa.healthmap.com.br</code> sem contrato formal. Dificulta mapear equivalentes no Tabia.</div>
+              <div class="risk-label m">Mitigação</div>
+              <div class="risk-text">Solicitar documentação ao time Healthmap antes do início da migração.</div>
+            </div>
+            <div class="risk-card high">
+              <div class="risk-title">Risco 2 — Alta Transversalidade</div>
+              <div class="risk-label r">Risco</div>
+              <div class="risk-text">Beneficiário e Autenticação usados por todos os 6 subsistemas. Incompatibilidade no Tabia afeta toda a plataforma.</div>
+              <div class="risk-label m">Mitigação</div>
+              <div class="risk-text">Priorizar validação desses contratos no início do projeto de migração.</div>
+            </div>
+            <div class="risk-card medium">
+              <div class="risk-title">Risco 3 — Ambientes PRD vs HMG</div>
+              <div class="risk-label r">Risco</div>
+              <div class="risk-text">URL de homologação usa subdomínio diferente. O Tabia pode ter estratégia diferente de ambientes.</div>
+              <div class="risk-label m">Mitigação</div>
+              <div class="risk-text">Mapear estratégia de ambientes no Tabia e ajustar variáveis de configuração.</div>
+            </div>
+            <div class="risk-card medium">
+              <div class="risk-title">Risco 4 — Modelos de Dados Distintos</div>
+              <div class="risk-label r">Risco</div>
+              <div class="risk-text">DTOs Healthmap (Usuario, AcaoPlanoAcaoDTO, etc.) podem ter estrutura diferente no Tabia. Necessidade de transformação de dados.</div>
+              <div class="risk-label m">Mitigação</div>
+              <div class="risk-text">Mapear campos equivalentes (field mapping) antes da implementação.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">8.2 Recomendações para o Projeto de Migração</div>
+          <ol>
+            <li>Levantar contratos completos dos 4 endpoints externos (seção 6) junto ao time Healthmap.</li>
+            <li>Iniciar validação dos contratos do Tabia pelos endpoints transversais: <strong>Autenticação</strong> e <strong>Beneficiário</strong>.</li>
+            <li>Criar <strong>camada de abstração (adapter / anti-corruption layer)</strong> para isolar as chamadas ao Healthmap, facilitando a substituição pelo Tabia sem impactar regras de negócio.</li>
+            <li>Definir estratégia de migração: <strong>big bang</strong> (troca simultânea) vs. <strong>strangler fig</strong> (migração gradual por subsistema).</li>
+            <li>Garantir ambiente de <strong>homologação do Tabia</strong> disponível para testes antes da virada em produção.</li>
+            <li>Documentar o <strong>field mapping</strong> entre os modelos de dados Healthmap e Tabia para cada domínio.</li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEÇÃO 9 -->
+    <div class="section-card" id="sec9">
+      <div class="section-header">
+        <div class="section-number">9</div>
+        <h2>Glossário</h2>
+      </div>
+      <div class="section-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Termo</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Modelo Assistencial</strong></td><td>Conjunto de sistemas da Unimed PA para gestão e acompanhamento de saúde dos beneficiários</td></tr>
+              <tr><td><strong>Healthmap</strong></td><td>Plataforma atual de saúde populacional integrada ao Modelo Assistencial</td></tr>
+              <tr><td><strong>Tabia</strong></td><td>Nova plataforma que substituirá o Healthmap nas integrações do Modelo Assistencial</td></tr>
+              <tr><td><strong>Bearer Token</strong></td><td>Token de autenticação enviado no header <code>Authorization</code> das requisições</td></tr>
+              <tr><td><strong>KeyDS</strong></td><td>Header de ambiente utilizado nas chamadas à API Healthmap (PRD ou HMG)</td></tr>
+              <tr><td><strong>PRD</strong></td><td>Ambiente de produção</td></tr>
+              <tr><td><strong>HMG</strong></td><td>Ambiente de homologação</td></tr>
+              <tr><td><strong>DTO</strong></td><td>Data Transfer Object — objeto de transferência de dados nas APIs</td></tr>
+              <tr><td><strong>Swagger</strong></td><td>Documentação OpenAPI das APIs Healthmap disponível em <code>/v2/api-docs</code></td></tr>
+              <tr><td><strong>Page&lt;T&gt;</strong></td><td>Padrão de resposta paginada utilizado pelo Healthmap (pageSize, offset, pageNumber)</td></tr>
+              <tr><td><strong>Adapter / ACL</strong></td><td>Anti-Corruption Layer — camada de isolamento entre sistemas para facilitar trocas de fornecedor</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <footer id="page-footer">
+    Documento gerado em 28/03/2026 &nbsp;|&nbsp; Unimed PA — Modelo Assistencial &nbsp;|&nbsp; Referência Healthmap → Tabia
+  </footer>
+
+</div><!-- /main -->
+
+<!-- SCROLL TOP -->
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Sidebar toggle
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const sidebar = document.getElementById('sidebar');
+    const btn = document.getElementById('menu-toggle');
+    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !btn.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // Scroll top button
+  window.addEventListener('scroll', function() {
+    const btn = document.getElementById('scroll-top');
+    btn.classList.toggle('visible', window.scrollY > 300);
+  });
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('[id^="sec"]');
+  const navLinks = document.querySelectorAll('#sidebar nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`#sidebar nav a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
