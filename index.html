@@ -272,6 +272,12 @@
       border: 1px solid var(--gray-border);
       border-radius: 8px; padding: 16px;
       background: var(--blue-pale);
+      transition: box-shadow .2s, transform .2s;
+      cursor: default;
+    }
+    .overview-card:hover {
+      box-shadow: 0 4px 16px rgba(46,117,182,.15);
+      transform: translateY(-2px);
     }
     .overview-card .oc-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--blue-main); font-weight: 600; }
     .overview-card .oc-value { font-size: 13px; font-weight: 600; color: var(--blue-dark); margin-top: 4px; word-break: break-all; }
