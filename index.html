@@ -636,31 +636,19 @@
       padding: 10px 20px; background: #fff;
       border-bottom: 1px solid #e2e8f0; flex-wrap: wrap;
     }
-    .diag-btn {
-      padding: 4px 12px; border: 1px solid #cbd5e1;
-      background: #f8fafc; border-radius: 6px;
+    .diag-btn.accent {
+      padding: 6px 16px; border: 1px solid #1a3a5c;
+      background: #1a3a5c; color: #fff; border-radius: 6px;
       font-size: 13px; font-weight: 600; cursor: pointer;
-      color: #334155; transition: all .15s;
+      transition: all .15s;
     }
-    .diag-btn:hover { background: #1a3a5c; color: #fff; border-color: #1a3a5c; }
-    .diag-btn.accent { background: #1a3a5c; color: #fff; border-color: #1a3a5c; }
     .diag-btn.accent:hover { background: #0f2a47; }
     .diag-btn.accent.active-mode { background: #c0392b; border-color: #c0392b; }
-    .diag-zoom-label {
-      font-size: 12px; color: #64748b; min-width: 36px;
-      text-align: center;
-    }
     .diag-wrapper {
-      overflow: hidden; background: #f1f5f9;
-      min-height: 540px; position: relative; cursor: grab;
+      background: #f1f5f9; overflow: auto;
     }
-    .diag-wrapper:active { cursor: grabbing; }
-    .diag-canvas {
-      transform-origin: 0 0;
-      transition: transform .1s;
-      display: inline-block; min-width: 100%;
-    }
-    .diag-panel { display: none; padding: 24px 20px; }
+    .diag-canvas { width: 100%; }
+    .diag-panel { display: none; padding: 20px; }
     .diag-panel.active { display: block; }
     .diag-panel svg { display: block; width: 100%; height: auto; }
     .diag-loading {
@@ -822,11 +810,6 @@
 
         <!-- Toolbar -->
         <div class="diag-toolbar">
-          <button class="diag-btn" onclick="diagZoom(0.2)" title="Ampliar">＋</button>
-          <button class="diag-btn" onclick="diagZoom(-0.2)" title="Reduzir">－</button>
-          <button class="diag-btn" onclick="diagReset()" title="Resetar zoom">⟳ Reset</button>
-          <span class="diag-zoom-label" id="zoomLabel">100%</span>
-          <div style="flex:1"></div>
           <button class="diag-btn accent" id="btnMigration" onclick="toggleMigrationMode()">🔄 Ver migração → Tabia</button>
         </div>
 
@@ -1859,14 +1842,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 function exportPDF() {
   const prev = document.title;
   document.title = 'Arquitetura CBV × Healthmap — Integrações';
-  // Garante que o canvas do diagrama não está transformado
-  const canvas = document.getElementById('diagCanvas');
-  const prevTransform = canvas ? canvas.style.transform : '';
-  if (canvas) canvas.style.transform = '';
   window.print();
-  // Restaura após print
   document.title = prev;
-  if (canvas) canvas.style.transform = prevTransform;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1966,9 +1943,6 @@ const diagTipsPartial = [
   { key: 'Programa', tip: 'Endpoints de Programa:\nGET /api/programa/v1/programa' },
 ];
 
-let diagScale = 1;
-let diagPanX = 0, diagPanY = 0;
-let isDragging = false, dragStartX = 0, dragStartY = 0, panStartX = 0, panStartY = 0;
 let activeDiag = 'macro';
 let migrationModeOn = false;
 const loadedDiags = {};
@@ -1979,7 +1953,6 @@ function switchDiag(name) {
     document.getElementById('dtab-'+n).classList.toggle('active', n === name);
     document.getElementById('panel-'+n).classList.toggle('active', n === name);
   });
-  diagReset();
   if (name === 'macro' && !loadedDiags.macro) loadDiag('macro', 'macro_arquitetura.svg');
   if (name === 'detail' && !loadedDiags.detail) loadDiag('detail', 'integracao_detalhada.svg');
   if (migrationModeOn) applyMigrationMode();
@@ -2085,43 +2058,6 @@ function hideDiagTip() {
   document.getElementById('diagTooltip').classList.remove('show');
 }
 
-// Zoom
-function diagZoom(delta) {
-  diagScale = Math.min(3, Math.max(0.3, diagScale + delta));
-  applyTransform();
-}
-function diagReset() {
-  diagScale = 1; diagPanX = 0; diagPanY = 0;
-  applyTransform();
-}
-function applyTransform() {
-  const canvas = document.getElementById('diagCanvas');
-  canvas.style.transform = `translate(${diagPanX}px,${diagPanY}px) scale(${diagScale})`;
-  document.getElementById('zoomLabel').textContent = Math.round(diagScale * 100) + '%';
-}
-
-// Pan
-const wrapper = document.getElementById('diagWrapper');
-wrapper.addEventListener('mousedown', e => {
-  if (e.button !== 0) return;
-  isDragging = true;
-  dragStartX = e.clientX; dragStartY = e.clientY;
-  panStartX = diagPanX; panStartY = diagPanY;
-  e.preventDefault();
-});
-window.addEventListener('mousemove', e => {
-  if (!isDragging) return;
-  diagPanX = panStartX + (e.clientX - dragStartX);
-  diagPanY = panStartY + (e.clientY - dragStartY);
-  applyTransform();
-});
-window.addEventListener('mouseup', () => { isDragging = false; });
-
-// Scroll to zoom
-wrapper.addEventListener('wheel', e => {
-  e.preventDefault();
-  diagZoom(e.deltaY < 0 ? 0.1 : -0.1);
-}, { passive: false });
 
 // Migration mode
 function toggleMigrationMode() {
