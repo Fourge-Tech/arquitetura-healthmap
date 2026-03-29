@@ -1614,7 +1614,7 @@
                   <td>ListarAcoes <em>(externo)</em></td>
                   <td><span class="method get">GET</span></td>
                   <td><code>unimedpa.healthmap.com.br/api/v1/relatorio/listar-acoes</code></td>
-                  <td>⚠️ Fora do Swagger principal — ver seção 6</td>
+                  <td>⚠️ Fora do Swagger principal — ver seção 6 <button class="btn-payload" onclick="openPayload('listar-acoes')">{ } JSON</button></td>
                 </tr>
               </tbody>
             </table>
@@ -1787,7 +1787,7 @@
                 <td><code>https://unimedpa.healthmap.com.br/api/v1/relatorio/listar-acoes</code></td>
                 <td>Cockpit Navegação</td>
                 <td><span class="env-prd">PRD</span></td>
-                <td>Relatório de ações — visão gerencial/BI</td>
+                <td>Relatório de ações — visão gerencial/BI <button class="btn-payload" onclick="openPayload('listar-acoes')">{ } JSON</button></td>
               </tr>
             </tbody>
           </table>
@@ -2176,7 +2176,7 @@
                 <td>GetListarAcoes <em>(externo)</em></td>
                 <td><span class="method get">GET</span></td>
                 <td><code>unimedpa.healthmap.com.br/api/v1/relatorio/listar-acoes</code></td>
-                <td>Contrato não documentado — levantar com time Healthmap</td>
+                <td><button class="btn-payload" onclick="openPayload('listar-acoes')">{ } JSON</button></td>
               </tr>
             </tbody>
           </table>
@@ -2454,6 +2454,43 @@ const payloads = {
     sub: 'Segurança — listagem de usuários',
     request: { headers: H, queryParams: { cpf: "98765432101", email: "carlos@healthmap.com.br", id: 11001, nome: "Carlos Santos", status: "ATIVO", tipo: "PROFISSIONAL", offset: 0, pageSize: 20 } },
     response: { content: [{ id: 11001, nome: "Dr. Carlos Santos", cpf: "98765432101", email: "carlos@healthmap.com.br", tipo: "PROFISSIONAL", status: "ATIVO" }], totalElements: 200, totalPages: 20, number: 0, size: 10 }
+  },
+  'listar-acoes': {
+    title: 'GET https://unimedpa.healthmap.com.br/api/v1/relatorio/listar-acoes',
+    sub: 'Endpoint externo — Relatório de ações · Cockpit Navegação',
+    request: {
+      queryParams: {
+        codigoAcao: "245",
+        statusAcao: "4",
+        periodoIniExecPrevAcao: "2026-03-01",
+        periodoFimExecPrevAcao: "2026-04-22",
+        periodoIniExecRealAcao: "",
+        periodoFimExecRealAcao: "",
+        codigoGestor: "1767469",
+        codigoExternoPaciente: "",
+        statusPaciente: "A",
+        pagina: "1",
+        quantidade: "213"
+      }
+    },
+    response: {
+      conteudo: [
+        {
+          id: "4258579",
+          codigoAcao: "245",
+          nomeAcao: "Monitoramento",
+          statusAcao: "4",
+          dataExecPrev: "2026-04-06 12:00:00.0",
+          dataExecReal: "",
+          nomePaciente: "GENI MORAES AVEIRO DE OLIVEIRA",
+          codigoPaciente: "80134327004",
+          nomeGestor: "ELEONORA MOLINA RIBEIRO"
+        }
+      ],
+      paginaAtual: "1",
+      totalRegistros: "2716",
+      totalPaginas: "2716"
+    }
   },
   'responder-avaliacao': {
     title: 'POST /api/v1/questionario/responderAvaliacao',
