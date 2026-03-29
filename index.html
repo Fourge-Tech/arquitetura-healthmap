@@ -315,6 +315,17 @@
     tbody td:last-child { border-right: none; }
     tbody tr:last-child td { border-bottom: none; }
 
+    /* ── SEÇÃO 10 — colunas fixas para alinhar todas as tabelas ── */
+    #sec10 table {
+      table-layout: fixed;
+    }
+    #sec10 table th:nth-child(1) { width: 22%; }
+    #sec10 table th:nth-child(2) { width: 9%; }
+    #sec10 table th:nth-child(3) { width: 60%; }
+    #sec10 table th:nth-child(4) { width: 9%; }
+    #sec10 table td { word-break: break-word; }
+    #sec10 table code { word-break: break-all; }
+
     /* sim / não badges */
     .sim {
       background: var(--green-yes); color: var(--green-text);
