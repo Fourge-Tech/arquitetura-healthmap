@@ -1056,10 +1056,10 @@
     <h1>Integrações CBV com Healthmap</h1>
     <div class="subtitle">Referência para Migração ao Sistema Tabia</div>
     <div class="meta">
-      <span class="chip" style="cursor:pointer;" onclick="openChangelog()" title="Ver histórico de alterações"><span class="chip-icon">📋</span> Versão 1.0</span>
-      <span class="chip"><span class="chip-icon">📅</span> 28/03/2026</span>
+      <span id="chip-version" class="chip" style="cursor:pointer;" onclick="openChangelog()" title="Ver histórico de alterações"><span class="chip-icon">📋</span> Versão 1.0</span>
+      <span id="chip-date" class="chip"><span class="chip-icon">📅</span> 28/03/2026</span>
       <span class="chip"><span class="chip-icon">🏥</span> Unimed POA</span>
-      <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+      <span id="chip-status" class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
       <button id="btn-history" onclick="openChangelog()" title="Histórico de alterações">📋 Histórico</button>
       <button id="btn-dashboard" onclick="goHome()" title="Voltar ao dashboard">
         ← Dashboard
@@ -2696,9 +2696,11 @@ let _guestMode = false;
 })();
 
 function _applyGuestUI() {
-  // Esconde botão ← Dashboard (não faz sentido para visitante)
-  const db = document.getElementById('btn-dashboard');
-  if (db) db.style.display = 'none';
+  // Esconde elementos de versão/data/status/histórico no modo visitante
+  ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
   // Insere chip "Visitante" na linha de meta do header
   const meta = document.querySelector('#page-header .meta');
   if (meta) {
