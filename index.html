@@ -326,6 +326,32 @@
     #sec10 table td { word-break: break-word; }
     #sec10 table code { word-break: break-all; }
 
+    /* ── SEÇÃO 4 — padroniza colunas nas tabelas de API ── */
+    /* Tabelas 5 colunas: Operação | Método | Endpoint | Parâmetros | Retorno */
+    #sec4 table:has(thead th:nth-child(5)) { table-layout: fixed; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(1) { width: 18%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(2) { width: 8%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(3) { width: 33%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(4) { width: 26%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(5) { width: 15%; }
+    #sec4 table:has(thead th:nth-child(5)) td { word-break: break-word; }
+    #sec4 table:has(thead th:nth-child(5)) code { word-break: break-all; }
+    /* Tabelas 4 colunas: Operação | Método | Endpoint | Parâmetros (sec 4.1 e 4.3) */
+    #sec4-1 table:not(:has(thead th:nth-child(5))),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) { table-layout: fixed; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(1),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(1) { width: 20%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(2),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(2) { width: 9%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(3),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(3) { width: 38%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(4),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(4) { width: 33%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) td,
+    #sec4-3 table:not(:has(thead th:nth-child(5))) td { word-break: break-word; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) code,
+    #sec4-3 table:not(:has(thead th:nth-child(5))) code { word-break: break-all; }
+
     /* sim / não badges */
     .sim {
       background: var(--green-yes); color: var(--green-text);
