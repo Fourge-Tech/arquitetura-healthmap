@@ -906,6 +906,13 @@
       padding: 10px 20px; background: #fff;
       border-bottom: 1px solid #e2e8f0; flex-wrap: wrap;
     }
+    .diag-btn {
+      padding: 5px 12px; border: 1px solid #cbd5e1;
+      background: #fff; color: #475569; border-radius: 6px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: all .15s; line-height: 1; font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .diag-btn:hover { background: #f1f5f9; border-color: #94a3b8; color: #1e293b; }
     .diag-btn.accent {
       padding: 6px 16px; border: 1px solid #1a3a5c;
       background: #1a3a5c; color: #fff; border-radius: 6px;
@@ -1158,6 +1165,11 @@
         <!-- Toolbar -->
         <div class="diag-toolbar">
           <button class="diag-btn accent" id="btnMigration" onclick="toggleMigrationMode()">🔄 Ver migração → Tabia</button>
+          <div style="width:1px;height:22px;background:#e2e8f0;margin:0 6px;flex-shrink:0;"></div>
+          <button class="diag-btn" onclick="diagZoomOut()" title="Diminuir zoom" style="font-size:17px;padding:2px 13px;">−</button>
+          <span id="diagZoomLabel" style="font-size:12px;color:#64748b;font-weight:600;min-width:42px;text-align:center;user-select:none;">100%</span>
+          <button class="diag-btn" onclick="diagZoomIn()" title="Aumentar zoom" style="font-size:17px;padding:2px 13px;">+</button>
+          <button class="diag-btn" onclick="diagZoomReset()" title="Resetar zoom" style="font-size:12px;padding:5px 10px;">↺ Reset</button>
         </div>
 
         <!-- Wrapper drag/zoom -->
@@ -3453,6 +3465,41 @@ function applyMigrationMode() {
     else panel.classList.remove('migration-mode');
   });
 }
+
+/* ══════════════════════════════════════════════════════
+   DIAGRAM ZOOM — in / out / reset + Ctrl+scroll
+══════════════════════════════════════════════════════ */
+let diagZoom = 1;
+const ZOOM_STEP = 0.25;
+const ZOOM_MIN  = 0.5;
+const ZOOM_MAX  = 3.0;
+
+function diagZoomIn() {
+  diagZoom = Math.min(ZOOM_MAX, parseFloat((diagZoom + ZOOM_STEP).toFixed(2)));
+  applyDiagZoom();
+}
+function diagZoomOut() {
+  diagZoom = Math.max(ZOOM_MIN, parseFloat((diagZoom - ZOOM_STEP).toFixed(2)));
+  applyDiagZoom();
+}
+function diagZoomReset() {
+  diagZoom = 1;
+  applyDiagZoom();
+}
+function applyDiagZoom() {
+  document.querySelectorAll('#diagCanvas svg').forEach(svg => {
+    svg.style.width = (diagZoom * 100) + '%';
+  });
+  const lbl = document.getElementById('diagZoomLabel');
+  if (lbl) lbl.textContent = Math.round(diagZoom * 100) + '%';
+}
+
+document.getElementById('diagWrapper').addEventListener('wheel', function(e) {
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    e.deltaY < 0 ? diagZoomIn() : diagZoomOut();
+  }
+}, { passive: false });
 
 // Load macro on page ready
 document.addEventListener('DOMContentLoaded', () => {
