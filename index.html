@@ -1078,6 +1078,13 @@
     <a href="#sec8">8. Riscos e Migração</a>
     <a href="#sec9">9. Glossário</a>
     <a href="#sec10">10. Referência Rápida</a>
+    <div class="nav-section">CRM &amp; Marketing</div>
+    <a href="#sec11">11. CRM Dynamics 365</a>
+    <a href="#sec11-1" class="sub">11.1 Autenticação Azure AD</a>
+    <a href="#sec11-2" class="sub">11.2 Fluxo de Integração</a>
+    <a href="#sec11-3" class="sub">11.3 Contato (Beneficiário)</a>
+    <a href="#sec11-4" class="sub">11.4 Linha de Cuidado</a>
+    <a href="#sec11-5" class="sub">11.5 WhatsApp / BLIP</a>
   </nav>
 </aside>
 
@@ -2192,6 +2199,292 @@
       </div>
     </div>
 
+
+    <!-- SEÇÃO 11 — CRM Dynamics 365 -->
+    <div class="section-card" id="sec11">
+      <div class="section-header" style="background: #2a1a5c;">
+        <div class="section-number" style="background:rgba(255,255,255,.15);">11</div>
+        <h2>Integração Viver Bem → CRM Dynamics 365</h2>
+      </div>
+      <div class="section-body">
+
+        <p>
+          Fluxo de automação de marketing para gestão de beneficiários na <strong>Linha de Cuidado</strong>.
+          Dados originados no <strong>Healthmap</strong> são processados pelo <strong>Viver Bem</strong>, que aciona o
+          <strong>CRM Dynamics 365 (Unimed POA)</strong> via API REST (Dataverse Web API v9.2).
+          O CRM, por sua vez, dispara notificações via <strong>BLIP</strong> pelo canal WhatsApp ao beneficiário.
+        </p>
+
+        <!-- Macro Flow Diagram -->
+        <div style="display:flex;align-items:stretch;flex-wrap:wrap;gap:0;margin:24px 0;justify-content:center;">
+          <div style="background:#d5e8f0;border:2px solid #2E75B6;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#2E75B6;font-weight:700;">Fonte</div>
+            <div style="font-size:20px;margin:8px 0;">🏥</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Healthmap</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Dados clínicos</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
+          <div style="background:#e2efda;border:2px solid #375623;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#375623;font-weight:700;">Orquestrador</div>
+            <div style="font-size:20px;margin:8px 0;">💻</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Viver Bem</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">CBV / Modelo Assistencial</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
+          <div style="background:#ede8f8;border:2px solid #6a3a9a;border-radius:8px;padding:16px 20px;text-align:center;min-width:120px;flex:1;max-width:160px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#6a3a9a;font-weight:700;">CRM</div>
+            <div style="font-size:20px;margin:8px 0;">⚙️</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Dynamics 365</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Unimed POA</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
+          <div style="background:#fff0d6;border:2px dashed #e8a020;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;opacity:.8;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#e8a020;font-weight:700;">Mensageria</div>
+            <div style="font-size:20px;margin:8px 0;">📡</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">BLIP</div>
+            <div style="font-size:11px;color:#e8a020;margin-top:4px;">⚠️ docs pendente</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
+          <div style="background:#e3f4e3;border:2px dashed #276027;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;opacity:.8;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#276027;font-weight:700;">Canal</div>
+            <div style="font-size:20px;margin:8px 0;">💬</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">WhatsApp</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Beneficiário</div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <strong>⚠️ Documentação parcial</strong>
+          A etapa BLIP → WhatsApp não possui contrato de API disponível no momento. A seção 11.5 será complementada após recebimento da documentação BLIP.
+        </div>
+
+        <!-- 11.1 Autenticação Azure AD -->
+        <div class="subsection" id="sec11-1">
+          <div class="subsection-title">11.1 Autenticação — Azure AD (OAuth 2.0 Client Credentials)</div>
+          <p>
+            A autenticação com o CRM Dynamics 365 usa o fluxo <strong>client_credentials</strong> do
+            <strong>Azure Active Directory</strong>, diferente do OAuth2 padrão Healthmap.
+            O token obtido é enviado como Bearer em todas as chamadas subsequentes à Dataverse Web API.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Token Azure AD</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>https://login.windows.net/{tenantid}/oauth2/token</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-token')">{ } JSON</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>ℹ️ Diferença em relação ao Healthmap</strong>
+            O Healthmap autentica via <code>POST /oauth/token</code> na própria plataforma com <code>KeyDS</code>.
+            O CRM usa o Azure AD (<code>login.windows.net/{tenantid}/oauth2/token</code>) com
+            <code>grant_type=client_credentials</code>, <code>client_id</code>, <code>client_secret</code>
+            e o parâmetro <code>resource</code> apontando para a URL base do CRM.
+            O script de teste Postman extrai automaticamente o <code>access_token</code> e salva na variável <code>token</code> da collection.
+          </div>
+        </div>
+
+        <!-- 11.2 Fluxo -->
+        <div class="subsection" id="sec11-2">
+          <div class="subsection-title">11.2 Fluxo de Integração — Passo a Passo</div>
+          <p>O Viver Bem executa os seguintes passos de forma sequencial ao processar um beneficiário para a Linha de Cuidado:</p>
+          <ol>
+            <li><strong>Obter Token</strong> — Autentica no Azure AD (<code>POST /oauth2/token</code>) e obtém o Bearer Token do CRM.</li>
+            <li><strong>Verificar Contato por CPF</strong> — Consulta a entidade <code>contacts</code> filtrando pelo campo customizado <code>uni_cpf</code>.</li>
+            <li><strong>Criar / Atualizar Contato</strong> — Se o contato não existir, cria via <code>POST /api/data/v9.2/contacts</code>. Se existir, atualiza telefone e e-mail via <code>PATCH</code> com os dados vindos do Healthmap.</li>
+            <li><strong>Verificar Linha de Cuidado por CPF</strong> — Consulta <code>uni_linhadecuidados</code> expandindo o contato vinculado e filtrando por <code>uni_cpf</code>.</li>
+            <li><strong>Criar / Atualizar Linha de Cuidado</strong> — Se não existir, cria o registro com os flags de monitoramento. Se existir, atualiza os flags via <code>PATCH</code>.</li>
+            <li><strong>CRM → BLIP → WhatsApp</strong> — Automação interna do Dynamics 365 detecta a criação/atualização da Linha de Cuidado e aciona o BLIP para envio da mensagem WhatsApp ao beneficiário.</li>
+          </ol>
+          <div class="callout info">
+            <strong>ℹ️ Rastreamento de mensagens</strong>
+            Após o disparo via BLIP, o CRM cria um registro na entidade <code>uni_whatsapps</code> com o status, template utilizado, fila e eventual falha — permitindo auditoria do envio.
+          </div>
+        </div>
+
+        <!-- 11.3 Contato -->
+        <div class="subsection" id="sec11-3">
+          <div class="subsection-title">11.3 Contato — Beneficiário no CRM <span class="tag">contacts</span></div>
+          <p>
+            Entidade padrão <code>contacts</code> do Dynamics 365 com campo customizado <code>uni_cpf</code>
+            para identificação do beneficiário Unimed. Os campos relevantes para o fluxo são
+            <code>fullname</code>, <code>telephone1</code> e <code>emailaddress1</code>.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Por CPF</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/contacts?$filter=uni_cpf eq '{cpf}'</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-contato-cpf')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Atualizar Contato</td>
+                  <td><span class="method put">PATCH</span></td>
+                  <td><code>/api/data/v9.2/contacts({contactid})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-contato-update')">{ } JSON</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>ℹ️ Criação de Contato</strong>
+            A criação de novo contato usa <code>POST /api/data/v9.2/contacts</code> (operação nativa do Dynamics 365, não mapeada explicitamente na collection). O campo <code>uni_cpf</code> deve ser preenchido na criação para viabilizar consultas subsequentes por CPF.
+          </div>
+        </div>
+
+        <!-- 11.4 Linha de Cuidado -->
+        <div class="subsection" id="sec11-4">
+          <div class="subsection-title">11.4 Linha de Cuidado <span class="tag">uni_linhadecuidados</span></div>
+          <p>
+            Entidade customizada do CRM que representa o vínculo do beneficiário ao programa de cuidado.
+            Os flags de monitoramento alimentam as automações do Dynamics 365 que acionam o BLIP para disparo de mensagens WhatsApp.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Por CPF</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados?$expand=uni_Contact&amp;$filter=(uni_Contact/uni_cpf eq '{cpf}')</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-cpf')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Obter Por ID</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados({id})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-id')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Criar Linha de Cuidado</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-criar')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Atualizar Flags</td>
+                  <td><span class="method put">PATCH</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados({id})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-update')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Deletar</td>
+                  <td><span class="method del">DELETE</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados({id})</code></td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">Campos da entidade uni_linhadecuidados</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><code>uni_linhadecuidadoid</code></td><td>GUID</td><td>Identificador único da linha de cuidado</td></tr>
+                <tr><td><code>uni_name</code></td><td>String</td><td>Nome/descrição da linha de cuidado</td></tr>
+                <tr><td><code>uni_Contact</code></td><td>Lookup</td><td>Vínculo com o contato — bind via <code>"uni_Contact@odata.bind": "/contacts({id})"</code></td></tr>
+                <tr><td><code>uni_elegivel_programa_cuidado</code></td><td>Boolean</td><td>Indica se o beneficiário é elegível ao programa de cuidado</td></tr>
+                <tr><td><code>uni_data_ativacao_contato</code></td><td>DateTime</td><td>Data de ativação no programa (ISO 8601)</td></tr>
+                <tr><td><code>uni_paciente_sem_acesso</code></td><td>String</td><td>Flag: beneficiário sem acesso ao sistema</td></tr>
+                <tr><td><code>uni_acoes_vencidas</code></td><td>String</td><td>Flag: possui ações vencidas no plano de ação</td></tr>
+                <tr><td><code>uni_monitoramento_previsto_para_o_dia</code></td><td>String</td><td>Flag: monitoramento previsto para o dia corrente</td></tr>
+                <tr><td><code>uni_alteracao_no_risco</code></td><td>String</td><td>Flag: houve alteração no risco do beneficiário (Healthmap)</td></tr>
+                <tr><td><code>uni_alteracao_no_pca</code></td><td>String</td><td>Flag: houve alteração no PCA (Plano de Cuidado Ativo)</td></tr>
+                <tr><td><code>uni_questionariospendentes</code></td><td>String</td><td>Flag: beneficiário possui questionários pendentes</td></tr>
+                <tr><td><code>uni_clientesemcontato</code></td><td>String</td><td>Flag: cliente sem contato recente registrado</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 11.5 WhatsApp / BLIP -->
+        <div class="subsection" id="sec11-5">
+          <div class="subsection-title">11.5 WhatsApp / BLIP <span class="tag">uni_whatsapps</span></div>
+          <p>
+            Entidade customizada <code>uni_whatsapps</code> do CRM para rastreamento das mensagens WhatsApp
+            enviadas via BLIP. Os registros são criados automaticamente pelas automações do Dynamics 365
+            após criação ou atualização de uma Linha de Cuidado.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Por ID</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_whatsapps({id})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-whatsapp-id')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Listar Mensagens</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_whatsapps</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-whatsapp-lista')">{ } JSON</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">Campos da entidade uni_whatsapps</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campo</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><code>scheduledend</code></td><td>Data/hora agendada para envio da mensagem</td></tr>
+                <tr><td><code>uni_numero_contato_cliente</code></td><td>Número de telefone do beneficiário (formato E.164)</td></tr>
+                <tr><td><code>_uni_contato_value</code></td><td>GUID do contato vinculado</td></tr>
+                <tr><td><code>uni_template</code></td><td>Nome do template de mensagem configurado no BLIP</td></tr>
+                <tr><td><code>uni_fila</code></td><td>Fila de envio configurada no BLIP</td></tr>
+                <tr><td><code>uni_status_mensagem</code></td><td>Status atual da mensagem (Enviado, Pendente, Falha, etc.)</td></tr>
+                <tr><td><code>description</code></td><td>Conteúdo ou descrição da mensagem enviada</td></tr>
+                <tr><td><code>uni_falha</code></td><td>Detalhe do erro em caso de falha no envio via BLIP</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout warn">
+            <strong>⚠️ Integração BLIP — documentação pendente</strong>
+            Os contratos de API do BLIP (disparo de mensagens WhatsApp) ainda não foram disponibilizados.
+            Esta subseção será complementada quando a documentação for fornecida.
+          </div>
+        </div>
+
+        <!-- Ambientes CRM -->
+        <div class="subsection">
+          <div class="subsection-title">Ambientes CRM Dynamics 365</div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">Homologação (HMG)</div>
+              <div class="oc-value">unimedpoa-hml.crm2.dynamics.com</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Desenvolvimento (DEV)</div>
+              <div class="oc-value">unimedpoa-dev.crm2.dynamics.com</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Versão da Web API</div>
+              <div class="oc-value">Dataverse v9.2</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Auth Provider</div>
+              <div class="oc-value">Azure AD — login.windows.net</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /content -->
 
   <footer id="page-footer">
@@ -2540,6 +2833,198 @@ const payloads = {
         "tipo": "Bearer",
         "expiresIn": 3600
       }
+    }
+  },
+  'crm-token': {
+    title: 'POST https://login.windows.net/{tenantid}/oauth2/token',
+    sub: 'Azure AD — Autenticação CRM Dynamics 365 (client_credentials)',
+    request: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      body: {
+        grant_type: "client_credentials",
+        client_id: "{client_id}",
+        client_secret: "{client_secret}",
+        resource: "https://unimedpoa-hml.crm2.dynamics.com"
+      }
+    },
+    response: {
+      token_type: "Bearer",
+      expires_in: "3599",
+      ext_expires_in: "3599",
+      resource: "https://unimedpoa-hml.crm2.dynamics.com",
+      access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+    }
+  },
+  'crm-contato-cpf': {
+    title: 'GET /api/data/v9.2/contacts?$filter=uni_cpf eq \'{cpf}\'',
+    sub: 'Contato — buscar beneficiário por CPF no CRM Dynamics 365',
+    request: {
+      headers: { Authorization: "Bearer {token}" },
+      queryParams: {
+        "$select": "fullname,telephone1,emailaddress1",
+        "$filter": "uni_cpf eq '82870233000'",
+        "$orderby": "createdon desc",
+        "$top": 1
+      }
+    },
+    response: {
+      "@odata.context": "https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/$metadata#contacts(fullname,telephone1,emailaddress1)",
+      value: [
+        {
+          "@odata.etag": "W/\"12345678\"",
+          fullname: "João Silva",
+          telephone1: "51999999999",
+          emailaddress1: "joao@example.com",
+          contactid: "84c201ea-7d66-ed11-9562-00224837ab21"
+        }
+      ]
+    }
+  },
+  'crm-contato-update': {
+    title: 'PATCH /api/data/v9.2/contacts({contactid})',
+    sub: 'Contato — atualizar telefone e e-mail do beneficiário',
+    request: {
+      headers: { Authorization: "Bearer {token}", "Content-Type": "application/json" },
+      pathParams: { contactid: "84c201ea-7d66-ed11-9562-00224837ab21" },
+      body: { telephone1: "51999999999", emailaddress1: "joao@example.com" }
+    },
+    response: { "_nota": "204 No Content — atualização bem-sucedida, sem body de retorno" }
+  },
+  'crm-ldc-criar': {
+    title: 'POST /api/data/v9.2/uni_linhadecuidados',
+    sub: 'Linha de Cuidado — criar novo registro (Prefer: return=representation)',
+    request: {
+      headers: { Authorization: "Bearer {token}", "Content-Type": "application/json", Prefer: "return=representation" },
+      queryParams: { "$select": "uni_linhadecuidadoid" },
+      body: {
+        uni_name: "Linha de Cuidado — João Silva",
+        "uni_Contact@odata.bind": "/contacts(84c201ea-7d66-ed11-9562-00224837ab21)",
+        uni_elegivel_programa_cuidado: true,
+        uni_data_ativacao_contato: "2024-02-12T06:00:00Z",
+        uni_paciente_sem_acesso: "false",
+        uni_acoes_vencidas: "false",
+        uni_monitoramento_previsto_para_o_dia: "false",
+        uni_alteracao_no_risco: "false",
+        uni_alteracao_no_pca: "false",
+        uni_questionariospendentes: "false",
+        uni_clientesemcontato: "false"
+      }
+    },
+    response: {
+      "@odata.context": "https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/$metadata#uni_linhadecuidados(uni_linhadecuidadoid)/$entity",
+      uni_linhadecuidadoid: "d5ea8db0-e8d1-ef11-a72e-002248365abf"
+    }
+  },
+  'crm-ldc-cpf': {
+    title: 'GET /api/data/v9.2/uni_linhadecuidados?$filter=(uni_Contact/uni_cpf eq \'{cpf}\')',
+    sub: 'Linha de Cuidado — buscar por CPF do beneficiário (com $expand)',
+    request: {
+      headers: { Authorization: "Bearer {token}" },
+      queryParams: {
+        "$select": "uni_linhadecuidadoid,uni_name",
+        "$expand": "uni_Contact($select=contactid,uni_cpf)",
+        "$filter": "(uni_Contact/uni_cpf eq '82870233000')",
+        "$orderby": "createdon desc",
+        "$top": 1
+      }
+    },
+    response: {
+      "@odata.context": "https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/$metadata#uni_linhadecuidados(...)",
+      value: [
+        {
+          uni_linhadecuidadoid: "d5ea8db0-e8d1-ef11-a72e-002248365abf",
+          uni_name: "Linha de Cuidado — João Silva",
+          uni_Contact: {
+            contactid: "84c201ea-7d66-ed11-9562-00224837ab21",
+            uni_cpf: "82870233000"
+          }
+        }
+      ]
+    }
+  },
+  'crm-ldc-id': {
+    title: 'GET /api/data/v9.2/uni_linhadecuidados({id})',
+    sub: 'Linha de Cuidado — obter registro completo por ID',
+    request: {
+      headers: { Authorization: "Bearer {token}" },
+      pathParams: { id: "d5ea8db0-e8d1-ef11-a72e-002248365abf" }
+    },
+    response: {
+      "@odata.context": "https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/$metadata#uni_linhadecuidados/$entity",
+      uni_linhadecuidadoid: "d5ea8db0-e8d1-ef11-a72e-002248365abf",
+      uni_name: "Linha de Cuidado — João Silva",
+      uni_elegivel_programa_cuidado: true,
+      uni_data_ativacao_contato: "2024-02-12T06:00:00Z",
+      uni_paciente_sem_acesso: "false",
+      uni_acoes_vencidas: "false",
+      uni_monitoramento_previsto_para_o_dia: "false",
+      uni_alteracao_no_risco: "false",
+      uni_alteracao_no_pca: "false",
+      uni_questionariospendentes: "false",
+      uni_clientesemcontato: "false"
+    }
+  },
+  'crm-ldc-update': {
+    title: 'PATCH /api/data/v9.2/uni_linhadecuidados({id})',
+    sub: 'Linha de Cuidado — atualizar flags de monitoramento',
+    request: {
+      headers: { Authorization: "Bearer {token}", "Content-Type": "application/json" },
+      pathParams: { id: "d5ea8db0-e8d1-ef11-a72e-002248365abf" },
+      body: {
+        uni_paciente_sem_acesso: "false",
+        uni_acoes_vencidas: "false",
+        uni_monitoramento_previsto_para_o_dia: "false",
+        uni_alteracao_no_risco: "false",
+        uni_alteracao_no_pca: "false",
+        uni_questionariospendentes: "false",
+        uni_clientesemcontato: "false"
+      }
+    },
+    response: { "_nota": "204 No Content — atualização bem-sucedida, sem body de retorno" }
+  },
+  'crm-whatsapp-id': {
+    title: 'GET /api/data/v9.2/uni_whatsapps({id})',
+    sub: 'WhatsApp — obter registro de mensagem por ID',
+    request: {
+      headers: { Authorization: "Bearer {token}" },
+      pathParams: { id: "432a6695-c796-ef11-8a69-002248e0cdc9" },
+      queryParams: { "$select": "scheduledend,uni_numero_contato_cliente,_uni_contato_value,uni_template,uni_fila,uni_status_mensagem,description,uni_falha" }
+    },
+    response: {
+      "@odata.context": "https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/$metadata#uni_whatsapps/$entity",
+      uni_whatsappid: "432a6695-c796-ef11-8a69-002248e0cdc9",
+      scheduledend: "2024-03-15T10:00:00Z",
+      uni_numero_contato_cliente: "5551999999999",
+      "_uni_contato_value": "84c201ea-7d66-ed11-9562-00224837ab21",
+      uni_template: "programa_cuidado_ativacao",
+      uni_fila: "fila_marketing",
+      uni_status_mensagem: "Enviado",
+      description: "Mensagem de ativação — Programa Linha de Cuidado",
+      uni_falha: null
+    }
+  },
+  'crm-whatsapp-lista': {
+    title: 'GET /api/data/v9.2/uni_whatsapps',
+    sub: 'WhatsApp — listar registros de mensagens',
+    request: {
+      headers: { Authorization: "Bearer {token}" },
+      queryParams: { "$select": "scheduledend,uni_numero_contato_cliente,_uni_contato_value,uni_template,uni_fila,uni_status_mensagem,description,uni_falha" }
+    },
+    response: {
+      "@odata.context": "https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/$metadata#uni_whatsapps(...)",
+      value: [
+        {
+          uni_whatsappid: "432a6695-c796-ef11-8a69-002248e0cdc9",
+          scheduledend: "2024-03-15T10:00:00Z",
+          uni_numero_contato_cliente: "5551999999999",
+          "_uni_contato_value": "84c201ea-7d66-ed11-9562-00224837ab21",
+          uni_template: "programa_cuidado_ativacao",
+          uni_fila: "fila_marketing",
+          uni_status_mensagem: "Enviado",
+          description: "Mensagem de ativação — Programa Linha de Cuidado",
+          uni_falha: null
+        }
+      ]
     }
   }
 };
