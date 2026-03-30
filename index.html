@@ -1070,7 +1070,7 @@
     <a href="#sec4-3" class="sub">4.3 Cockpit Navegação</a>
     <a href="#sec4-4" class="sub">4.4 Auditoria Clínica</a>
     <a href="#sec4-5" class="sub">4.5 Transição do Cuidado</a>
-    <a href="#sec4-6" class="sub">4.6 SAT (TEA)</a>
+    <a href="#sec4-6" class="sub">4.6 SRT (TEA)</a>
     <div class="nav-section">Referência</div>
     <a href="#sec5">5. Matriz Consolidada</a>
     <a href="#sec6">6. Endpoints Externos</a>
@@ -1353,7 +1353,7 @@
             <a href="#sec4-3" class="system-pill">3. Cockpit da Navegação</a>
             <a href="#sec4-4" class="system-pill">4. Cockpit da Auditoria Clínica</a>
             <a href="#sec4-5" class="system-pill">5. Transição do Cuidado</a>
-            <a href="#sec4-6" class="system-pill">6. SAT (TEA)</a>
+            <a href="#sec4-6" class="system-pill">6. SRT (TEA)</a>
           </div>
         </div>
 
@@ -1688,7 +1688,7 @@
 
         <!-- 4.6 -->
         <div class="subsection" id="sec4-6">
-          <div class="subsection-title">4.6 SAT (TEA)</div>
+          <div class="subsection-title">4.6 SRT (TEA)</div>
           <p>Sistema de Acompanhamento Terapêutico para Transtorno do Espectro Autista, com aplicação de questionários específicos.</p>
           <div class="table-wrap">
             <table>
@@ -1724,7 +1724,7 @@
               <th>Cockpit Nav.</th>
               <th>Auditoria</th>
               <th>Transição</th>
-              <th>SAT (TEA)</th>
+              <th>SRT (TEA)</th>
             </tr></thead>
             <tbody>
               <tr><td><code>POST /oauth/token</code></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
@@ -1740,7 +1740,7 @@
               <tr><td><code>GET /api/questionario/v1/questionario/{id}</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
               <tr><td><code>GET .../questionario/questaoRespostas</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
               <tr><td><code>POST .../responderQuestaoAvulsa</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
-              <tr style="background:#fffbea"><td><code>POST .../questaoUltimaResposta</code> <span class="badge-dev">🚧 Dev</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
+              <tr style="background:#fffbea"><td><code>POST .../questaoUltimaResposta</code> <span class="badge-dev">🚧 Dev</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
               <tr><td><code>POST /api/internacao/v1/listarAlertasInternacao</code></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
               <tr><td><code>GET /api/seguranca/v1/usuario</code></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td></tr>
               <tr class="ext-url"><td><code>POST unimedpa…/responderAvaliacao ⚠️</code></td><td><span class="sim">Sim</span></td><td><span class="nao">—</span></td><td><span class="nao">—</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td><td><span class="sim">Sim</span></td></tr>
@@ -1780,7 +1780,7 @@
               </tr>
               <tr>
                 <td><code>https://unimedpa.healthmap.com.br/api/v1/questionario/responderAvaliacao</code></td>
-                <td>Viver Bem, Auditoria, Transição, SAT</td>
+                <td>Viver Bem, Auditoria, Transição, SRT</td>
                 <td><span class="env-prd">PRD</span></td>
                 <td>Resposta de avaliação completa — contrato distinto do <code>responderQuestaoAvulsa</code> <button class="btn-payload" onclick="openPayload('responder-avaliacao')">{ } JSON</button></td>
               </tr>
@@ -3292,7 +3292,7 @@ const diagTips = {
   'Viver Bem':             'App principal para beneficiários.\nConsome endpoints de Beneficiário, Risco, Plano de Ação, Questionários.',
   'BackOffice':            'Redes de Valor — Painel administrativo para gestores.\nConsome endpoints de Beneficiário e Programa.',
   'Redes de Valor':        'Gestão de rede de prestadores e contratos.\nConsome endpoints de Beneficiário.',
-  'SAT':                   'Sistema de Atendimento ao TEA.\nConsome endpoints de Beneficiário e Questionários.',
+  'SAT':                   'SRT (TEA) — Sistema de Registro Terapêutico.\nConsome endpoints de Beneficiário e Questionários.',
   'Cockpit Navegação':     'Painel clínico para gestores clínicos.\nConsome endpoints de Beneficiário, Internação e Relatório.',
   'Cockpit Nav.':          'Painel clínico para gestores clínicos.\nConsome endpoints de Beneficiário, Internação e Relatório.',
   'Auditoria Clínica':     'Módulo de auditoria para auditores clínicos.\nConsome Beneficiário, Questionários e Consultas.',
