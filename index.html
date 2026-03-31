@@ -3119,7 +3119,7 @@
         <h2>Módulo 5 — Mude 1 Hábito</h2>
       </div>
       <div class="section-body">
-        <p>Módulo focado em <strong>mudança comportamental</strong> por meio de atividades práticas — presenciais e online — oferecidas tanto pela Unimed quanto por parceiros externos.</p>
+        <p>Módulo focado em <strong>mudança comportamental</strong> por meio de atividades práticas — presenciais e online. Todo o conteúdo e catálogo de atividades é gerido na <strong>base local do OutSystems ODC</strong>, sem integração com sistemas externos para esta funcionalidade.</p>
 
         <div class="subsection">
           <div class="subsection-title">Tipos de Atividade</div>
@@ -3156,9 +3156,9 @@
           A integração com o Aproveita é via <strong>deep link</strong> — o Viver Bem redireciona o usuário para o app ou site do parceiro sem processar dados entre sistemas. Não há troca de payload entre OutSystems e os parceiros neste fluxo.
         </div>
 
-        <div class="callout warn">
-          <strong>⚠️ APIs de atividades pendentes</strong>
-          Os endpoints de listagem de atividades online e presenciais disponíveis neste módulo não foram mapeados nesta versão. Verificar se o catálogo de atividades é gerido pelo Healthmap ou diretamente no OutSystems Backoffice.
+        <div class="callout info">
+          <strong>📌 Base local OutSystems</strong>
+          O catálogo de atividades (online e presenciais) é gerido diretamente no <strong>OutSystems Backoffice</strong> e armazenado na base local. Não há chamadas a APIs externas para listar ou exibir as atividades deste módulo.
         </div>
       </div>
     </div>
@@ -3193,14 +3193,14 @@
                 <tr>
                   <td><strong>Ficha Médica</strong></td>
                   <td>Consolidado de dados de saúde com opção de <strong>exportar</strong> e <strong>compartilhar</strong></td>
-                  <td>Healthmap / OutSystems</td>
-                  <td>⚠️ API de geração da ficha pendente de mapeamento</td>
+                  <td>OutSystems (local)</td>
+                  <td>Gerada e armazenada na base local OutSystems</td>
                 </tr>
                 <tr>
                   <td><strong>Perfil de Saúde</strong></td>
                   <td>Exibe a classificação de complexidade do beneficiário (ex: "Baixíssima Complexidade") com explicação e orientações</td>
-                  <td>Healthmap</td>
-                  <td>Derivado dos scores do Mapa de Saúde</td>
+                  <td>OutSystems (local)</td>
+                  <td>Dados mantidos na base local OutSystems</td>
                 </tr>
               </tbody>
             </table>
@@ -3288,9 +3288,9 @@
           <p>A aba Registros inclui <strong>acesso direto ao app Aproveita</strong> (clube de descontos), reforçando o ecossistema de benefícios da Unimed POA.</p>
         </div>
 
-        <div class="callout warn">
-          <strong>⚠️ APIs de Registros pendentes</strong>
-          Os endpoints de persistência dos registros de hábitos (água, sono, distância) não foram mapeados nesta versão. Verificar se são salvos no Healthmap ou exclusivamente na base local OutSystems.
+        <div class="callout info">
+          <strong>📌 Base local OutSystems</strong>
+          Todos os registros de hábitos (água, sono, distância) e medicamentos são armazenados exclusivamente na <strong>base local do OutSystems ODC</strong>. Não há integração com Healthmap ou Dynamics para este módulo.
         </div>
       </div>
     </div>
