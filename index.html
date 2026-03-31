@@ -112,7 +112,7 @@
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
     }
     #page-header-ma {
-      background: linear-gradient(135deg, #0f3320 0%, #1b5e3b 60%, #2a9d6f 100%);
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
     }
     #page-header .label, #page-header-ma .label {
       font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
@@ -138,7 +138,7 @@
       background: rgba(255,180,0,.18); border-color: rgba(255,180,0,.4);
       color: #ffe08a; font-weight: 600;
     }
-    #btn-export {
+    #btn-export, #btn-export-ma {
       display: inline-flex; align-items: center; gap: 7px;
       margin-left: auto;
       padding: 7px 18px;
@@ -149,12 +149,12 @@
       cursor: pointer; transition: background .2s, border-color .2s;
       font-family: 'Segoe UI', Arial, sans-serif;
     }
-    #btn-export:hover {
+    #btn-export:hover, #btn-export-ma:hover {
       background: rgba(255,255,255,.28);
       border-color: rgba(255,255,255,.7);
     }
-    #btn-export:active { transform: scale(.97); }
-    #btn-dashboard {
+    #btn-export:active, #btn-export-ma:active { transform: scale(.97); }
+    #btn-dashboard, #btn-dashboard-ma {
       display: inline-flex; align-items: center; gap: 7px;
       padding: 7px 18px;
       background: rgba(255,255,255,.1);
@@ -164,12 +164,12 @@
       cursor: pointer; transition: background .2s, border-color .2s, color .2s;
       font-family: 'Segoe UI', Arial, sans-serif;
     }
-    #btn-dashboard:hover {
+    #btn-dashboard:hover, #btn-dashboard-ma:hover {
       background: rgba(255,255,255,.22);
       border-color: rgba(255,255,255,.6);
       color: #fff;
     }
-    #btn-dashboard:active { transform: scale(.97); }
+    #btn-dashboard:active, #btn-dashboard-ma:active { transform: scale(.97); }
 
     /* ── CHANGELOG MODAL ── */
     #changelog-overlay {
@@ -2605,7 +2605,7 @@
       <button id="btn-dashboard-ma" onclick="goHome()" title="Voltar ao dashboard">
         ← Dashboard
       </button>
-      <button onclick="exportPDF()" title="Exportar como PDF" style="display:inline-flex;align-items:center;gap:7px;margin-left:4px;padding:7px 18px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);border-radius:20px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Segoe UI',Arial,sans-serif;">
+      <button id="btn-export-ma" onclick="exportPDF()" title="Exportar como PDF">
         <span>📄</span> Exportar PDF
       </button>
     </div>
