@@ -2577,6 +2577,12 @@
     <div class="nav-section">Referência</div>
     <a href="#ma-sec6">6. Tabela de Integrações</a>
     <a href="#ma-sec7">7. Glossário</a>
+    <div class="nav-section">Módulos da Plataforma</div>
+    <a href="#ma-sec8">8. Meu Plano</a>
+    <a href="#ma-sec9">9. Mude 1 Hábito</a>
+    <a href="#ma-sec10">10. Perfil</a>
+    <a href="#ma-sec11">11. Registros</a>
+    <a href="#ma-sec12">12. Roadmap — Comunidades</a>
   </nav>
 </aside>
 
@@ -3038,8 +3044,323 @@
               <tr><td><strong>Mapa de Saúde</strong></td><td>Painel visual com 7 dimensões de saúde, alimentado pelos scores do Healthmap em tempo real</td></tr>
               <tr><td><strong>BLIP</strong></td><td>Plataforma de mensageria — integração pendente de documentação</td></tr>
               <tr><td><strong>Job semanal</strong></td><td>Processo agendado no OutSystems que sincroniza a estrutura dos questionários do Healthmap para tabelas locais</td></tr>
+              <tr><td><strong>Meu Plano</strong></td><td>Módulo que exibe o plano de cuidado personalizado completo do beneficiário — ações e conteúdos exclusivos gerados pelo Healthmap</td></tr>
+              <tr><td><strong>Mude 1 Hábito</strong></td><td>Módulo de atividades online e presenciais para mudança comportamental, com acesso aos parceiros Zenit e Aproveita</td></tr>
+              <tr><td><strong>Zenit</strong></td><td>Parceiro de atividade física integrado ao Viver Bem via deep link — app de treinos e bem-estar</td></tr>
+              <tr><td><strong>Aproveita</strong></td><td>Parceiro de clube de descontos e benefícios integrado ao Viver Bem — acessível via Mude 1 Hábito e Registros</td></tr>
+              <tr><td><strong>Registros</strong></td><td>Módulo de automonitoramento de hábitos diários (água, sono, distância) e controle de medicamentos</td></tr>
+              <tr><td><strong>Ficha Médica</strong></td><td>Documento consolidado de dados de saúde do beneficiário, gerado pelo sistema com opção de exportar e compartilhar</td></tr>
+              <tr><td><strong>Perfil de Saúde</strong></td><td>Classificação de complexidade do beneficiário (ex: Baixíssima Complexidade) com orientações personalizadas</td></tr>
+              <tr><td><strong>Comunidades</strong></td><td>Funcionalidade planejada (MVP 2025) — ecossistema social dentro do app com grupos, feed, troféus e progresso coletivo</td></tr>
+              <tr><td><strong>Troféus</strong></td><td>Sistema de gamificação planejado para Comunidades — conquistas vinculadas ao cumprimento de ações do plano de saúde</td></tr>
+              <tr><td><strong>Baixa Complexidade</strong></td><td>Perfil de risco do público-alvo do Viver Bem — beneficiários que precisam de orientação digital de autocuidado, sem necessidade de atendimento especializado intensivo</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 8: MEU PLANO -->
+    <div class="section-card" id="ma-sec8">
+      <div class="section-header">
+        <div class="section-number">8</div>
+        <h2>Módulo 4 — Meu Plano</h2>
+      </div>
+      <div class="section-body">
+        <p>Seção dedicada ao <strong>plano de cuidado personalizado</strong> do beneficiário, gerado automaticamente com base nas respostas dos questionários de saúde e no perfil de risco calculado pelo Healthmap.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Funcionalidades</div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">Plano Personalizado</div>
+              <div class="oc-value" style="font-size:13px;">Gerado pelo motor de regras do Healthmap com base nos scores e respostas do beneficiário</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Ações do Plano</div>
+              <div class="oc-value" style="font-size:13px;">Lista de ações de saúde específicas para o perfil — ex: consulta médica, hábito de hidratação, atividade física</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Conteúdos Exclusivos</div>
+              <div class="oc-value" style="font-size:13px;">Artigos, vídeos e materiais educativos vinculados ao plano de cada beneficiário</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Relação com Outros Módulos</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Origem</th><th>Dado</th><th>Uso no Meu Plano</th></tr></thead>
+              <tbody>
+                <tr><td>Questionários (Home)</td><td>Respostas dos 3 perfis de saúde</td><td>Base para geração do plano personalizado no Healthmap</td></tr>
+                <tr><td>Mapa de Saúde (Home)</td><td>Scores das 7 categorias</td><td>Direciona as ações e conteúdos prioritários</td></tr>
+                <tr><td>Plano de Cuidado (Home 5.2)</td><td>Ações em execução (<code>status=E</code>)</td><td>As ações do Meu Plano são as mesmas listadas na Home — visão expandida</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <strong>📌 Nota técnica</strong>
+          O "Meu Plano" consome as mesmas APIs de Plano de Cuidado já documentadas na seção 5.2. A separação entre Home e Meu Plano é de <strong>UX</strong> — a Home exibe um resumo das principais ações; o Meu Plano exibe a visão completa com conteúdos associados.
+        </div>
+
+        <div class="callout warn">
+          <strong>⚠️ APIs de conteúdo pendentes</strong>
+          Os endpoints responsáveis por retornar conteúdos exclusivos (artigos, vídeos) vinculados ao plano não foram mapeados nesta versão do documento. Levantar com o time Healthmap.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 9: MUDE 1 HÁBITO -->
+    <div class="section-card" id="ma-sec9">
+      <div class="section-header">
+        <div class="section-number">9</div>
+        <h2>Módulo 5 — Mude 1 Hábito</h2>
+      </div>
+      <div class="section-body">
+        <p>Módulo focado em <strong>mudança comportamental</strong> por meio de atividades práticas — presenciais e online — oferecidas tanto pela Unimed quanto por parceiros externos.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Tipos de Atividade</div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">Atividades Online</div>
+              <div class="oc-value" style="font-size:13px;">Aulas, workshops e conteúdos interativos disponíveis diretamente na plataforma Viver Bem</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Atividades Presenciais</div>
+              <div class="oc-value" style="font-size:13px;">Eventos e atividades físicas organizadas pela Unimed POA — ex: caminhadas, pilates em grupo, aulas de meditação</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Parceiros Integrados</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Parceiro</th><th>Foco</th><th>Tipo de Integração</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Zenit</strong></td>
+                  <td>Atividade física — aplicativo de treinos e bem-estar</td>
+                  <td>Link direto para o app Zenit a partir do Viver Bem</td>
+                </tr>
+                <tr>
+                  <td><strong>Aproveita</strong></td>
+                  <td>Clube de descontos e benefícios em estabelecimentos parceiros</td>
+                  <td>Link direto para o app/site Aproveita — também acessível via Registros</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <strong>📌 Modelo de integração com parceiros</strong>
+          A integração com Zenit e Aproveita é via <strong>deep link</strong> — o Viver Bem redireciona o usuário para o app ou site do parceiro sem processar dados entre sistemas. Não há troca de payload entre OutSystems e os parceiros neste fluxo.
+        </div>
+
+        <div class="callout warn">
+          <strong>⚠️ APIs de atividades pendentes</strong>
+          Os endpoints de listagem de atividades online e presenciais disponíveis neste módulo não foram mapeados nesta versão. Verificar se o catálogo de atividades é gerido pelo Healthmap ou diretamente no OutSystems Backoffice.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 10: PERFIL -->
+    <div class="section-card" id="ma-sec10">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <h2>Módulo 6 — Perfil</h2>
+      </div>
+      <div class="section-body">
+        <p>Central de dados pessoais e de saúde do beneficiário. Permite visualizar e atualizar informações, além de acessar documentos gerados pelo sistema.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Funcionalidades do Perfil</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Funcionalidade</th><th>Descrição</th><th>Sistema</th><th>Obs.</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Dados de Perfil</strong></td>
+                  <td>Exibe e permite atualização de dados pessoais (nome, e-mail, telefone)</td>
+                  <td>Dynamics 365 CRM</td>
+                  <td>Mesmos endpoints documentados no Onboarding (4.2)</td>
+                </tr>
+                <tr>
+                  <td><strong>Termo de Consentimento</strong></td>
+                  <td>Acesso ao termo aceito no Onboarding — pode ser consultado a qualquer momento</td>
+                  <td>Healthmap</td>
+                  <td>Mesma API de termo documentada em 4.1</td>
+                </tr>
+                <tr>
+                  <td><strong>Ficha Médica</strong></td>
+                  <td>Consolidado de dados de saúde com opção de <strong>exportar</strong> e <strong>compartilhar</strong></td>
+                  <td>Healthmap / OutSystems</td>
+                  <td>⚠️ API de geração da ficha pendente de mapeamento</td>
+                </tr>
+                <tr>
+                  <td><strong>Perfil de Saúde</strong></td>
+                  <td>Exibe a classificação de complexidade do beneficiário (ex: "Baixíssima Complexidade") com explicação e orientações</td>
+                  <td>Healthmap</td>
+                  <td>Derivado dos scores do Mapa de Saúde</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Classificação de Complexidade</div>
+          <p>O <strong>Perfil de Saúde</strong> exibe a estratificação do beneficiário conforme o modelo de risco do Healthmap. Exemplo de classificação exibida na interface:</p>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">Baixíssima Complexidade</div>
+              <div class="oc-value" style="font-size:12px;">Saúde estável — foco em prevenção e manutenção de hábitos saudáveis</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Baixa Complexidade</div>
+              <div class="oc-value" style="font-size:12px;">Perfil do público-alvo principal do Viver Bem — autocuidado com orientação digital</div>
+            </div>
+          </div>
+          <div class="callout info">
+            <strong>ℹ️ Público-alvo do Viver Bem</strong>
+            A plataforma é o principal canal para beneficiários de <strong>baixa complexidade</strong> — o atendimento de média/alta complexidade ocorre por outros canais assistenciais da Unimed POA.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 11: REGISTROS -->
+    <div class="section-card" id="ma-sec11">
+      <div class="section-header">
+        <div class="section-number">11</div>
+        <h2>Módulo 7 — Registros</h2>
+      </div>
+      <div class="section-body">
+        <p>Módulo de <strong>automonitoramento de hábitos e medicamentos</strong>. Permite ao beneficiário registrar dados diários de saúde e acompanhar sua evolução ao longo do tempo.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Hábitos de Saúde</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Hábito</th><th>Dados Registrados</th><th>Visualização</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>💧 <strong>Água</strong></td>
+                  <td>Consumo diário em ml</td>
+                  <td>Gráfico de barras com histórico e meta diária</td>
+                </tr>
+                <tr>
+                  <td>😴 <strong>Sono</strong></td>
+                  <td>Horas dormidas por noite</td>
+                  <td>Gráfico de linha com média do período</td>
+                </tr>
+                <tr>
+                  <td>🏃 <strong>Distância Percorrida</strong></td>
+                  <td>Distância em km ou passos</td>
+                  <td>Gráfico com evolução diária</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:12px;font-size:13px;color:#5a7a96;">Os 3 hábitos são exibidos também em resumo na <strong>Home</strong> (seção 5 — Minha Saúde Hoje).</p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Medicamentos</div>
+          <p>Página dedicada ao controle do uso de medicamentos com duas categorias:</p>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">Medicamentos Esporádicos</div>
+              <div class="oc-value" style="font-size:13px;">Registro pontual — ex: analgésico tomado em determinada data</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Medicamentos Contínuos</div>
+              <div class="oc-value" style="font-size:13px;">Uso regular com calendário de controle — beneficiário marca os dias em que tomou</div>
+            </div>
+          </div>
+          <div class="callout info">
+            <strong>📌 Armazenamento de Medicamentos</strong>
+            O cadastro e histórico de medicamentos é gerido na base local do <strong>OutSystems ODC</strong>. Não há integração com o Healthmap ou Dynamics para esta funcionalidade nesta versão.
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Link para Parceiro Aproveita</div>
+          <p>A aba Registros inclui <strong>acesso direto ao app Aproveita</strong> (clube de descontos), reforçando o ecossistema de benefícios da Unimed POA.</p>
+        </div>
+
+        <div class="callout warn">
+          <strong>⚠️ APIs de Registros pendentes</strong>
+          Os endpoints de persistência dos registros de hábitos (água, sono, distância) não foram mapeados nesta versão. Verificar se são salvos no Healthmap ou exclusivamente na base local OutSystems.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 12: ROADMAP — COMUNIDADES -->
+    <div class="section-card" id="ma-sec12">
+      <div class="section-header">
+        <div class="section-number">12</div>
+        <h2>Roadmap — Comunidades</h2>
+      </div>
+      <div class="section-body">
+        <p>Funcionalidade planejada para 2025 que transforma o Viver Bem em um <strong>ecossistema social</strong> dentro do app, com foco em <strong>engajamento</strong> e <strong>escala</strong> do autocuidado.</p>
+
+        <div class="callout info">
+          <strong>📌 Status atual</strong>
+          Telas conceituais em validação de MVP. Não há implementação em produção nesta data. Este registro é para contextualização do repasse.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Visão Estratégica</div>
+          <p>O modelo de Comunidades busca transformar o cuidado com a saúde em <strong>hábito coletivo</strong>, criando um ciclo de engajamento crescente:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Benefício Esperado</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td>Melhora nos indicadores do Mapa de Saúde</td><td>Engajamento social estimula consistência nos questionários e hábitos</td></tr>
+                <tr><td>Regularidade no cuidado</td><td>Grupos e feed incentivam frequência nas atividades do plano</td></tr>
+                <tr><td>Melhora na percepção de bem-estar</td><td>Senso de progresso coletivo amplifica resultados individuais</td></tr>
+                <tr><td>Aumento da autonomia</td><td>Usuários mais informados tomam decisões de saúde com mais independência</td></tr>
+                <tr><td>Sensação de pertencimento</td><td>Vínculo com a comunidade aumenta retenção na plataforma</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">5 Pilares da Comunidade Digital</div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">👥 Grupos</div>
+              <div class="oc-value" style="font-size:13px;">Grupos temáticos com agenda, dicas, plano e progresso — ex: grupo de Pilates com horários de aulas presenciais</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">📰 Feed</div>
+              <div class="oc-value" style="font-size:13px;">Feed social com conteúdos gerados pelos membros da comunidade, estimulando troca de experiências</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">📈 Progresso Individual</div>
+              <div class="oc-value" style="font-size:13px;">Visualização do nível e frequência pessoal dentro do grupo — ex: "Nível 1 — Iniciante no Pilates — 62% de frequência"</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">🏆 Troféus</div>
+              <div class="oc-value" style="font-size:13px;">Sistema de conquistas vinculado ao Meu Plano — gamificação do cumprimento de ações de saúde com compartilhamento social</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">📲 Redes Sociais</div>
+              <div class="oc-value" style="font-size:13px;">Compartilhamento de conquistas (troféus) nas redes sociais do beneficiário com identidade visual Unimed / Viver Bem</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <strong>⚠️ Ponto de atenção para repasse</strong>
+          O módulo de Comunidades ainda não possui APIs definidas. Quando a feature entrar em desenvolvimento, será necessário mapear os endpoints de: criação/listagem de grupos, feed de posts, sistema de pontos/troféus e integração com Healthmap para validação de conquistas.
         </div>
       </div>
     </div>
