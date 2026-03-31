@@ -3954,8 +3954,8 @@ function loadProject(id) {
   // main
   const mCbv = document.getElementById('main');
   const mMa  = document.getElementById('main-ma');
-  if (mCbv) mCbv.style.display = isCbv ? '' : 'none';
-  if (mMa)  mMa.style.display  = isMa  ? '' : 'none';
+  if (mCbv) mCbv.style.display = isCbv ? 'block' : 'none';
+  if (mMa)  mMa.style.display  = isMa  ? 'block' : 'none';
 }
 
 function _applyGuestUI() {
