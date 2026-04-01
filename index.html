@@ -4225,7 +4225,8 @@ function cancelAuth() {
 }
 
 // ── MODO VISITANTE (link direto sem senha) ──────────────────────────────────
-// Acesso via: ?acesso=visitante
+// Acesso via: ?acesso=visitante              → abre CBV (padrão)
+// Acesso via: ?acesso=visitante&projeto=ma   → abre Modelo Assistencial
 // Qualquer pessoa com o link entra direto sem home nem senha.
 let _guestMode = false;
 
@@ -4235,16 +4236,23 @@ let _guestMode = false;
 
   if (isGuest) {
     _guestMode = true;
+    const guestProj = params.get('projeto') === 'ma' ? 'ma' : 'cbv';
     // Oculta overlays instantaneamente
     const ov = document.getElementById('auth-overlay');
     if (ov) { ov.classList.remove('show'); }
     const ho = document.getElementById('home-overlay');
     if (ho) { ho.classList.add('hide'); }
     document.body.style.overflow = '';
-    // Mostra badge "Visitante" no header e esconde botão Dashboard
-    document.addEventListener('DOMContentLoaded', _applyGuestUI);
+    // Carrega o projeto correto e aplica UI visitante
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProject(guestProj);
+      _applyGuestUI(guestProj);
+    });
     // DOMContentLoaded pode já ter ocorrido (script inline)
-    if (document.readyState !== 'loading') _applyGuestUI();
+    if (document.readyState !== 'loading') {
+      loadProject(guestProj);
+      _applyGuestUI(guestProj);
+    }
     return;
   }
 
@@ -4278,21 +4286,36 @@ function loadProject(id) {
   if (mMa)  mMa.style.display  = isMa  ? 'block' : 'none';
 }
 
-function _applyGuestUI() {
-  // Esconde elementos de versão/data/status/histórico no modo visitante
-  ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
-  // Insere chip "Visitante" na linha de meta do header
-  const meta = document.querySelector('#page-header .meta');
-  if (meta) {
-    const chip = document.createElement('span');
-    chip.className = 'chip chip-guest';
-    chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
-    // Insere antes do botão Exportar PDF
-    const exportBtn = document.getElementById('btn-export');
-    meta.insertBefore(chip, exportBtn);
+function _applyGuestUI(proj) {
+  proj = proj || 'cbv';
+  if (proj === 'ma') {
+    // Esconde botão Dashboard do MA
+    const dashMa = document.getElementById('btn-dashboard-ma');
+    if (dashMa) dashMa.style.display = 'none';
+    // Insere chip "Visitante" na linha de meta do header MA
+    const meta = document.querySelector('#page-header-ma .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export-ma');
+      meta.insertBefore(chip, exportBtn);
+    }
+  } else {
+    // Esconde elementos de versão/data/status/histórico no modo visitante (CBV)
+    ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    // Insere chip "Visitante" na linha de meta do header CBV
+    const meta = document.querySelector('#page-header .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export');
+      meta.insertBefore(chip, exportBtn);
+    }
   }
 }
 
