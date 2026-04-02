@@ -1,0 +1,1335 @@
+{
+  "info": {
+    "_postman_id": "jornada-assistencial-cbv-healthmap",
+    "name": "Jornada Assistencial — CBV × Healthmap",
+    "description": "Mapeamento completo dos fluxos de API da integração CBV (Unimed POA) × Healthmap, organizado por jornada assistencial. Baseado no ModeloAssistencial_Lib (OutSystems ODC).\n\n**Subsistemas cobertos:**\n- Viver Bem (Beneficiários)\n- Redes de Valor\n- Cockpit da Navegação\n- Auditoria Clínica\n- Transição do Cuidado\n- SRT (TEA)\n\n**Autenticação:** OAuth2 client_credentials + header KeyDS (PRD | HMG)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.healthmap.com.br",
+      "description": "Base URL do ambiente (PRD). Para HMG: https://api.hmg.healthmap.com.br"
+    },
+    {
+      "key": "externalBaseUrl",
+      "value": "https://unimedpa.healthmap.com.br",
+      "description": "Base URL dos endpoints externos (sem Swagger) — PRD"
+    },
+    {
+      "key": "externalBaseUrlHmg",
+      "value": "https://unimedpa.hmg.healthmap.com.br",
+      "description": "Base URL dos endpoints externos — HMG"
+    },
+    {
+      "key": "bearerToken",
+      "value": "",
+      "description": "Token OAuth2. Obtido via POST /oauth/token. Atualizado automaticamente pelo script de autenticação."
+    },
+    {
+      "key": "clientId",
+      "value": "",
+      "description": "client_id para OAuth2"
+    },
+    {
+      "key": "clientSecret",
+      "value": "",
+      "description": "client_secret para OAuth2"
+    },
+    {
+      "key": "keyDS",
+      "value": "PRD",
+      "description": "Identificador de ambiente: PRD (produção) ou HMG (homologação)"
+    },
+    {
+      "key": "idCliente",
+      "value": "",
+      "description": "ID do beneficiário/cliente"
+    },
+    {
+      "key": "idPessoa",
+      "value": "",
+      "description": "ID da pessoa"
+    },
+    {
+      "key": "idTermo",
+      "value": "",
+      "description": "ID do termo"
+    },
+    {
+      "key": "idEmpresa",
+      "value": "",
+      "description": "ID da empresa"
+    },
+    {
+      "key": "idQuestionario",
+      "value": "",
+      "description": "ID do questionário"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticação",
+      "description": "Autenticação OAuth2 compartilhada por todos os subsistemas. O header KeyDS identifica o ambiente (PRD ou HMG).",
+      "item": [
+        {
+          "name": "Obter Token OAuth2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set('bearerToken', jsonData.access_token);",
+                  "    console.log('Token salvo com sucesso');",
+                  "} else {",
+                  "    console.error('Token não encontrado na resposta');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "KeyDS",
+                "value": "{{keyDS}}",
+                "description": "Identificador de ambiente: PRD ou HMG"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "description": "Tipo de grant OAuth2"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{clientId}}"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{clientSecret}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/oauth/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["oauth", "token"]
+            },
+            "description": "Obtém o Bearer Token via OAuth2 client_credentials. O script de teste salva o token na variável `bearerToken` automaticamente.\n\n**Header obrigatório:** KeyDS = PRD | HMG\n\n**Resposta:** `{ access_token, token_type, expires_in }`"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🌿 Jornada — Viver Bem (Beneficiários)",
+      "description": "Plataforma Viver Bem — interface principal para beneficiários. Cobre termos de aceite, dados do beneficiário, risco/estratificação, plano de ação e questionários.",
+      "item": [
+        {
+          "name": "Termo de Aceite",
+          "description": "Gestão de termos de aceite dos beneficiários.",
+          "item": [
+            {
+              "name": "Consultar Aceite de Termo",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/termo/v1/termo/aceiteTermo?idCliente={{idCliente}}&idTermo={{idTermo}}&idEmpresa={{idEmpresa}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "termo", "v1", "termo", "aceiteTermo"],
+                  "query": [
+                    {
+                      "key": "idCliente",
+                      "value": "{{idCliente}}",
+                      "description": "ID do beneficiário"
+                    },
+                    {
+                      "key": "idTermo",
+                      "value": "{{idTermo}}",
+                      "description": "ID do termo"
+                    },
+                    {
+                      "key": "idEmpresa",
+                      "value": "{{idEmpresa}}",
+                      "description": "ID da empresa"
+                    }
+                  ]
+                },
+                "description": "Verifica se o beneficiário aceitou um determinado termo."
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Termo Publicado por Empresa",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/termo/v1/termo/buscaTermoPublicadoPorEmpresa?idEmpresa={{idEmpresa}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "termo", "v1", "termo", "buscaTermoPublicadoPorEmpresa"],
+                  "query": [
+                    {
+                      "key": "idEmpresa",
+                      "value": "{{idEmpresa}}",
+                      "description": "ID da empresa para filtrar termos publicados"
+                    }
+                  ]
+                },
+                "description": "Retorna os termos publicados por uma empresa específica."
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Aceite de Termo",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/termo/v1/termo/buscarAceiteTermo?idCliente={{idCliente}}&idTermo={{idTermo}}&idEmpresa={{idEmpresa}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "termo", "v1", "termo", "buscarAceiteTermo"],
+                  "query": [
+                    {
+                      "key": "idCliente",
+                      "value": "{{idCliente}}"
+                    },
+                    {
+                      "key": "idTermo",
+                      "value": "{{idTermo}}"
+                    },
+                    {
+                      "key": "idEmpresa",
+                      "value": "{{idEmpresa}}"
+                    }
+                  ]
+                },
+                "description": "Busca registros de aceite de termo com filtros."
+              },
+              "response": []
+            },
+            {
+              "name": "Revogar Termo",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/termo/v1/termo/revogaTermo/{{idPessoa}}/{{idTermo}}/{{idEmpresa}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "termo",
+                    "v1",
+                    "termo",
+                    "revogaTermo",
+                    "{{idPessoa}}",
+                    "{{idTermo}}",
+                    "{{idEmpresa}}"
+                  ]
+                },
+                "description": "Revoga a aceitação de um termo por parte do beneficiário.\n\n**Path params:** idPessoa, idTermo, idEmpresa"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Beneficiário",
+          "description": "Consulta de dados dos beneficiários cadastrados no Healthmap.",
+          "item": [
+            {
+              "name": "Listar Beneficiários (paginado)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario?pageSize=20&cpf=&email=&id=&nome=&numeroCarteirinha=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "beneficiario", "v1", "beneficiario"],
+                  "query": [
+                    {
+                      "key": "pageSize",
+                      "value": "20",
+                      "description": "Itens por página"
+                    },
+                    {
+                      "key": "cpf",
+                      "value": "",
+                      "description": "Filtro por CPF"
+                    },
+                    {
+                      "key": "email",
+                      "value": "",
+                      "description": "Filtro por e-mail"
+                    },
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "Filtro por ID interno"
+                    },
+                    {
+                      "key": "nome",
+                      "value": "",
+                      "description": "Filtro por nome"
+                    },
+                    {
+                      "key": "numeroCarteirinha",
+                      "value": "",
+                      "description": "Filtro por número de carteirinha"
+                    }
+                  ]
+                },
+                "description": "Lista beneficiários com suporte a paginação (Page<BeneficiarioDTO>) e múltiplos filtros.\n\n**Endpoint transversal:** usado por todos os 6 subsistemas — alta criticidade para migração."
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Beneficiário por ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario/{{idCliente}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "beneficiario", "v1", "beneficiario", "{{idCliente}}"]
+                },
+                "description": "Retorna dados completos de um beneficiário pelo ID interno."
+              },
+              "response": []
+            },
+            {
+              "name": "Dados Resumidos do Beneficiário",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario/dadosBeneficiarioResumido/{{idCliente}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "beneficiario",
+                    "v1",
+                    "beneficiario",
+                    "dadosBeneficiarioResumido",
+                    "{{idCliente}}"
+                  ]
+                },
+                "description": "Retorna BeneficiarioResumidoDTO — versão compacta dos dados do beneficiário, usada em listagens e cards."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Risco / Estratificação",
+          "description": "Medições de risco e estratificação de saúde dos beneficiários (Health Map).",
+          "item": [
+            {
+              "name": "Consultar Medição de Risco",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/risco/v1/medicaoRisco?idCliente={{idCliente}}&status=&pageSize=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "risco", "v1", "medicaoRisco"],
+                  "query": [
+                    {
+                      "key": "idCliente",
+                      "value": "{{idCliente}}",
+                      "description": "ID do beneficiário"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "description": "Filtro por status da medição"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "20",
+                      "description": "Itens por página"
+                    }
+                  ]
+                },
+                "description": "Retorna MedicaoRisco — estratificação/classificação de risco do beneficiário. Resposta: Page<MedicaoRisco>.\n\n**Usado por:** Viver Bem, Redes de Valor, Cockpit Navegação."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Plano de Ação",
+          "description": "Gestão de planos de ação assistencial dos beneficiários.",
+          "item": [
+            {
+              "name": "Consultar Planos de Ação",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/planoacao/v1/planoAcao?id=&idCliente={{idCliente}}&status=&statusAcao=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "planoacao", "v1", "planoAcao"],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": "",
+                      "description": "ID do plano de ação"
+                    },
+                    {
+                      "key": "idCliente",
+                      "value": "{{idCliente}}",
+                      "description": "ID do beneficiário"
+                    },
+                    {
+                      "key": "status",
+                      "value": "",
+                      "description": "Status do plano"
+                    },
+                    {
+                      "key": "statusAcao",
+                      "value": "",
+                      "description": "Status da ação dentro do plano"
+                    }
+                  ]
+                },
+                "description": "Lista planos de ação com filtros por ID, cliente, status do plano e status da ação."
+              },
+              "response": []
+            },
+            {
+              "name": "Programar Ação no Plano",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"idAcao\": \"\",\n    \"idPlanoAcao\": \"\",\n    \"dataAgendamento\": \"2024-01-01T10:00:00\",\n    \"observacao\": \"\",\n    \"responsavel\": \"\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/planoacao/v1/planoAcao/programarAcao/{{idCliente}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "planoacao",
+                    "v1",
+                    "planoAcao",
+                    "programarAcao",
+                    "{{idCliente}}"
+                  ]
+                },
+                "description": "Agenda uma ou mais ações no plano de ação do beneficiário.\n\n**Body:** Array de `AcaoPlanoAcaoDTO` (aceita item único ou lista)\n\n```json\n[\n  {\n    \"idAcao\": \"string\",\n    \"idPlanoAcao\": \"string\",\n    \"dataAgendamento\": \"datetime\",\n    \"observacao\": \"string\",\n    \"responsavel\": \"string\"\n  }\n]\n```"
+              },
+              "response": []
+            },
+            {
+              "name": "Realizar Ação do Plano",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idAcaoPlanoAcao\": \"\",\n  \"dataRealizacao\": \"2024-01-01T10:00:00\",\n  \"observacao\": \"\",\n  \"resultado\": \"\",\n  \"responsavel\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/planoacao/v1/planoAcao/realizarAcao",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "planoacao", "v1", "planoAcao", "realizarAcao"]
+                },
+                "description": "Registra a realização/execução de uma ação do plano.\n\n**Body:** `RealizarAcaoDTO`\n\n```json\n{\n  \"idAcaoPlanoAcao\": \"string\",\n  \"dataRealizacao\": \"datetime\",\n  \"observacao\": \"string\",\n  \"resultado\": \"string\",\n  \"responsavel\": \"string\"\n}\n```"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Questionários",
+          "description": "Gestão de questionários assistenciais — consulta, resposta avulsa e última resposta.",
+          "item": [
+            {
+              "name": "Buscar Questionário por ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/questionario/v1/questionario/{{idQuestionario}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "questionario", "v1", "questionario", "{{idQuestionario}}"]
+                },
+                "description": "Retorna a estrutura completa de um questionário pelo seu ID."
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Respostas de Questão",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/questionario/v1/questionario/questaoRespostas?idQuestao=&dataInicioResposta=&dataFimResposta=&pageSize=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "questionario", "v1", "questionario", "questaoRespostas"],
+                  "query": [
+                    {
+                      "key": "idQuestao",
+                      "value": "",
+                      "description": "ID da questão"
+                    },
+                    {
+                      "key": "dataInicioResposta",
+                      "value": "",
+                      "description": "Data início (formato ISO 8601)"
+                    },
+                    {
+                      "key": "dataFimResposta",
+                      "value": "",
+                      "description": "Data fim (formato ISO 8601)"
+                    },
+                    {
+                      "key": "pageSize",
+                      "value": "20",
+                      "description": "Itens por página"
+                    }
+                  ]
+                },
+                "description": "Retorna respostas de uma questão específica, com filtro de período. Resposta: Page<QuestaoRespostaDTO>."
+              },
+              "response": []
+            },
+            {
+              "name": "Responder Questão Avulsa",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idCliente\": \"{{idCliente}}\",\n  \"idQuestao\": \"\",\n  \"resposta\": \"\",\n  \"dataResposta\": \"2024-01-01T10:00:00\",\n  \"observacao\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/questionario/v1/questionario/responderQuestaoAvulsa",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "questionario", "v1", "questionario", "responderQuestaoAvulsa"]
+                },
+                "description": "Registra a resposta de uma única questão avulsa.\n\n**Body:** `ResponderQuestaoDTO`\n\n```json\n{\n  \"idCliente\": \"string\",\n  \"idQuestao\": \"string\",\n  \"resposta\": \"string\",\n  \"dataResposta\": \"datetime\",\n  \"observacao\": \"string\"\n}\n```\n\n**Atenção:** Diferente do endpoint externo `responderAvaliacao` (contrato distinto)."
+              },
+              "response": []
+            },
+            {
+              "name": "Última Resposta da Questão [🚧 Em Desenvolvimento]",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idCliente\": \"{{idCliente}}\",\n  \"idQuestionario\": \"{{idQuestionario}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/questionario/v1/questionario/questaoUltimaResposta",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "questionario", "v1", "questionario", "questaoUltimaResposta"]
+                },
+                "description": "🚧 **EM DESENVOLVIMENTO** — Retorna a última resposta registrada para o questionário de um beneficiário.\n\n**Body:** `{ idCliente, idQuestionario }`\n\n**Status:** Não disponível em produção ainda."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "📊 Jornada — Redes de Valor",
+      "description": "Redes de Valor — visão gerencial para gestores. Usa subconjunto dos endpoints do Viver Bem.\n\n**Endpoints utilizados:**\n- POST /oauth/token\n- GET /api/beneficiario/v1/beneficiario\n- GET /api/risco/v1/medicaoRisco",
+      "item": [
+        {
+          "name": "Listar Beneficiários",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "KeyDS",
+                "value": "{{keyDS}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario?pageSize=20&cpf=&email=&id=&nome=&numeroCarteirinha=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "beneficiario", "v1", "beneficiario"],
+              "query": [
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "cpf",
+                  "value": ""
+                },
+                {
+                  "key": "email",
+                  "value": ""
+                },
+                {
+                  "key": "id",
+                  "value": ""
+                },
+                {
+                  "key": "nome",
+                  "value": ""
+                },
+                {
+                  "key": "numeroCarteirinha",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Lista beneficiários — mesma rota do Viver Bem, utilizada pelo contexto de Redes de Valor."
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar Medição de Risco",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "KeyDS",
+                "value": "{{keyDS}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/risco/v1/medicaoRisco?idCliente={{idCliente}}&status=&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "risco", "v1", "medicaoRisco"],
+              "query": [
+                {
+                  "key": "idCliente",
+                  "value": "{{idCliente}}"
+                },
+                {
+                  "key": "status",
+                  "value": ""
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Estratificação de risco dos beneficiários — visão utilizada em Redes de Valor."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🧭 Jornada — Cockpit da Navegação",
+      "description": "Cockpit da Navegação — painel para navegadores assistenciais (BackOffice/Gestores). Inclui endpoints exclusivos de usuário, internação e relatório de ações externo.",
+      "item": [
+        {
+          "name": "Beneficiário e Usuário",
+          "item": [
+            {
+              "name": "Listar Beneficiários",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario?pageSize=20&cpf=&email=&id=&nome=&numeroCarteirinha=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "beneficiario", "v1", "beneficiario"],
+                  "query": [
+                    { "key": "pageSize", "value": "20" },
+                    { "key": "cpf", "value": "" },
+                    { "key": "email", "value": "" },
+                    { "key": "id", "value": "" },
+                    { "key": "nome", "value": "" },
+                    { "key": "numeroCarteirinha", "value": "" }
+                  ]
+                },
+                "description": "Listagem de beneficiários no contexto do Cockpit de Navegação."
+              },
+              "response": []
+            },
+            {
+              "name": "Consultar Usuário (Exclusivo Cockpit Nav.)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "KeyDS",
+                    "value": "{{keyDS}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/seguranca/v1/usuario?pageSize=20&cpf=&email=&id=&nome=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "seguranca", "v1", "usuario"],
+                  "query": [
+                    { "key": "pageSize", "value": "20" },
+                    { "key": "cpf", "value": "" },
+                    { "key": "email", "value": "" },
+                    { "key": "id", "value": "" },
+                    { "key": "nome", "value": "" }
+                  ]
+                },
+                "description": "Endpoint exclusivo do Cockpit de Navegação — busca usuários internos (navegadores/gestores) com os mesmos parâmetros do beneficiário. Tipo de retorno: `Usuario`."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Plano de Ação",
+          "item": [
+            {
+              "name": "Consultar Planos de Ação",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/api/planoacao/v1/planoAcao?idCliente={{idCliente}}&status=&statusAcao=",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "planoacao", "v1", "planoAcao"],
+                  "query": [
+                    { "key": "idCliente", "value": "{{idCliente}}" },
+                    { "key": "status", "value": "" },
+                    { "key": "statusAcao", "value": "" }
+                  ]
+                },
+                "description": "Lista planos de ação do beneficiário no contexto do Cockpit de Navegação."
+              },
+              "response": []
+            },
+            {
+              "name": "Programar Ação no Plano",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "KeyDS", "value": "{{keyDS}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"idAcao\": \"\",\n    \"idPlanoAcao\": \"\",\n    \"dataAgendamento\": \"2024-01-01T10:00:00\",\n    \"observacao\": \"\",\n    \"responsavel\": \"\"\n  }\n]",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/planoacao/v1/planoAcao/programarAcao/{{idCliente}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "planoacao", "v1", "planoAcao", "programarAcao", "{{idCliente}}"]
+                },
+                "description": "Agenda ações no plano de ação — contexto Cockpit Navegação."
+              },
+              "response": []
+            },
+            {
+              "name": "Realizar Ação do Plano",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "KeyDS", "value": "{{keyDS}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idAcaoPlanoAcao\": \"\",\n  \"dataRealizacao\": \"2024-01-01T10:00:00\",\n  \"observacao\": \"\",\n  \"resultado\": \"\",\n  \"responsavel\": \"\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/planoacao/v1/planoAcao/realizarAcao",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "planoacao", "v1", "planoAcao", "realizarAcao"]
+                },
+                "description": "Registra execução de ação do plano — contexto Cockpit Navegação."
+              },
+              "response": []
+            },
+            {
+              "name": "Listar Ações — Relatório Externo ⚠️",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "KeyDS", "value": "{{keyDS}}" }
+                ],
+                "url": {
+                  "raw": "{{externalBaseUrl}}/api/v1/relatorio/listar-acoes",
+                  "host": ["{{externalBaseUrl}}"],
+                  "path": ["api", "v1", "relatorio", "listar-acoes"]
+                },
+                "description": "⚠️ **Endpoint Externo — SEM Swagger documentado**\n\nEndpoint no backend complementar (`unimedpa.healthmap.com.br`) para relatório/visão gerencial de ações.\n\n**Risco:** Sem contrato formal — verificar com time Healthmap antes da migração para Tabia."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Risco",
+          "item": [
+            {
+              "name": "Consultar Medição de Risco",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/api/risco/v1/medicaoRisco?idCliente={{idCliente}}&status=&pageSize=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "risco", "v1", "medicaoRisco"],
+                  "query": [
+                    { "key": "idCliente", "value": "{{idCliente}}" },
+                    { "key": "status", "value": "" },
+                    { "key": "pageSize", "value": "20" }
+                  ]
+                },
+                "description": "Estratificação de risco — contexto Cockpit Navegação."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Alertas de Internação",
+          "item": [
+            {
+              "name": "Listar Alertas de Internação",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "KeyDS", "value": "{{keyDS}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dataInternacao\": \"2024-01-01\",\n  \"dataSaida\": \"2024-01-31\",\n  \"idGestor\": \"\",\n  \"pagina\": 1,\n  \"itensPorPagina\": 20\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/internacao/v1/listarAlertasInternacao",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "internacao", "v1", "listarAlertasInternacao"]
+                },
+                "description": "Exclusivo do Cockpit de Navegação — lista alertas de internação hospitalar.\n\n**Body:** InternacaoDTO\n\n```json\n{\n  \"dataInternacao\": \"date\",\n  \"dataSaida\": \"date\",\n  \"idGestor\": \"string\",\n  \"pagina\": number,\n  \"itensPorPagina\": number\n}\n```"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🩺 Jornada — Auditoria Clínica",
+      "description": "Cockpit de Auditoria Clínica — usado por auditores para análise de questionários e avaliações clínicas. Inclui endpoints externos sem Swagger.",
+      "item": [
+        {
+          "name": "Listar Beneficiários",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario?pageSize=20&cpf=&email=&id=&nome=&numeroCarteirinha=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "beneficiario", "v1", "beneficiario"],
+              "query": [
+                { "key": "pageSize", "value": "20" },
+                { "key": "cpf", "value": "" },
+                { "key": "email", "value": "" },
+                { "key": "id", "value": "" },
+                { "key": "nome", "value": "" },
+                { "key": "numeroCarteirinha", "value": "" }
+              ]
+            },
+            "description": "Listagem de beneficiários — contexto Auditoria Clínica."
+          },
+          "response": []
+        },
+        {
+          "name": "Questionários",
+          "item": [
+            {
+              "name": "Buscar Questionário por ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/api/questionario/v1/questionario/{{idQuestionario}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "questionario", "v1", "questionario", "{{idQuestionario}}"]
+                },
+                "description": "Estrutura completa do questionário — contexto Auditoria Clínica."
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Respostas de Questão",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/api/questionario/v1/questionario/questaoRespostas?idQuestao=&dataInicioResposta=&dataFimResposta=&pageSize=20",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "questionario", "v1", "questionario", "questaoRespostas"],
+                  "query": [
+                    { "key": "idQuestao", "value": "" },
+                    { "key": "dataInicioResposta", "value": "" },
+                    { "key": "dataFimResposta", "value": "" },
+                    { "key": "pageSize", "value": "20" }
+                  ]
+                },
+                "description": "Respostas de questões por período — contexto Auditoria Clínica."
+              },
+              "response": []
+            },
+            {
+              "name": "Responder Questão Avulsa",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "KeyDS", "value": "{{keyDS}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"idCliente\": \"{{idCliente}}\",\n  \"idQuestao\": \"\",\n  \"resposta\": \"\",\n  \"dataResposta\": \"2024-01-01T10:00:00\",\n  \"observacao\": \"\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/questionario/v1/questionario/responderQuestaoAvulsa",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "questionario", "v1", "questionario", "responderQuestaoAvulsa"]
+                },
+                "description": "Registro de resposta avulsa — contexto Auditoria Clínica."
+              },
+              "response": []
+            },
+            {
+              "name": "Responder Avaliação Completa — Externo ⚠️",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "KeyDS", "value": "{{keyDS}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"// ATENÇÃO\": \"Contrato diferente de responderQuestaoAvulsa — verificar com time Healthmap\",\n  \"idCliente\": \"{{idCliente}}\",\n  \"idQuestionario\": \"{{idQuestionario}}\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{externalBaseUrl}}/api/v1/questionario/responderAvaliacao",
+                  "host": ["{{externalBaseUrl}}"],
+                  "path": ["api", "v1", "questionario", "responderAvaliacao"]
+                },
+                "description": "⚠️ **Endpoint Externo — SEM Swagger documentado**\n\nEndpoint no backend complementar com **contrato diferente** de `responderQuestaoAvulsa`.\n\n**Risco alto:** Sem documentação formal. Solicitar contrato completo ao time Healthmap antes da migração."
+              },
+              "response": []
+            },
+            {
+              "name": "Dados Sintéticos de Questionários — Externo ⚠️",
+              "request": {
+                "method": "GET",
+                "header": [
+                  { "key": "KeyDS", "value": "{{keyDS}}" }
+                ],
+                "url": {
+                  "raw": "{{externalBaseUrl}}/api/v1/consultas/dadosQuestionariosSintetico",
+                  "host": ["{{externalBaseUrl}}"],
+                  "path": ["api", "v1", "consultas", "dadosQuestionariosSintetico"]
+                },
+                "description": "⚠️ **Endpoint Externo — SEM Swagger documentado**\n\nRetorna dados sintéticos/resumidos de questionários. Usado por Viver Bem e Auditoria Clínica.\n\n**Risco:** Sem contrato formal — verificar com time Healthmap."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🔄 Jornada — Transição do Cuidado",
+      "description": "Transição do Cuidado — acompanhamento do cuidado em transições (alta hospitalar, etc.). Usa os mesmos endpoints da Auditoria Clínica, sem os externos.",
+      "item": [
+        {
+          "name": "Listar Beneficiários",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario?pageSize=20&cpf=&email=&id=&nome=&numeroCarteirinha=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "beneficiario", "v1", "beneficiario"],
+              "query": [
+                { "key": "pageSize", "value": "20" },
+                { "key": "cpf", "value": "" },
+                { "key": "email", "value": "" },
+                { "key": "id", "value": "" },
+                { "key": "nome", "value": "" },
+                { "key": "numeroCarteirinha", "value": "" }
+              ]
+            },
+            "description": "Listagem de beneficiários — contexto Transição do Cuidado."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Questionário por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/questionario/v1/questionario/{{idQuestionario}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "questionario", "v1", "questionario", "{{idQuestionario}}"]
+            },
+            "description": "Estrutura do questionário — contexto Transição do Cuidado."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Respostas de Questão",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/questionario/v1/questionario/questaoRespostas?idQuestao=&dataInicioResposta=&dataFimResposta=&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "questionario", "v1", "questionario", "questaoRespostas"],
+              "query": [
+                { "key": "idQuestao", "value": "" },
+                { "key": "dataInicioResposta", "value": "" },
+                { "key": "dataFimResposta", "value": "" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            },
+            "description": "Respostas por período — contexto Transição do Cuidado."
+          },
+          "response": []
+        },
+        {
+          "name": "Responder Questão Avulsa",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "KeyDS", "value": "{{keyDS}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": \"{{idCliente}}\",\n  \"idQuestao\": \"\",\n  \"resposta\": \"\",\n  \"dataResposta\": \"2024-01-01T10:00:00\",\n  \"observacao\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/questionario/v1/questionario/responderQuestaoAvulsa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "questionario", "v1", "questionario", "responderQuestaoAvulsa"]
+            },
+            "description": "Registro de resposta avulsa — contexto Transição do Cuidado."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🧩 Jornada — SRT (TEA)",
+      "description": "Sistema de Rastreamento TEA — Transtorno do Espectro Autista. Usa os mesmos endpoints da Auditoria Clínica, sem os externos.",
+      "item": [
+        {
+          "name": "Listar Beneficiários",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/beneficiario/v1/beneficiario?pageSize=20&cpf=&email=&id=&nome=&numeroCarteirinha=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "beneficiario", "v1", "beneficiario"],
+              "query": [
+                { "key": "pageSize", "value": "20" },
+                { "key": "cpf", "value": "" },
+                { "key": "email", "value": "" },
+                { "key": "id", "value": "" },
+                { "key": "nome", "value": "" },
+                { "key": "numeroCarteirinha", "value": "" }
+              ]
+            },
+            "description": "Listagem de beneficiários — contexto SRT (TEA)."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Questionário por ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/questionario/v1/questionario/{{idQuestionario}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "questionario", "v1", "questionario", "{{idQuestionario}}"]
+            },
+            "description": "Estrutura do questionário — contexto SRT (TEA)."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Respostas de Questão",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "KeyDS", "value": "{{keyDS}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/questionario/v1/questionario/questaoRespostas?idQuestao=&dataInicioResposta=&dataFimResposta=&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "questionario", "v1", "questionario", "questaoRespostas"],
+              "query": [
+                { "key": "idQuestao", "value": "" },
+                { "key": "dataInicioResposta", "value": "" },
+                { "key": "dataFimResposta", "value": "" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            },
+            "description": "Respostas por período — contexto SRT (TEA)."
+          },
+          "response": []
+        },
+        {
+          "name": "Responder Questão Avulsa",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "KeyDS", "value": "{{keyDS}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idCliente\": \"{{idCliente}}\",\n  \"idQuestao\": \"\",\n  \"resposta\": \"\",\n  \"dataResposta\": \"2024-01-01T10:00:00\",\n  \"observacao\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/questionario/v1/questionario/responderQuestaoAvulsa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "questionario", "v1", "questionario", "responderQuestaoAvulsa"]
+            },
+            "description": "Registro de resposta avulsa — contexto SRT (TEA)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "⚠️ Endpoints Externos (Sem Swagger)",
+      "description": "Endpoints no backend complementar `unimedpa.healthmap.com.br` — **sem documentação Swagger formal**.\n\nEsses 3 endpoints representam risco crítico para a migração ao Tabia. Solicitar contratos formais ao time Healthmap antes de iniciar a migração.\n\n**Usados por:**\n- `responderAvaliacao` → Viver Bem, Auditoria, Transição, SRT\n- `dadosQuestionariosSintetico` → Viver Bem, Auditoria\n- `listar-acoes` → Cockpit Navegação",
+      "item": [
+        {
+          "name": "Responder Avaliação Completa (PRD)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "KeyDS", "value": "PRD" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"// ATENÇÃO\": \"Contrato diferente de /responderQuestaoAvulsa — obter documentação com time Healthmap\",\n  \"idCliente\": \"\",\n  \"idQuestionario\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{externalBaseUrl}}/api/v1/questionario/responderAvaliacao",
+              "host": ["{{externalBaseUrl}}"],
+              "path": ["api", "v1", "questionario", "responderAvaliacao"]
+            },
+            "description": "⚠️ **SEM Swagger** — Contrato diferente de `responderQuestaoAvulsa`.\n\nEndpoint externo para resposta de avaliação completa."
+          },
+          "response": []
+        },
+        {
+          "name": "Dados Sintéticos de Questionários (PRD)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "KeyDS", "value": "PRD" }
+            ],
+            "url": {
+              "raw": "{{externalBaseUrl}}/api/v1/consultas/dadosQuestionariosSintetico",
+              "host": ["{{externalBaseUrl}}"],
+              "path": ["api", "v1", "consultas", "dadosQuestionariosSintetico"]
+            },
+            "description": "⚠️ **SEM Swagger** — Dados resumidos/sintéticos de questionários.\n\nUsado por Viver Bem e Auditoria Clínica."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Ações — Relatório (PRD)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "KeyDS", "value": "PRD" }
+            ],
+            "url": {
+              "raw": "{{externalBaseUrl}}/api/v1/relatorio/listar-acoes",
+              "host": ["{{externalBaseUrl}}"],
+              "path": ["api", "v1", "relatorio", "listar-acoes"]
+            },
+            "description": "⚠️ **SEM Swagger** — Relatório/visão gerencial de ações.\n\nUsado pelo Cockpit de Navegação."
+          },
+          "response": []
+        },
+        {
+          "name": "Beneficiário HMG — Externo (HMG)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "KeyDS", "value": "HMG" }
+            ],
+            "url": {
+              "raw": "{{externalBaseUrlHmg}}/api/v1/beneficiario",
+              "host": ["{{externalBaseUrlHmg}}"],
+              "path": ["api", "v1", "beneficiario"]
+            },
+            "description": "⚠️ **SEM Swagger** — Endpoint de beneficiário no ambiente HMG via subdomínio externo.\n\nUsado por Viver Bem e Redes de Valor no ambiente de homologação."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
