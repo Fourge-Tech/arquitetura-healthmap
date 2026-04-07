@@ -302,7 +302,10 @@
       color: #fff;
       padding: 14px 24px;
       display: flex; align-items: center; gap: 12px;
+      cursor: pointer;
+      user-select: none;
     }
+    .section-header:hover { filter: brightness(1.08); }
     .section-number {
       background: rgba(255,255,255,.2);
       border-radius: 50%;
@@ -310,8 +313,27 @@
       display: flex; align-items: center; justify-content: center;
       font-weight: 700; font-size: 13px; flex-shrink: 0;
     }
-    .section-header h2 { font-size: 16px; font-weight: 600; }
-    .section-body { padding: 24px; }
+    .section-header h2 { font-size: 16px; font-weight: 600; flex: 1; }
+    .section-chevron {
+      font-size: 14px;
+      opacity: .75;
+      transition: transform .25s ease;
+      flex-shrink: 0;
+    }
+    .section-card.collapsed .section-chevron { transform: rotate(-90deg); }
+    .section-body {
+      padding: 24px;
+      overflow: hidden;
+      transition: max-height .35s ease, padding .35s ease, opacity .25s ease;
+      max-height: 9999px;
+      opacity: 1;
+    }
+    .section-card.collapsed .section-body {
+      max-height: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      opacity: 0;
+    }
 
     /* ── SUB SECTION ── */
     .subsection { margin-bottom: 24px; }
@@ -7227,6 +7249,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const lbl = document.getElementById('jaDiagZoomLabel');
   if (lbl) lbl.textContent = '50%';
+});
+
+/* ── COLLAPSIBLE SECTIONS ── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.section-header').forEach(header => {
+    // Inject chevron
+    const chev = document.createElement('span');
+    chev.className = 'section-chevron';
+    chev.textContent = '▾';
+    header.appendChild(chev);
+
+    header.addEventListener('click', () => {
+      const card = header.closest('.section-card');
+      if (card) card.classList.toggle('collapsed');
+    });
+  });
 });
 </script>
 </body>
