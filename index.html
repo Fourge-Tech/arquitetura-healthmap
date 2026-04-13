@@ -735,7 +735,7 @@
     .json-panel:last-child pre.json-view { border-radius: 0 0 10px 10px; }
     .jk { color: #89dceb; }
     .js { color: #a6e3a1; }
-    .jn { color: #fab387; }
+    .jn { color: #cba6f7; }
     .jb { color: #cba6f7; }
     .jl { color: #7f849c; }
 
@@ -3615,31 +3615,19 @@
     <div class="nav-section">Módulos de API</div>
     <a href="#ja-sec4">4. Base de Vidas</a>
     <a href="#ja-sec5">5. Healthmap</a>
-    <a href="#ja-sec5-1" class="sub">5.1 Questionários Sintéticos</a>
-    <a href="#ja-sec5-2" class="sub">5.2 Resposta de Avaliação</a>
-    <a href="#ja-sec5-3" class="sub">5.3 Linha de Cuidado</a>
-    <a href="#ja-sec5-4" class="sub">5.4 Plano de Ação</a>
+    <a href="#ja-sec5" class="sub">5.1 Resposta de Avaliação</a>
     <a href="#ja-sec6">6. TOTVS — Guias</a>
     <a href="#ja-sec7">7. SAE — Internações</a>
-    <a href="#ja-sec7-1" class="sub">7.1 Listar Internações</a>
-    <a href="#ja-sec7-2" class="sub">7.2 Login SAE</a>
-    <a href="#ja-sec7-3" class="sub">7.3 Lista Médico</a>
-    <a href="#ja-sec7-4" class="sub">7.4 Lista Procedimentos</a>
-    <a href="#ja-sec7-5" class="sub">7.5 Localização</a>
-    <a href="#ja-sec7-6" class="sub">7.6 Emergência</a>
-    <a href="#ja-sec7-7" class="sub">7.7 Dados Paciente</a>
-    <a href="#ja-sec7-8" class="sub">7.8 Solicitação Internação</a>
-    <a href="#ja-sec7-9" class="sub">7.9 Guia SAE</a>
-    <a href="#ja-sec7-10" class="sub">7.10 Guia Carteira</a>
     <a href="#ja-sec8">8. Avaliações Clínicas</a>
-    <a href="#ja-sec8-1" class="sub">8.1 Avaliação Inicial</a>
-    <a href="#ja-sec8-2" class="sub">8.2 Avaliação Enfermagem</a>
-    <a href="#ja-sec8-3" class="sub">8.3 Assist. Social</a>
-    <a href="#ja-sec8-4" class="sub">8.4 Hospitalista (Médico)</a>
+    <a href="#ja-sec8" class="sub">8.1 GetAvaliacaoInicial</a>
+    <a href="#ja-sec8" class="sub">8.2 GetAvaliacaoVisita</a>
+    <a href="#ja-sec8" class="sub">8.3 PostAvaliacaoVisita</a>
+    <a href="#ja-sec8" class="sub">8.4 GetAvaliacaoAssistenteSocial</a>
+    <a href="#ja-sec8" class="sub">8.5 PostAvaliacaoAssistenteSocial</a>
+    <a href="#ja-sec8" class="sub">8.6 GetAvaliacaoHospitalista</a>
+    <a href="#ja-sec8" class="sub">8.7 PostAvaliacaoHospitalista</a>
     <a href="#ja-sec9">9. Inconformidade</a>
     <a href="#ja-sec10">10. Desospitalização</a>
-    <div class="nav-section">Referência</div>
-    <a href="#ja-sec11">11. Tabela de Endpoints</a>
   </nav>
 </aside>
 
@@ -4356,6 +4344,11 @@
           <div class="callout warn">
             <strong>⚠️ Grant type <code>password</code></strong> — diferente do OAuth2 padrão (client_credentials). Requer credenciais de usuário do sistema (<code>integracao.viverbem</code>).
           </div>
+          <div class="callout info">
+            <strong>🔑 Header especial Healthmap — <code>aKEY</code></strong><br>
+            Além do Bearer token, os endpoints Healthmap exigem o header: <code>aKEY: he@lthM@P00987sK5Y</code><br>
+            Obrigatório em: QuestionariosSintetico, RespostaAvaliacao, LinhaCuidado.
+          </div>
         </div>
 
         <!-- 3.2 Token Unimedpoa -->
@@ -4373,13 +4366,6 @@
               </tbody>
             </table>
           </div>
-        </div>
-
-        <!-- Header Healthmap aKEY -->
-        <div class="callout info">
-          <strong>🔑 Header especial Healthmap — <code>aKEY</code></strong><br>
-          Além do Bearer token, os endpoints Healthmap exigem o header: <code>aKEY: he@lthM@P00987sK5Y</code><br>
-          Obrigatório em: QuestionariosSintetico, RespostaAvaliacao, LinhaCuidado.
         </div>
       </div>
     </div>
@@ -4401,7 +4387,7 @@
                 <td>GetBaseVidas</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/analyticsBackoffice/v1/vidas</code></td>
-                <td>Sem body (requisição GET) <button class="btn-payload" onclick="openPayload('ja-base-vidas','request')">{ } JSON</button></td>
+                <td>Sem parâmetros <button class="btn-payload" onclick="openPayload('ja-base-vidas','request')">{ } JSON</button></td>
                 <td>Array de beneficiários ativos <button class="btn-payload" onclick="openPayload('ja-base-vidas','response')">{ } JSON</button></td>
               </tr>
             </tbody>
@@ -4739,78 +4725,20 @@
         <h2>Módulo — Healthmap (APIs Assistenciais)</h2>
       </div>
       <div class="section-body">
-        <p>Integrações com a plataforma Healthmap para gestão de questionários, avaliações e plano de ação dos beneficiários.</p>
-
-        <div class="subsection" id="ja-sec5-1">
-          <div class="subsection-title">5.1 Questionários Sintéticos</div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros / Body</th><th>Retorno</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>DadosQuestionariosSintetico</td>
-                  <td><span class="method post">POST</span></td>
-                  <td><code>/api/v1/consultas/dadosQuestionariosSintetico</code></td>
-                  <td>Body: <code>questionario[]</code>, <code>codigoBeneficiario[]</code> <button class="btn-payload" onclick="openPayload('ja-quest-sintetico')">{ } JSON</button></td>
-                  <td>Array de respostas sintéticas <button class="btn-payload" onclick="openPayload('ja-quest-sintetico')">{ } JSON</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="subsection" id="ja-sec5-2">
-          <div class="subsection-title">5.2 Resposta de Avaliação (Completa)</div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros / Body</th><th>Retorno</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>ResponderAvaliacao</td>
-                  <td><span class="method post">POST</span></td>
-                  <td><code>/api/v1/questionario/responderAvaliacao</code></td>
-                  <td>Body: <code>codigoInternoPessoa</code>, <code>codigoInternoQuestionario</code>, <code>respostas[]</code> <button class="btn-payload" onclick="openPayload('ja-responder-avaliacao')">{ } JSON</button></td>
-                  <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-responder-avaliacao')">{ } JSON</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="subsection" id="ja-sec5-3">
-          <div class="subsection-title">5.3 Linha de Cuidado — Questionários Completos</div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>DadosQuestionariosCompletos</td>
-                  <td><span class="method get">GET</span></td>
-                  <td><code>/api/v1/consultas/dadosQuestionariosCompletos</code></td>
-                  <td><code>dataRespIni</code>, <code>dataRespFim</code>, <code>benef</code> (query) <button class="btn-payload" onclick="openPayload('ja-quest-completos')">{ } JSON</button></td>
-                  <td>Array de questionários completos <button class="btn-payload" onclick="openPayload('ja-quest-completos')">{ } JSON</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="subsection" id="ja-sec5-4">
-          <div class="subsection-title">5.4 Plano de Ação</div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>GetPlanoAcao</td>
-                  <td><span class="method get">GET</span></td>
-                  <td><code>/api/planoacao/v1/planoAcao</code></td>
-                  <td><code>semLimite</code>, <code>idCliente</code>, <code>status</code> (query) <button class="btn-payload" onclick="openPayload('ja-plano-acao')">{ } JSON</button></td>
-                  <td>Lista de planos de ação <button class="btn-payload" onclick="openPayload('ja-plano-acao')">{ } JSON</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <p>Integração com a plataforma Healthmap para envio de respostas de avaliação dos beneficiários.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>ResponderAvaliacao</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/v1/questionario/responderAvaliacao</code></td>
+                <td>Body: <code>codigoInternoPessoa</code>, <code>codigoInternoQuestionario</code>, <code>respostas[]</code> <button class="btn-payload" onclick="openPayload('ja-responder-avaliacao')">{ } JSON</button></td>
+                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-responder-avaliacao')">{ } JSON</button></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -4819,27 +4747,20 @@
     <div class="section-card" id="ja-sec6">
       <div class="section-header" style="background:#2E75B6;">
         <div class="section-number">6</div>
-        <h2>Módulo — TOTVS GPS (Guias)</h2>
+        <h2>Módulo — TOTVS (Guias Paciente)</h2>
       </div>
       <div class="section-body">
-        <p>Integração com o TOTVS GPS para consulta de guias de internação por paciente ou prestador.</p>
+        <p>Integração com o TOTVS para consulta de guias vinculadas ao paciente. O parâmetro principal é o <strong>número da carteirinha</strong>, passado no path da URL.</p>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
             <tbody>
               <tr>
-                <td>GetGuiasPaciente</td>
+                <td>GuiasPaciente</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/cadTotvs/v1/guias-pacientes/{numeroCarteirinha}</code></td>
-                <td><code>numeroCarteirinha</code> (path) <button class="btn-payload" onclick="openPayload('ja-guias-paciente')">{ } JSON</button></td>
-                <td>Guias de internação do paciente <button class="btn-payload" onclick="openPayload('ja-guias-paciente')">{ } JSON</button></td>
-              </tr>
-              <tr>
-                <td>GetGuiasPrestador</td>
-                <td><span class="method get">GET</span></td>
-                <td><code>/dts/datasul-rest/resources/prg/hes/v1/prestador/{id}/{cnes}/guias-internacao/</code></td>
-                <td><code>id</code>, <code>cnes</code> (path) <button class="btn-payload" onclick="openPayload('ja-guias-prestador')">{ } JSON</button></td>
-                <td>Guias de internação do prestador <button class="btn-payload" onclick="openPayload('ja-guias-prestador')">{ } JSON</button></td>
+                <td><code>numeroCarteirinha</code> <button class="btn-payload" onclick="openPayload('ja-guias-paciente')">{ } JSON</button></td>
+                <td>Dados do beneficiário + guias abertas e pendentes <button class="btn-payload" onclick="openPayload('ja-guias-paciente', 'response')">{ } JSON</button></td>
               </tr>
             </tbody>
           </table>
@@ -4851,83 +4772,69 @@
     <div class="section-card" id="ja-sec7">
       <div class="section-header" style="background:#2E75B6;">
         <div class="section-number">7</div>
-        <h2>Módulo — SAE (Sistema de Auditoria — Internações)</h2>
+        <h2>Módulo — SAE (Internações)</h2>
       </div>
       <div class="section-body">
-        <p>Endpoints do SAE para gestão completa do ciclo de internação hospitalar. Todos usam <code>Authorization: Bearer {token_final}</code> + Cookie de sessão (<code>az_asm</code>, <code>az_botm</code>).</p>
+        <p>Endpoints do SAE para internação hospitalar. Autenticação via token da seção <strong>3.2</strong> — <code>Bearer {token}</code> + cookies <code>az_asm</code> e <code>az_botm</code>.</p>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
             <tbody>
               <tr>
-                <td>ListarInternacoes</td>
+                <td>GetListarInternacoes</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/internacoes</code></td>
-                <td><code>limit</code>, <code>p_statusInternacao</code>, <code>p_hospital</code> (query) <button class="btn-payload" onclick="openPayload('ja-internacoes')">{ } JSON</button></td>
-                <td>Array de internações <button class="btn-payload" onclick="openPayload('ja-internacoes')">{ } JSON</button></td>
+                <td><code>p_dataAlta</code>, <code>p_statusInternacao</code>, <code>p_hospital</code> <button class="btn-payload" onclick="openPayload('ja-internacoes')">{ } JSON</button></td>
+                <td>Array de internações <button class="btn-payload" onclick="openPayload('ja-internacoes', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>LoginSAE</td>
+                <td>GetLoginSAE</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/login</code></td>
-                <td><code>login</code> (query) <button class="btn-payload" onclick="openPayload('ja-login-sae')">{ } JSON</button></td>
-                <td>Dados do usuário + cookies de sessão <button class="btn-payload" onclick="openPayload('ja-login-sae')">{ } JSON</button></td>
+                <td><code>login</code> <button class="btn-payload" onclick="openPayload('ja-login-sae')">{ } JSON</button></td>
+                <td>Dados do usuário <button class="btn-payload" onclick="openPayload('ja-login-sae', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>ListaMedico</td>
+                <td>GetListaMedico</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/lista-medico</code></td>
-                <td>— <button class="btn-payload" onclick="openPayload('ja-lista-medico')">{ } JSON</button></td>
-                <td>Array de médicos <button class="btn-payload" onclick="openPayload('ja-lista-medico')">{ } JSON</button></td>
+                <td>Sem parâmetros <button class="btn-payload" onclick="openPayload('ja-lista-medico')">{ } JSON</button></td>
+                <td>Array de médicos <button class="btn-payload" onclick="openPayload('ja-lista-medico', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>ListaProcedimentos</td>
+                <td>GetListaProcedimentos</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/lista-procedimentos</code></td>
-                <td>— <button class="btn-payload" onclick="openPayload('ja-lista-procedimentos')">{ } JSON</button></td>
-                <td>Array de procedimentos <button class="btn-payload" onclick="openPayload('ja-lista-procedimentos')">{ } JSON</button></td>
+                <td>Sem parâmetros <button class="btn-payload" onclick="openPayload('ja-lista-procedimentos')">{ } JSON</button></td>
+                <td>Array de procedimentos <button class="btn-payload" onclick="openPayload('ja-lista-procedimentos', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>LocalizacaoInternacao</td>
+                <td>GetLocalizacaoInternacao</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/localizacao-internacao</code></td>
-                <td><code>p_internacao</code> (query) <button class="btn-payload" onclick="openPayload('ja-localizacao')">{ } JSON</button></td>
-                <td>Leito / ala / UTI do paciente <button class="btn-payload" onclick="openPayload('ja-localizacao')">{ } JSON</button></td>
+                <td><code>id_internacao</code> <button class="btn-payload" onclick="openPayload('ja-localizacao')">{ } JSON</button></td>
+                <td>Localização do paciente <button class="btn-payload" onclick="openPayload('ja-localizacao', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>EmergenciaInternacao</td>
-                <td><span class="method get">GET</span></td>
-                <td><code>/sae/v1/emergencia-internacao</code></td>
-                <td><code>p_hospital</code> (query) <button class="btn-payload" onclick="openPayload('ja-emergencia')">{ } JSON</button></td>
-                <td>Array de internações de emergência <button class="btn-payload" onclick="openPayload('ja-emergencia')">{ } JSON</button></td>
-              </tr>
-              <tr>
-                <td>DadosPaciente</td>
+                <td>GetDadosPaciente</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/internacoes-indicadores</code></td>
-                <td><code>p_idPaciente</code> (carteirinha, query) <button class="btn-payload" onclick="openPayload('ja-dados-paciente')">{ } JSON</button></td>
-                <td>Indicadores assistenciais do paciente <button class="btn-payload" onclick="openPayload('ja-dados-paciente')">{ } JSON</button></td>
+                <td><code>p_idPaciente</code> <button class="btn-payload" onclick="openPayload('ja-dados-paciente')">{ } JSON</button></td>
+                <td>Dados do paciente <button class="btn-payload" onclick="openPayload('ja-dados-paciente', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>SolicitacaoInternacao</td>
+                <td>GetSolicitacaoInternacao</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/solicitacao-internacao</code></td>
-                <td><code>limit</code> (query) <button class="btn-payload" onclick="openPayload('ja-solicitacao-internacao')">{ } JSON</button></td>
-                <td>Array de solicitações de internação <button class="btn-payload" onclick="openPayload('ja-solicitacao-internacao')">{ } JSON</button></td>
+                <td>Sem parâmetros <button class="btn-payload" onclick="openPayload('ja-solicitacao-internacao')">{ } JSON</button></td>
+                <td>Array de solicitações de internação <button class="btn-payload" onclick="openPayload('ja-solicitacao-internacao', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>GuiaSAE</td>
+                <td>GetGuiaSAE</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/guia_sae</code></td>
-                <td><code>p_statusInternacao</code>, <code>limit</code>, <code>p_hospital</code> (query) <button class="btn-payload" onclick="openPayload('ja-guia-sae')">{ } JSON</button></td>
-                <td>Array de guias SAE <button class="btn-payload" onclick="openPayload('ja-guia-sae')">{ } JSON</button></td>
-              </tr>
-              <tr>
-                <td>GuiaCarteira</td>
-                <td><span class="method get">GET</span></td>
-                <td><code>/sae/v1/guias/{numeroCarteirinha}</code></td>
-                <td><code>numeroCarteirinha</code> (path) <button class="btn-payload" onclick="openPayload('ja-guia-carteira')">{ } JSON</button></td>
-                <td>Guias SAE do beneficiário <button class="btn-payload" onclick="openPayload('ja-guia-carteira')">{ } JSON</button></td>
+                <td><code>p_dataAlta</code>, <code>p_statusInternacao</code>, <code>p_hospital</code> <button class="btn-payload" onclick="openPayload('ja-guia-sae')">{ } JSON</button></td>
+                <td>Array de guias SAE <button class="btn-payload" onclick="openPayload('ja-guia-sae', 'response')">{ } JSON</button></td>
               </tr>
             </tbody>
           </table>
@@ -4945,49 +4852,56 @@
         <p>Endpoints para registro e consulta das avaliações clínicas realizadas durante a internação. Todos usam autenticação Bearer + Cookie de sessão SAE.</p>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros / Body</th><th>Retorno</th></tr></thead>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
             <tbody>
               <tr>
                 <td>GetAvaliacaoInicial</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/avaliacao-inicial</code></td>
-                <td><code>p_internacao</code> (query) <button class="btn-payload" onclick="openPayload('ja-aval-inicial-get')">{ } JSON</button></td>
-                <td>Avaliação inicial da internação <button class="btn-payload" onclick="openPayload('ja-aval-inicial-get')">{ } JSON</button></td>
-              </tr>
-              <tr>
-                <td>PostAvaliacaoInicial</td>
-                <td><span class="method post">POST</span></td>
-                <td><code>/sae/v1/avaliacao-inicial</code></td>
-                <td>Body: <code>id_internacao</code>, <code>id_cid</code>, <code>id_profissional</code>… <button class="btn-payload" onclick="openPayload('ja-aval-inicial-post')">{ } JSON</button></td>
-                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-aval-inicial-post')">{ } JSON</button></td>
+                <td><code>p_internacao</code> <button class="btn-payload" onclick="openPayload('ja-aval-inicial-get')">{ } JSON</button></td>
+                <td>Avaliação inicial da internação <button class="btn-payload" onclick="openPayload('ja-aval-inicial-get', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
                 <td>GetAvaliacaoVisita</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/avaliacao-visita</code></td>
-                <td><code>p_internacao</code> (query) <button class="btn-payload" onclick="openPayload('ja-aval-visita-get')">{ } JSON</button></td>
-                <td>Última avaliação de visita <button class="btn-payload" onclick="openPayload('ja-aval-visita-get')">{ } JSON</button></td>
+                <td><code>p_internacao</code> <button class="btn-payload" onclick="openPayload('ja-aval-visita-get')">{ } JSON</button></td>
+                <td>Última avaliação de visita <button class="btn-payload" onclick="openPayload('ja-aval-visita-get', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
                 <td>PostAvaliacaoVisita</td>
                 <td><span class="method post">POST</span></td>
                 <td><code>/sae/v1/avaliacao-visita</code></td>
-                <td>Body: <code>en_ventilatorio</code>, <code>en_drogas</code>, <code>en_acessos</code>… <button class="btn-payload" onclick="openPayload('ja-aval-visita-post')">{ } JSON</button></td>
-                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-aval-visita-post')">{ } JSON</button></td>
+                <td>Body: <code>id_internacao</code>, <code>data_visita</code>, <code>en_ventilatorio</code>… <button class="btn-payload" onclick="openPayload('ja-aval-visita-post')">{ } JSON</button></td>
+                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-aval-visita-post', 'response')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>GetAvaliacaoAssistenteSocial</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/sae/v1/avaliacao-assistente-social</code></td>
+                <td><code>p_internacao</code> <button class="btn-payload" onclick="openPayload('ja-aval-as-get')">{ } JSON</button></td>
+                <td>Último registro de avaliação de serviço social <button class="btn-payload" onclick="openPayload('ja-aval-as-get', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
                 <td>PostAvaliacaoAssistenteSocial</td>
                 <td><span class="method post">POST</span></td>
                 <td><code>/sae/v1/avaliacao-assistente-social</code></td>
-                <td>Body: <code>e_ocupacao</code>, <code>e_residencia</code>, <code>e_escolaridade</code>… <button class="btn-payload" onclick="openPayload('ja-aval-as')">{ } JSON</button></td>
-                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-aval-as')">{ } JSON</button></td>
+                <td>Body: <code>id_internacao</code>, <code>e_ocupacao</code>, <code>e_apoiosocial</code>… <button class="btn-payload" onclick="openPayload('ja-aval-as')">{ } JSON</button></td>
+                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-aval-as', 'response')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>GetAvaliacaoHospitalista</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/sae/v1/avaliacao-hospitalista</code></td>
+                <td><code>p_internacao</code> <button class="btn-payload" onclick="openPayload('ja-aval-hospitalista-get')">{ } JSON</button></td>
+                <td>Último registro de avaliação hospitalista <button class="btn-payload" onclick="openPayload('ja-aval-hospitalista-get', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
                 <td>PostAvaliacaoHospitalista</td>
                 <td><span class="method post">POST</span></td>
                 <td><code>/sae/v1/avaliacao-hospitalista</code></td>
-                <td>Body: <code>id_internacao</code>, <code>paciente_estavel</code>, <code>antibioticoterapia[]</code>… <button class="btn-payload" onclick="openPayload('ja-aval-hospitalista')">{ } JSON</button></td>
-                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-aval-hospitalista')">{ } JSON</button></td>
+                <td>Body: <code>id_internacao</code>, <code>paciente_estavel</code>, <code>caso_social[]</code>… <button class="btn-payload" onclick="openPayload('ja-aval-hospitalista')">{ } JSON</button></td>
+                <td>Confirmação de registro <button class="btn-payload" onclick="openPayload('ja-aval-hospitalista', 'response')">{ } JSON</button></td>
               </tr>
             </tbody>
           </table>
@@ -5005,28 +4919,28 @@
         <p>Gestão de registros de inconformidade assistencial durante a internação.</p>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros / Body</th><th>Retorno</th></tr></thead>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
             <tbody>
               <tr>
-                <td>ConsultarInconformidade</td>
+                <td>GetInconformidade</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/inconformidade</code></td>
-                <td><code>p_internacao</code> (query) <button class="btn-payload" onclick="openPayload('ja-inconformidade-get')">{ } JSON</button></td>
-                <td>Lista de inconformidades <button class="btn-payload" onclick="openPayload('ja-inconformidade-get')">{ } JSON</button></td>
+                <td><code>p_internacao</code> e/ou <code>p_internacao_inconf_diaria</code> <button class="btn-payload" onclick="openPayload('ja-inconformidade-get')">{ } JSON</button></td>
+                <td>Lista de inconformidades <button class="btn-payload" onclick="openPayload('ja-inconformidade-get', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>RegistrarInconformidade</td>
+                <td>PostInconformidade</td>
                 <td><span class="method post">POST</span></td>
                 <td><code>/sae/v1/inconformidade</code></td>
                 <td>Body: <code>id_internacao</code>, <code>en_inconformidade_tipo</code>, <code>opme[]</code>… <button class="btn-payload" onclick="openPayload('ja-inconformidade-post')">{ } JSON</button></td>
-                <td>Confirmação de criação <button class="btn-payload" onclick="openPayload('ja-inconformidade-post')">{ } JSON</button></td>
+                <td>Confirmação de criação <button class="btn-payload" onclick="openPayload('ja-inconformidade-post', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>AtualizarInconformidade</td>
+                <td>PutInconformidade</td>
                 <td><span class="method put">PUT</span></td>
                 <td><code>/sae/v1/inconformidade</code></td>
-                <td>Body: campos a atualizar + <code>id_inconformidade</code> <button class="btn-payload" onclick="openPayload('ja-inconformidade-put')">{ } JSON</button></td>
-                <td>Confirmação de atualização <button class="btn-payload" onclick="openPayload('ja-inconformidade-put')">{ } JSON</button></td>
+                <td>Body: <code>id_internacao_inconf_diaria</code>, <code>en_inconformidade_tipo</code>… <button class="btn-payload" onclick="openPayload('ja-inconformidade-put')">{ } JSON</button></td>
+                <td>Confirmação de atualização <button class="btn-payload" onclick="openPayload('ja-inconformidade-put', 'response')">{ } JSON</button></td>
               </tr>
             </tbody>
           </table>
@@ -5044,28 +4958,28 @@
         <p>Gestão do processo de alta e desospitalização do paciente, incluindo encaminhamentos e programas de continuidade do cuidado.</p>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros / Body</th><th>Retorno</th></tr></thead>
+            <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>Parâmetros Principais</th><th>Retorno</th></tr></thead>
             <tbody>
               <tr>
-                <td>ConsultarDesospitalizacao</td>
+                <td>GetDesospitalizacao</td>
                 <td><span class="method get">GET</span></td>
                 <td><code>/sae/v1/desospitalizacao</code></td>
-                <td><code>p_data_inicio</code> (query) <button class="btn-payload" onclick="openPayload('ja-desospit-get')">{ } JSON</button></td>
-                <td>Lista de desospitalizações <button class="btn-payload" onclick="openPayload('ja-desospit-get')">{ } JSON</button></td>
+                <td><code>p_internacao_desosp</code>, <code>p_internacao</code>, <code>p_hospital</code> <button class="btn-payload" onclick="openPayload('ja-desospit-get')">{ } JSON</button></td>
+                <td>Lista de desospitalizações <button class="btn-payload" onclick="openPayload('ja-desospit-get', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>RegistrarDesospitalizacao</td>
+                <td>PostDesospitalizacao</td>
                 <td><span class="method post">POST</span></td>
                 <td><code>/sae/v1/desospitalizacao</code></td>
-                <td>Body: <code>id_internacao</code>, <code>observacao</code>, <code>programas[]</code>, <code>cuidados[]</code>… <button class="btn-payload" onclick="openPayload('ja-desospit-post')">{ } JSON</button></td>
-                <td>Confirmação de criação <button class="btn-payload" onclick="openPayload('ja-desospit-post')">{ } JSON</button></td>
+                <td>Body: <code>id_internacao</code>, <code>programas[]</code>, <code>cuidados[]</code> <button class="btn-payload" onclick="openPayload('ja-desospit-post')">{ } JSON</button></td>
+                <td>Confirmação de criação <button class="btn-payload" onclick="openPayload('ja-desospit-post', 'response')">{ } JSON</button></td>
               </tr>
               <tr>
-                <td>AtualizarDesospitalizacao</td>
+                <td>PutDesospitalizacao</td>
                 <td><span class="method put">PUT</span></td>
                 <td><code>/sae/v1/desospitalizacao</code></td>
-                <td>Body: campos a atualizar <button class="btn-payload" onclick="openPayload('ja-desospit-put')">{ } JSON</button></td>
-                <td>Confirmação de atualização <button class="btn-payload" onclick="openPayload('ja-desospit-put')">{ } JSON</button></td>
+                <td>Body: <code>id_internacao_desosp</code>, <code>tipo_encerramento</code>, <code>programas_detalhe[]</code> <button class="btn-payload" onclick="openPayload('ja-desospit-put')">{ } JSON</button></td>
+                <td>Confirmação de atualização <button class="btn-payload" onclick="openPayload('ja-desospit-put', 'response')">{ } JSON</button></td>
               </tr>
             </tbody>
           </table>
@@ -5076,8 +4990,8 @@
       </div>
     </div>
 
-    <!-- SEC 11: ENDPOINTS ACCORDION -->
-    <div class="section-card" id="ja-sec11">
+    <!-- SEC 11 REMOVIDO -->
+    <div class="section-card" id="ja-sec11" style="display:none;">
       <div class="section-header" style="background:#2E75B6;">
         <div class="section-number">11</div>
         <h2>Referência de Endpoints</h2>
@@ -5112,7 +5026,7 @@
           </div>
           <!-- Contador -->
           <div id="ep-count" style="margin-left:auto;font-size:12px;color:#64748b;white-space:nowrap;flex-shrink:0;">
-            <strong id="ep-count-num" style="color:#1e293b;">30</strong> endpoints em <strong style="color:#1e293b;">4</strong> sistemas
+            <strong id="ep-count-num" style="color:#1e293b;">28</strong> endpoints em <strong style="color:#1e293b;">4</strong> sistemas
           </div>
         </div>
 
@@ -5172,7 +5086,7 @@
                 <div style="font-size:14px;font-weight:700;color:#1e293b;">Healthmap</div>
               </div>
               <span class="ep-badge" style="background:#fef9e7;color:#92400e;border-radius:20px;padding:3px 10px;
-                    font-size:11px;font-weight:700;flex-shrink:0;">5 endpoints</span>
+                    font-size:11px;font-weight:700;flex-shrink:0;">2 endpoints</span>
               <span class="ep-chevron" style="color:#94a3b8;font-size:16px;transition:transform .25s;flex-shrink:0;">▾</span>
             </button>
             <div class="ep-group-body" style="max-height:0;overflow:hidden;transition:max-height .3s ease;">
@@ -5193,33 +5107,12 @@
                       <td style="padding:12px 16px;font-size:12px;color:#64748b;">Autenticação</td>
                       <td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/oauth/token')">⎘</button></td>
                     </tr>
-                    <tr class="ep-row" data-method="POST" data-text="questionariossintetico questionarios sintetico api/v1/consultas/dadosquestionariossintetico healthmap">
-                      <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">QuestionariosSintetico</td>
-                      <td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td>
-                      <td style="padding:12px 16px;"><code class="ep-path">/api/v1/consultas/dadosQuestionariosSintetico</code></td>
-                      <td style="padding:12px 16px;font-size:12px;color:#64748b;">Healthmap</td>
-                      <td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/api/v1/consultas/dadosQuestionariosSintetico')">⎘</button></td>
-                    </tr>
                     <tr class="ep-row" data-method="POST" data-text="respostaavaliacao resposta avaliacao api/v1/questionario/responderavaliacao healthmap">
-                      <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">RespostaAvaliacao</td>
+                      <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">ResponderAvaliacao</td>
                       <td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td>
                       <td style="padding:12px 16px;"><code class="ep-path">/api/v1/questionario/responderAvaliacao</code></td>
                       <td style="padding:12px 16px;font-size:12px;color:#64748b;">Healthmap</td>
                       <td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/api/v1/questionario/responderAvaliacao')">⎘</button></td>
-                    </tr>
-                    <tr class="ep-row" data-method="GET" data-text="linhacuidado linha cuidado api/v1/consultas/dadosquestionarioscompletos healthmap">
-                      <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">LinhaCuidado</td>
-                      <td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td>
-                      <td style="padding:12px 16px;"><code class="ep-path">/api/v1/consultas/dadosQuestionariosCompletos</code></td>
-                      <td style="padding:12px 16px;font-size:12px;color:#64748b;">Healthmap</td>
-                      <td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/api/v1/consultas/dadosQuestionariosCompletos')">⎘</button></td>
-                    </tr>
-                    <tr class="ep-row" data-method="GET" data-text="planoacao plano acao api/planoacao/v1/planoacao healthmap">
-                      <td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PlanoAcao</td>
-                      <td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td>
-                      <td style="padding:12px 16px;"><code class="ep-path">/api/planoacao/v1/planoAcao</code></td>
-                      <td style="padding:12px 16px;font-size:12px;color:#64748b;">Healthmap</td>
-                      <td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/api/planoacao/v1/planoAcao')">⎘</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -5287,7 +5180,7 @@
                 <div style="font-size:14px;font-weight:700;color:#1e293b;">SAE</div>
               </div>
               <span class="ep-badge" style="background:#f0f7ff;color:#1e40af;border-radius:20px;padding:3px 10px;
-                    font-size:11px;font-weight:700;flex-shrink:0;">22 endpoints</span>
+                    font-size:11px;font-weight:700;flex-shrink:0;">23 endpoints</span>
               <span class="ep-chevron" style="color:#94a3b8;font-size:16px;transition:transform .25s;flex-shrink:0;">▾</span>
             </button>
             <div class="ep-group-body" style="max-height:0;overflow:hidden;transition:max-height .3s ease;">
@@ -5311,18 +5204,19 @@
                     <tr class="ep-row" data-method="GET" data-text="solicitacaointernacao solicitacao sae/v1/solicitacao-internacao internações"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">SolicitacaoInternacao</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/solicitacao-internacao</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Internações</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/solicitacao-internacao')">⎘</button></td></tr>
                     <tr class="ep-row" data-method="GET" data-text="guiasae guia sae sae/v1/guia_sae internações"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GuiaSAE</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/guia_sae</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Internações</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/guia_sae')">⎘</button></td></tr>
                     <tr class="ep-row" data-method="GET" data-text="guiacarteira guia carteira sae/v1/guias internações"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GuiaCarteira</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/guias/{carteirinha}</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Internações</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/guias/{carteirinha}')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="GET" data-text="avaliacaoinicial avaliacao inicial get sae/v1/avaliacao-inicial"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">AvaliacaoInicial</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-inicial</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Aval. Inicial</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-inicial')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="POST" data-text="avaliacaoinicial avaliacao inicial post sae/v1/avaliacao-inicial"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">AvaliacaoInicial</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-inicial</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Aval. Inicial</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-inicial')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="POST" data-text="avaliacaovisita avaliacao visita enfermagem post sae/v1/avaliacao-visita"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">AvaliacaoVisita</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-visita</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Aval. Enfermagem</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-visita')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="GET" data-text="ultimaavaliacaovisita ultima avaliacao visita enfermagem get sae/v1/avaliacao-visita"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">UltimaAvaliacaoVisita</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-visita</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Aval. Enfermagem</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-visita')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="POST" data-text="avaliacaoassistentesocial assistente social post sae/v1/avaliacao-assistente-social"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">AvaliacaoAssisSocial</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-assistente-social</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Aval. Assis. Social</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-assistente-social')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="POST" data-text="avaliacaohospitalista hospitalista medico post sae/v1/avaliacao-hospitalista"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">AvaliacaoHospitalista</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-hospitalista</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Aval. Hospitalista</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-hospitalista')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="GET" data-text="consultainconformidade inconformidade get sae/v1/inconformidade"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">ConsultaInconformidade</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/inconformidade</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Inconformidade</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/inconformidade')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="POST" data-text="enviainconformidade inconformidade post sae/v1/inconformidade"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">EnviaInconformidade</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/inconformidade</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Inconformidade</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/inconformidade')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="PUT" data-text="atualizainconformidade inconformidade put sae/v1/inconformidade"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">AtualizaInconformidade</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-put">PUT</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/inconformidade</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Inconformidade</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/inconformidade')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="GET" data-text="consultadesospitalizacao desospitalizacao get sae/v1/desospitalizacao"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">ConsultaDesospitalizacao</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/desospitalizacao</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Desospitalização</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/desospitalizacao')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="POST" data-text="enviaDdesospitalizacao desospitalizacao post sae/v1/desospitalizacao"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">EnviaDesospitalizacao</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/desospitalizacao</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Desospitalização</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/desospitalizacao')">⎘</button></td></tr>
-                    <tr class="ep-row" data-method="PUT" data-text="atualizadesospitalizacao desospitalizacao put sae/v1/desospitalizacao"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">AtualizaDesospitalizacao</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-put">PUT</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/desospitalizacao</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Desospitalização</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/desospitalizacao')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="GET" data-text="avaliacaoinicial avaliacao inicial get sae/v1/avaliacao-inicial avaliações clínicas"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GetAvaliacaoInicial</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-inicial</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Avaliações Clínicas</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-inicial')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="GET" data-text="avaliacaovisita avaliacao visita enfermagem get sae/v1/avaliacao-visita avaliações clínicas"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GetAvaliacaoVisita</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-visita</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Avaliações Clínicas</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-visita')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="POST" data-text="avaliacaovisita avaliacao visita enfermagem post sae/v1/avaliacao-visita avaliações clínicas"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PostAvaliacaoVisita</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-visita</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Avaliações Clínicas</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-visita')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="GET" data-text="getavaliacaoassistentesocial assistente social get sae/v1/avaliacao-assistente-social avaliações clínicas"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GetAvaliacaoAssistenteSocial</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-assistente-social</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Avaliações Clínicas</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-assistente-social')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="POST" data-text="avaliacaoassistentesocial assistente social post sae/v1/avaliacao-assistente-social avaliações clínicas"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PostAvaliacaoAssistenteSocial</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-assistente-social</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Avaliações Clínicas</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-assistente-social')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="GET" data-text="getavaliacaohospitalista hospitalista medico get sae/v1/avaliacao-hospitalista avaliações clínicas"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GetAvaliacaoHospitalista</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-hospitalista</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Avaliações Clínicas</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-hospitalista')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="POST" data-text="avaliacaohospitalista hospitalista medico post sae/v1/avaliacao-hospitalista avaliações clínicas"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PostAvaliacaoHospitalista</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/avaliacao-hospitalista</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Avaliações Clínicas</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/avaliacao-hospitalista')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="GET" data-text="getinconformidade inconformidade get sae/v1/inconformidade"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GetInconformidade</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/inconformidade</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Inconformidade</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/inconformidade')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="POST" data-text="postinconformidade inconformidade post sae/v1/inconformidade"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PostInconformidade</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/inconformidade</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Inconformidade</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/inconformidade')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="PUT" data-text="putinconformidade inconformidade put sae/v1/inconformidade"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PutInconformidade</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-put">PUT</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/inconformidade</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Inconformidade</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/inconformidade')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="GET" data-text="getdesospitalizacao desospitalizacao get sae/v1/desospitalizacao"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">GetDesospitalizacao</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-get">GET</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/desospitalizacao</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Desospitalização</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/desospitalizacao')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="POST" data-text="postdesospitalizacao desospitalizacao post sae/v1/desospitalizacao"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PostDesospitalizacao</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-post">POST</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/desospitalizacao</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Desospitalização</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/desospitalizacao')">⎘</button></td></tr>
+                    <tr class="ep-row" data-method="PUT" data-text="putdesospitalizacao desospitalizacao put sae/v1/desospitalizacao"><td style="padding:12px 16px;font-size:13px;font-weight:600;color:#1e293b;">PutDesospitalizacao</td><td style="padding:12px 10px;text-align:center;"><span class="ep-method-put">PUT</span></td><td style="padding:12px 16px;"><code class="ep-path">/sae/v1/desospitalizacao</code></td><td style="padding:12px 16px;font-size:12px;color:#64748b;">Desospitalização</td><td style="padding:12px 10px;"><button class="ep-copy" title="Copiar cURL" onclick="jaCopyPath(this,'/sae/v1/desospitalizacao')">⎘</button></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -6420,37 +6314,54 @@ const diagTips = {
   'ja-guias-paciente': {
     title: 'Guias TOTVS — Paciente',
     sub: 'GET /cadTotvs/v1/guias-pacientes/{numeroCarteirinha} — TOTVS',
-    request: `// Path param
-{
-  "numeroCarteirinha": "000000000000000"
-}`,
-    response: `[
-  {
-    "numeroGuia": null,
-    "numeroCarteirinha": null,
-    "dataInternacao": null,
-    "dataAlta": null,
-    "hospital": null,
-    "status": null
-  }
-]`
-  },
-  'ja-guias-prestador': {
-    title: 'Guias TOTVS — Prestador',
-    sub: 'GET /dts/datasul-rest/resources/prg/hes/v1/prestador/{id}/{cnes}/guias-internacao/ — TOTVS HML',
-    request: `// Path params
-{
-  "id": null,
-  "cnes": null
-}`,
+    request: `GET https://api.unimedpoa.com.br/cadTotvs/v1/guias-pacientes/{numeroCarteirinha}
+
+Exemplo:
+GET https://api.unimedpoa.com.br/cadTotvs/v1/guias-pacientes/00480100676700044`,
     response: `{
-  "items": [
+  "tipoPessoa": "F",
+  "codigoBeneficiario": "00480100676700044",
+  "custOperacional": "PRE PAGAMENTO",
+  "CPF": "87394936015",
+  "vinculo": "PLANO-NAO-COOPERADO",
+  "liminar": true,
+  "nome": "ALINE SILVA DOS REIS",
+  "empresaContratante": "CLAIR SILVA DOS SANTOS",
+  "outrasGuias": [
     {
-      "numeroGuia": null,
-      "paciente": null,
-      "dataInternacao": null,
-      "dataAlta": null,
-      "status": null
+      "numeroGuia": "20261230274",
+      "codigoPrestador": "100140",
+      "nomePrestador": "ASSOC EDUCADORA SAO CARLOS - AESC"
+    },
+    {
+      "numeroGuia": "20261045596",
+      "codigoPrestador": "100140",
+      "nomePrestador": "ASSOC EDUCADORA SAO CARLOS - AESC"
+    },
+    {
+      "numeroGuia": "2026971664",
+      "codigoPrestador": "100140",
+      "nomePrestador": "ASSOC EDUCADORA SAO CARLOS - AESC"
+    }
+  ],
+  "guiasPendentes": [
+    {
+      "guiaPrincipal": "2026817125",
+      "tipo": "52",
+      "numeroGuia": "20261233563",
+      "codigoPrestador": "100140",
+      "nomePrestador": "ASSOC EDUCADORA SAO CARLOS - AESC",
+      "caixaAuditoria": "",
+      "status": "Pendente Liberacao"
+    },
+    {
+      "guiaPrincipal": "2026795145",
+      "tipo": "52",
+      "numeroGuia": "20261213403",
+      "codigoPrestador": "100140",
+      "nomePrestador": "ASSOC EDUCADORA SAO CARLOS - AESC",
+      "caixaAuditoria": "",
+      "status": "Pendente Liberacao"
     }
   ]
 }`
@@ -6458,152 +6369,333 @@ const diagTips = {
   'ja-internacoes': {
     title: 'Listar Internações — SAE',
     sub: 'GET /sae/v1/internacoes — SAE',
-    request: `// Query params
-{
-  "limit": 10000,
-  "p_statusInternacao": 1,
-  "p_hospital": null,
-  "p_dataAlta": null,
-  "offset": null
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/internacoes?p_statusInternacao=1&p_hospital=101154
+
+Parâmetros (query):
+  p_dataAlta          — data de alta da internação (ex: 2025-12-01)
+  p_statusInternacao  — 1 em andamento · 2 cancelado · 3 finalizado
+  p_hospital          — código do hospital
+
+Hospitais disponíveis:
+  101332  Hospital São Lucas da PUCRS
+  101154  Hospital Divina Providência
+  100204  Hospital Moinhos de Vento
+  101960  Hospital Ernesto Dorneles
+  100638  Santa Casa de Porto Alegre
+  100140  Hospital Mãe de Deus
+  102053  Hospital de Clínicas de Porto Alegre
+  101863  Instituto de Cardiologia do RS`,
     response: `[
   {
-    "id_internacao": null,
-    "id_paciente": null,
-    "nome_paciente": null,
-    "carteirinha": null,
-    "hospital": null,
-    "data_internacao": null,
+    "id_internacao": 2453174692,
+    "instituicao": "HOSPITAL DIVINA PROVIDENCIA",
+    "id_atendimento": "3428299",
+    "data_internacao": "2025-09-12",
+    "hora_internacao": "18:19",
+    "nome_paciente": "ANTONIO PAULO AMARAL BOTELHO",
+    "cpf": 1262840244,
+    "cpf_formatado": "012.628.402-44",
+    "carteira_paciente": 482087028014852,
+    "data_nascimento": "1949-07-09",
+    "sexo": 1,
+    "plano": "COLETIVO GLO POR ADESAO C/PART",
+    "medico_assistente": "Eula Carla Mendes Costa Sousa",
+    "local": "5º Andar Clinica Medica",
+    "observacao_conclusao": null,
+    "leito": "B",
+    "quarto": "513",
+    "cid_principal": "I633 - INFARTO CEREBR DEV TROMBOSE ARTERIAS CEREBR",
+    "id_tipo_especialidade": 907,
+    "ds_label_especialidade": "NEUROLOGIA",
+    "tipo_acomodacao": "PRIVATIVO/SEMI-PRIVATIVO",
+    "visita_ava": null,
+    "profissional_visita_ava": null,
+    "ava_hospitalista": null,
+    "profissional_ava_hospitalista": null,
+    "ava_servico_social": null,
+    "profissional_ava_serv_social": null,
+    "data_avaliacao_inicial": null,
+    "reinternacao": 1,
     "data_alta": null,
-    "status": null,
-    "leito": null,
-    "medico": null
+    "tipo_encerramento": null,
+    "data_alta_estimada": null,
+    "data_alta_prevista_drg": "2025-09-16",
+    "status": "Andamento",
+    "atualizacao": "2026-04-09T18:04:33.119Z"
+  },
+  {
+    "id_internacao": 2611943131,
+    "instituicao": "HOSPITAL DIVINA PROVIDENCIA",
+    "id_atendimento": "3496516",
+    "data_internacao": "2025-11-19",
+    "hora_internacao": "00:07",
+    "nome_paciente": "MARINO ACELIO LEITE SEVERO",
+    "cpf": 20884885020,
+    "cpf_formatado": "208.848.850-20",
+    "carteira_paciente": 481015433600017,
+    "data_nascimento": "1954-05-15",
+    "sexo": 1,
+    "plano": "GLOBAL C/PART.",
+    "medico_assistente": "MOACIR CARLOS ZENI",
+    "local": "5º Andar Clinica Medica",
+    "observacao_conclusao": null,
+    "leito": "P",
+    "quarto": "502",
+    "cid_principal": "A419 - SEPTICEMIA NE",
+    "id_tipo_especialidade": 872,
+    "ds_label_especialidade": "CARDIOLOGIA",
+    "tipo_acomodacao": "PRIVATIVO/SEMI-PRIVATIVO",
+    "visita_ava": "2026-03-09",
+    "profissional_visita_ava": "Michelle de Moura Pinto",
+    "ava_hospitalista": "2026-03-14",
+    "profissional_ava_hospitalista": "Andre Zabel",
+    "ava_servico_social": "2026-03-16",
+    "profissional_ava_serv_social": "Jacquevanesa Rabelo Rousselet",
+    "data_avaliacao_inicial": "2025-11-21",
+    "reinternacao": 1,
+    "data_alta": null,
+    "tipo_encerramento": null,
+    "data_alta_estimada": "2026-03-20",
+    "data_alta_prevista_drg": "2025-11-29",
+    "status": "Andamento",
+    "atualizacao": "2026-04-11T14:36:47.875Z"
   }
 ]`
   },
   'ja-login-sae': {
     title: 'Login SAE',
     sub: 'GET /sae/v1/login — SAE',
-    request: `// Query params
-{
-  "login": "usuario@unimedpoa.com.br"
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/login?login=fourge.cassiano
+
+Parâmetro (query):
+  login — prefixo do e-mail corporativo (parte antes do @unimedpoa.com.br)
+
+Exemplos:
+  fourge.cassiano   →  fourge.cassiano@unimedpoa.com.br
+  joao.silva        →  joao.silva@unimedpoa.com.br`,
     response: `{
-  "id_profissional": null,
-  "nome": null,
-  "login": null,
-  "perfil": null,
-  "token": null,
-  "az_asm": null,
-  "az_botm": null
+  "LOGIN": "fourge.cassiano",
+  "ID_CADASTRO": 1906649466,
+  "ULTIMO_LOGIN": "2026-04-09"
 }`
   },
   'ja-lista-medico': {
     title: 'Lista Médico — SAE',
     sub: 'GET /sae/v1/lista-medico — SAE',
-    request: `// Sem parâmetros`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/lista-medico
+
+Sem parâmetros — nenhum valor precisa ser enviado no path ou query.`,
     response: `[
   {
-    "id_medico": null,
-    "nome": null,
-    "crm": null,
-    "especialidade": null
+    "id_profissional": 2625661704,
+    "nome": "Cris Camila Carlos do Nascimento",
+    "email": null,
+    "cpf": 11668319900,
+    "sigla_conselho": null,
+    "numero_conselho": "20145D",
+    "ds_especialidade": "NUTRICIONISTA"
+  },
+  {
+    "id_profissional": 1580229382,
+    "nome": "PEDRO VINICIUS SILVA PINCHEMEL",
+    "email": null,
+    "cpf": 4740080532,
+    "sigla_conselho": null,
+    "numero_conselho": "50100",
+    "ds_especialidade": "MEDICO ORTOPEDISTA E TRAUMATOLOGISTA"
   }
 ]`
   },
   'ja-lista-procedimentos': {
     title: 'Lista Procedimentos — SAE',
     sub: 'GET /sae/v1/lista-procedimentos — SAE',
-    request: `// Sem parâmetros`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/lista-procedimentos
+
+Sem parâmetros — nenhum valor precisa ser enviado no path ou query.`,
     response: `[
   {
-    "id_procedimento": null,
-    "codigo": null,
-    "descricao": null
+    "id_procedimentos": "40305015",
+    "procedimento": "1,25-DIHIDROXI VITAMINA D"
+  },
+  {
+    "id_procedimentos": "40322351",
+    "procedimento": "10,11 EPOXIDO CARBAMAZEPINAM, SORO"
+  },
+  {
+    "id_procedimentos": "DCOR30",
+    "procedimento": "11 DESOXICORTISOL (30 MINUTOS)"
+  },
+  {
+    "id_procedimentos": "DCOR",
+    "procedimento": "11 DESOXICORTISOL (COMPOSTO S)"
+  },
+  {
+    "id_procedimentos": "11DESOXI",
+    "procedimento": "11 Desoxicorticosterona"
+  },
+  {
+    "id_procedimentos": "40305740",
+    "procedimento": "11-DESOXICORTICOSTERONA"
   }
 ]`
   },
   'ja-localizacao': {
     title: 'Localização de Internação — SAE',
     sub: 'GET /sae/v1/localizacao-internacao — SAE',
-    request: `// Query params
-{
-  "p_internacao": null
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/localizacao-internacao?p_internacao={id_internacao}
+
+Parâmetro (query):
+  id_internacao — identificador da internação (ex: 2453174692)`,
     response: `{
-  "id_internacao": null,
-  "leito": null,
-  "ala": null,
-  "andar": null,
-  "uti": null
+  "id_internacao": 2453174692,
+  "data_entrada": "15/09/2025",
+  "data_saida": "11/04/2026",
+  "local": "5º Andar Clinica Medica",
+  "quarto": "513",
+  "leito": "B",
+  "tempo_internado": 208
 }`
   },
-  'ja-emergencia': {
-    title: 'Emergência — Internação SAE',
-    sub: 'GET /sae/v1/emergencia-internacao — SAE',
-    request: `// Query params
-{
-  "p_hospital": null
-}`,
-    response: `[
-  {
-    "id_internacao": null,
-    "paciente": null,
-    "data_entrada": null,
-    "status": null
-  }
-]`
-  },
   'ja-dados-paciente': {
-    title: 'Dados do Paciente (Indicadores) — SAE',
+    title: 'Dados do Paciente — SAE',
     sub: 'GET /sae/v1/internacoes-indicadores — SAE',
-    request: `// Query params
-{
-  "p_idPaciente": "000000000000000"
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/internacoes-indicadores?p_idPaciente={carteirinha}
+
+Parâmetro (query):
+  p_idPaciente — número da carteirinha do beneficiário (ex: 482087028014852)`,
     response: `{
-  "carteirinha": null,
-  "nome": null,
-  "historico_internacoes": null,
-  "dias_totais": null,
-  "ultimo_cid": null
+  "carteirinha": 482022845038837,
+  "cpf": 84309911072,
+  "nome_paciente": "ALICE CATALINA MARTINEZ HOBBAS",
+  "data_nascimento": "04/03/1978",
+  "contato_email": "alice.hobbas@unimedpoa.com.br",
+  "contato_telefone_string": "51983326016",
+  "sexo": "Feminino",
+  "endereco_rua": "VENANCIO AIRES, 495, 12",
+  "nome_cidade": "PORTO ALEGRE",
+  "ds_classe_hospitalar": "SEMIPRIVATIVO"
 }`
   },
   'ja-solicitacao-internacao': {
     title: 'Solicitação de Internação — SAE',
     sub: 'GET /sae/v1/solicitacao-internacao — SAE',
-    request: `// Query params
-{
-  "limit": 10000
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/solicitacao-internacao
+
+Sem parâmetros — nenhum valor precisa ser enviado no path ou query.`,
     response: `[
   {
-    "id_solicitacao": null,
-    "id_paciente": null,
-    "carteirinha": null,
-    "hospital": null,
-    "data_solicitacao": null,
-    "status": null
+    "id_guia": 2818601257,
+    "cpf": 2152402006,
+    "id_paciente": 482053374016944,
+    "id_cid": "Z000",
+    "ds_cid": "EXAME MEDICO GERAL",
+    "id_hospital_solicitado": 2361185,
+    "nome_paciente": "SUELLEN REGINA DIAS BARBOSA",
+    "data_sugerida_paciente": "2026-04-13T00:00:00Z",
+    "tipo_internacao": 2,
+    "ds_tipo_internacao": "Cirúrgica",
+    "sequencial": 1,
+    "id_procedimento": "31307183",
+    "ds_procedimento": "ENDOMETRIOSE PERITONEAL - TRATAMENTO CIRURGICO VIA LAPAROSCOPICA"
+  },
+  {
+    "id_guia": 2818601257,
+    "cpf": 2152402006,
+    "id_paciente": 482053374016944,
+    "id_cid": "Z000",
+    "ds_cid": "EXAME MEDICO GERAL",
+    "id_hospital_solicitado": 2361185,
+    "nome_paciente": "SUELLEN REGINA DIAS BARBOSA",
+    "data_sugerida_paciente": "2026-04-13T00:00:00Z",
+    "tipo_internacao": 2,
+    "ds_tipo_internacao": "Cirúrgica",
+    "sequencial": 1,
+    "id_procedimento": "31307060",
+    "ds_procedimento": "LAPAROSCOPIA GINECOLOGICA COM OU SEM BIOPSIA (INCLUI A CROMOTUBAGEM)"
+  },
+  {
+    "id_guia": 2818247780,
+    "cpf": 54174783004,
+    "id_paciente": 482070205021606,
+    "id_cid": "M511",
+    "ds_cid": "TRANST DISCO LOMBAR OUTR INTERVERT RADICULOP",
+    "id_hospital_solicitado": 2462508,
+    "nome_paciente": "PAULO ROBERTO DOS SANTOS LOPES",
+    "data_sugerida_paciente": "2026-04-23T00:00:00Z",
+    "tipo_internacao": 2,
+    "ds_tipo_internacao": "Cirúrgica",
+    "sequencial": 1,
+    "id_procedimento": "30715059",
+    "ds_procedimento": "CIRURGIA DE COLUNA POR VIA ENDOSCOPICA HERNIADISCO LOMBAR"
   }
 ]`
   },
   'ja-guia-sae': {
     title: 'Guia SAE',
     sub: 'GET /sae/v1/guia_sae — SAE',
-    request: `// Query params
-{
-  "p_statusInternacao": 1,
-  "limit": null,
-  "p_hospital": null,
-  "p_internacao": null
-}`,
-    response: `[
+    request: `GET https://api.unimedpoa.com.br/sae/v1/guia_sae?p_statusInternacao=1&p_hospital=101154
+
+Parâmetros (query):
+  p_dataAlta          — data de alta da internação (ex: 2025-12-01)
+  p_statusInternacao  — 1 em andamento · 2 cancelado · 3 finalizado
+  p_hospital          — código do hospital (ver lista de hospitais)
+
+Hospitais disponíveis:
+  101332  Hospital São Lucas da PUCRS
+  101154  Hospital Divina Providência
+  100204  Hospital Moinhos de Vento
+  101960  Hospital Ernesto Dorneles
+  100638  Santa Casa de Porto Alegre
+  100140  Hospital Mãe de Deus
+  102053  Hospital de Clínicas de Porto Alegre
+  101863  Instituto de Cardiologia do RS`,
+    response: `// EN_TIPO_MARCO
+//   0  → Análise da empresa
+//   1  → Análise de documentação
+//   2  → Análise de perícia médica
+//   3  → Auditoria OPME
+//   4  → Cotação de OPME
+//   5  → Auditoria médica
+//   6  → Autorizações
+//   7  → Autorização de intercâmbio
+//   8  → Análise NAIS
+//   9  → Envio lote
+//  10  → Autorização da origem
+//  11  → Gestão OPME
+//  12  → Célula de negativa
+//  13  → Triagem
+//  14  → Auditoria farmácia
+//  15  → Análise de restrições
+//  16  → Transcrições
+//  17  → Acolhimento
+//
+// EN_STATUS_MARCO
+//   1  → Em análise
+
+[
   {
-    "id_guia": null,
-    "id_internacao": null,
-    "numero_guia": null,
-    "status": null,
-    "data_emissao": null
+    "carteirinha_paciente": 482037226056865,
+    "id_internacao": 2801336426,
+    "codigo_prestador": "3977099",
+    "cd_internacao": "3977099",
+    "id_guia": 2801320244,
+    "codigo_web": "124751670",
+    "nome_especialidade": "MEDICO NEFROLOGISTA",
+    "en_tipo_marco": 3,
+    "en_status_marco": 1,
+    "mensagem": null
+  },
+  {
+    "carteirinha_paciente": 482037226056865,
+    "id_internacao": 2801336426,
+    "codigo_prestador": "3977099",
+    "cd_internacao": "3977099",
+    "id_guia": 2801320244,
+    "codigo_web": "124751670",
+    "nome_especialidade": "MEDICO NEFROLOGISTA",
+    "en_tipo_marco": 13,
+    "en_status_marco": 1,
+    "mensagem": null
   }
 ]`
   },
@@ -6626,20 +6718,38 @@ const diagTips = {
   'ja-aval-inicial-get': {
     title: 'Avaliação Inicial — Consulta',
     sub: 'GET /sae/v1/avaliacao-inicial — SAE',
-    request: `// Query params
-{
-  "p_internacao": null
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/avaliacao-inicial?p_internacao={id_internacao}
+
+Parâmetro (query):
+  p_internacao — identificador da internação (ex: 1259442806)`,
     response: `{
-  "id_avaliacao": null,
-  "id_internacao": null,
-  "id_profissional": null,
-  "id_cid": null,
-  "id_acomodacao_inicial": null,
+  "id_internacao_avaliacao_ini": 1260200913,
+  "id_internacao": 1259442806,
+  "nome_paciente": "ROSANE GOMES CHAGAS",
+  "id_avaliacao": 1260200913,
+  "ds_instituicao": "HOSPITAL SANTA CASA - INTERNACAO",
+  "id_responsavel": 849434692,
+  "responsavel": "Cristiano Bruno da Silva",
+  "data_avaliacao_inicial": "2021-11-08",
+  "id_acomodacao_inicial": 65096,
+  "en_origem": null,
+  "id_tipo_carater_internacao": 3,
   "en_procedencia_paciente": null,
-  "bl_recemnascido": null,
-  "bl_notificacao_judicial": null,
-  "observacao": null
+  "bl_notificacao_judicial": 0,
+  "bl_recemnascido": 1,
+  "en_tipo_gemelar": null,
+  "peso_nascimento": null,
+  "quinto_minuto": null,
+  "idade_gestacional": null,
+  "comprimento": null,
+  "sexo": null,
+  "en_nascido_vivo": null,
+  "en_tocotraumatismo": null,
+  "en_apgar": null,
+  "en_alta_rn_48_horas": null,
+  "id_cid": "M519",
+  "ids_tipo_cid": "G931, I460, M545",
+  "observacao": "MI: POI Hérnia coluna vertebral\r\nMI UTI: PCR"
 }`
   },
   'ja-aval-inicial-post': {
@@ -6667,151 +6777,538 @@ const diagTips = {
   'ja-aval-visita-get': {
     title: 'Avaliação de Visita — Consulta',
     sub: 'GET /sae/v1/avaliacao-visita — SAE',
-    request: `// Query params
-{
-  "p_internacao": null
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/avaliacao-visita?p_internacao={id_internacao}
+
+Parâmetro (query):
+  p_internacao — identificador da internação (ex: 2339294962)`,
     response: `{
-  "id_avaliacao": null,
-  "id_internacao": null,
-  "en_ventilatorio": null,
-  "en_drogas": null,
-  "en_acessos": null,
-  "en_eliminacoes": null,
-  "en_curativos": null,
-  "analise_critica": null
+  "id_avaliacao": 2790829650,
+  "id_internacao": 2339294962,
+  "id_cidatual": "E878",
+  "id_acomodacaoatual": 65096,
+  "acessos": "1",
+  "en_localacessocvc": 0,
+  "data_inicio_cvc": "2025-11-18T00:00:00Z",
+  "hora_inicio_cvc": "16:00",
+  "data_fim_cvc": null,
+  "hora_fim_cvc": null,
+  "en_localacessopicc": null,
+  "data_inicio_picc": null,
+  "hora_inicio_picc": null,
+  "data_fim_picc": null,
+  "hora_fim_picc": null,
+  "en_tipouti": 0,
+  "id_ciduti": "J188",
+  "data_uti": "2025-11-16",
+  "hora_uti": "00:31",
+  "en_ventilatorio": 0,
+  "en_ventilatorioinvasivo": 0,
+  "data_inicio_vent_invasivo": "2025-11-17",
+  "hora_inicio_vent_invasivo": "00:31",
+  "data_fim_vent_invasivo": null,
+  "hora_fim_vent_invasivo": null,
+  "id_medico_uti": 2226535,
+  "nome_cadastro": "MARIA CLAUDIA DUTRA BARCELLOS GUTERRES DA COSTA",
+  "en_nivelconsciencia": 3,
+  "en_nivelconscienciaclinico": null,
+  "data_criacao": "2026-03-13"
 }`
   },
   'ja-aval-visita-post': {
     title: 'Avaliação de Visita — Registro',
     sub: 'POST /sae/v1/avaliacao-visita — SAE',
     request: `{
-  "id_internacao": null,
-  "id_profissional": null,
-  "en_ventilatorio": null,
-  "en_drogas": null,
-  "en_acessos": null,
-  "en_eliminacoes": null,
-  "en_curativos": null,
-  "condicao_adquirida": null,
-  "analise_critica": null
+  "id_profissional": "1497395299",
+  "id_paciente": "482022845020695",
+  "id_instituicao": "625",
+  "id_internacao": "1712251841",
+  "data_visita": "2025-09-27",
+  "observacao": "Teste criação",
+  "id_cid_atual": "F051",
+  "id_acomodacao_atual": 65099,
+  "isolamento": 1,
+  "id_cid_uti": "Z000",
+  "en_tipo_uti": 1,
+  "id_medico_uti": 1039,
+  "data_uti": "2025-09-27",
+  "hora_uti": "20:00",
+  "en_nivel_consciencia": 1,
+  "en_condicao_alta_uti": 1,
+  "condicao_alta_uti": {
+    "data_alta_uti": "2025-09-27",
+    "hora_alta_uti": "20:00"
+  },
+  "en_ventilatorio": 1,
+  "ventilatorio": {
+    "en_ventilatorio_invasivo": 1,
+    "data_inicio_vent_invasivo": "2025-09-27",
+    "hora_inicio_vent_invasivo": "22:00",
+    "data_fim_vent_invasivo": "2025-09-27",
+    "hora_fim_vent_invasivo": "22:00",
+    "en_ventilatorio_nao_invasivo": 1,
+    "en_local_ventilatorio": 1
+  },
+  "en_nivel_consciencia_clinico": 0,
+  "en_drogas": [0],
+  "en_digestivo": [0],
+  "en_acessos": [1, 2],
+  "acessos": [
+    {
+      "en_local_acesso_cvc": 0,
+      "data_inicio_cvc": "2025-09-27",
+      "hora_inicio_cvc": "20:00",
+      "data_fim_cvc": "2025-09-27",
+      "hora_fim_cvc": "20:00"
+    },
+    {
+      "en_local_acesso_picc": 0,
+      "data_inicio_picc": "2025-09-27",
+      "hora_inicio_picc": "20:00",
+      "data_fim_picc": "2025-09-27",
+      "hora_fim_picc": "20:00"
+    }
+  ],
+  "en_medicamentos": [0],
+  "en_eliminacoes": [3],
+  "eliminacoes": [{ "en_avaliacao_ostomia": 0 }],
+  "en_curativos": [0],
+  "en_nivelcuidado": [0],
+  "en_mobilidade": [0],
+  "en_hemodialise": [0],
+  "en_terminalidade": [0],
+  "en_aguardando": 0,
+  "evolucao": "evolução menor quando en_aguardando 0 ou UTI",
+  "enca_grps": 0,
+  "enca_grps_observacao": "teste obs",
+  "enca_medprevent": 0,
+  "enca_medprevent_observacao": "teste obs",
+  "enca_reembolso": 0,
+  "enca_reembolso_observacao": "teste obs",
+  "condicao_adquirida": [
+    { "data_condicao_adquirida": "2025-09-27", "cid_condicao_adquirida": "T784" },
+    { "data_condicao_adquirida": "2025-09-27", "cid_condicao_adquirida": "Z000" }
+  ],
+  "analise_critica": [
+    { "data_analise_critica": "2025-09-27", "descricao_analise_critica": "Cassiano Teste" },
+    { "data_analise_critica": "2025-09-27", "descricao_analise_critica": "Teste 2" }
+  ]
 }`,
     response: `{
-  "sucesso": null,
-  "id_avaliacao": null,
-  "mensagem": null
+  "status": "Avaliação enviada com sucesso!",
+  "id_avaliacao": 2802512152
+}`
+  },
+  'ja-aval-as-get': {
+    title: 'Avaliação Assistente Social — Consulta',
+    sub: 'GET /sae/v1/avaliacao-assistente-social — SAE',
+    request: `GET https://api.unimedpoa.com.br/sae/v1/avaliacao-assistente-social?p_internacao={id_internacao}
+
+Parâmetro (query):
+  p_internacao — identificador da internação (ex: 2777390627)`,
+    response: `{
+  "data_criacao": "2026-04-10T16:38:48.834Z",
+  "id_paciente": 482082985000160,
+  "id_instituicao": 601,
+  "id_internacao": 2777390627,
+  "id_acomodacao": 65083,
+  "id_avaliacao": 2802462152,
+  "id_profissional": 1906649466,
+  "nome_cadastro": "Cassiano Borowsky Brigido",
+  "en_tipo_visita": 1,
+  "e_ocupacao": 1,
+  "e_residencia": 1,
+  "e_escolaridade": 1,
+  "e_familiaresponsavel": 1,
+  "e_recursospublicos": 0,
+  "e_recursospublicos_quais": 0,
+  "recursos_publicos_outrps": null,
+  "e_cobrancaparticular": 0,
+  "exameprocedimento": "TESTE",
+  "e_acomodacaoatual": 1,
+  "e_internacaoemergencia": 1,
+  "e_inadequacaoemergencia": 0,
+  "e_higienizacao": 1,
+  "e_inadequacaohigienizacao": 1,
+  "e_nutricaopaciente": 1,
+  "e_inadequacaonutricional": 1,
+  "e_refeicoesacompanhante": 1,
+  "e_inadequacaorefeicoesac": 1,
+  "e_instalacoesgerais": 1,
+  "e_inadequacaoinstalgerais": 5,
+  "e_qualidadeassistencial": 1,
+  "e_inadequacaoqualidadeass": 1,
+  "e_classificacaogeral": 1,
+  "e_observacaohospital": "TESTE CASSIANO",
+  "e_apoiosocial": 0,
+  "e_autopercepcaosaude": 0,
+  "e_medicoreferencia": 1,
+  "observacao": "TESTE CASSIANO",
+  "protocolo_crm": "35250120260410200083",
+  "data_visita": null
 }`
   },
   'ja-aval-as': {
-    title: 'Avaliação Assistente Social',
+    title: 'Avaliação Assistente Social — Registro',
     sub: 'POST /sae/v1/avaliacao-assistente-social — SAE',
     request: `{
-  "id_internacao": null,
-  "id_profissional": null,
-  "e_ocupacao": null,
-  "e_residencia": null,
-  "e_escolaridade": null,
-  "e_recursospublicos": null,
-  "e_qualidadeassistencial": null,
-  "e_apoiosocial": null,
-  "e_protocolocrm": null
+  "id_profissional": "1497395299",
+  "id_paciente": "481005642200022",
+  "id_instituicao": "625",
+  "id_internacao": "1712251841",
+  "id_acomodacao": "26121995",
+  "e_ocupacao": 2,
+  "e_residencia": 1,
+  "e_escolaridade": 1,
+  "e_familiaresponsavel": 1,
+  "e_recursospublicos": 2,
+  "e_cobrancaparticular": 1,
+  "exameprocedimento": "Cassiano Teste",
+  "e_acomodacaoatual": 2,
+  "e_internacaoemergencia": 1,
+  "e_inadequacaoemergencia": 1,
+  "e_higienizacao": 1,
+  "e_inadequacaohigienizacao": 1,
+  "e_nutricaopaciente": 1,
+  "e_inadequacaonutricional": 1,
+  "e_refeicoesacompanhante": 1,
+  "e_inadequacaorefeicoesacompanhante": 1,
+  "e_instalacoesgerais": 1,
+  "e_inadequacaoinstagerais": 1,
+  "e_qualidadeassistencial": 2,
+  "e_inadequacaoqualidadeass": 2,
+  "e_classificacaogeral": 1,
+  "e_observacaohospital": "Observacao Teste",
+  "e_apoiosocial": 2,
+  "e_autopercepcaosaude": 2,
+  "e_medicoreferencia": 1,
+  "e_observacao": "Observacao Teste",
+  "e_protocolocrm": 123123,
+  "e_recursospublicos_quais": 2,
+  "recursos_publicos_outrps": 0,
+  "tipo_visita": 0
 }`,
     response: `{
-  "sucesso": null,
-  "id_avaliacao": null,
-  "mensagem": null
+  "status": "Avaliação enviada com sucesso!",
+  "id_avaliacao": 2802512157
+}`
+  },
+  'ja-aval-hospitalista-get': {
+    title: 'Avaliação Hospitalista — Consulta',
+    sub: 'GET /sae/v1/avaliacao-hospitalista — SAE',
+    request: `GET https://api.unimedpoa.com.br/sae/v1/avaliacao-hospitalista?p_internacao={id_internacao}
+
+Parâmetro (query):
+  p_internacao — identificador da internação (ex: 2777390627)`,
+    response: `{
+  "id_internacao_avaliacao_hospitalista": 2802476152,
+  "id_internacao": 2777390627,
+  "id_profissional": 1906649466,
+  "nome_cadastro": "Cassiano Borowsky Brigido",
+  "data_visita": "2026-04-10T00:00:00Z",
+  "data_alta_estimada_drg": "2026-03-07T00:00:00Z",
+  "cid_atual": "I260",
+  "ds_revisao_caso": "teste",
+  "paciente_estavel": 1,
+  "cd_tipo_paciente_instavel": 1,
+  "ds_paciente_instavel_outra": null,
+  "en_tipo_visita": 1,
+  "alternativa_ambu_pend_alta": 0,
+  "ds_alternativa_ambu_pend_alta": "1",
+  "recomendacao_ao_med_assistente": 0,
+  "ds_recomendacao_ao_med_assistente": "2",
+  "cd_tp_adesao_recom_ao_med_assistente": 1,
+  "qtd_dias_adicional_perman_estimada": 1,
+  "data_alta_estimada": "2026-04-11T16:54:42Z",
+  "data_criacao": "2026-04-10T16:55:03Z",
+  "id_internacao_caso_social": 2802474152,
+  "cs_data_inicio": "2026-04-10T00:00:00Z",
+  "cs_data_encerramento": null,
+  "id_tipo_caso_social": 7,
+  "cs_ds_observacao": "teste 1",
+  "cs_id_status": 0,
+  "id_internacao_antibioticoterapia": 2802474153,
+  "ab_data_inicio": "2026-04-10T00:00:00Z",
+  "ab_data_encerramento": null,
+  "id_tipo_antibioticoterapia": 16,
+  "ab_ds_observacao": "teste 2",
+  "ab_id_status": 0,
+  "id_internacao_oxigenioterapia": 2802474154,
+  "ox_data_inicio": "2026-04-10T00:00:00Z",
+  "ox_data_encerramento": null,
+  "id_tipo_oxigenioterapia": 1,
+  "ox_ds_observacao": "teste 3",
+  "ox_id_status": 0,
+  "id_internacao_transf_interna": 2802474155,
+  "ti_data_inicio": "2026-04-10T00:00:00Z",
+  "ti_data_encerramento": null,
+  "id_tipo_transferencia_interna": 1,
+  "ti_ds_observacao": "teste 4",
+  "ti_id_status": 0,
+  "id_internacao_serv_extra_hospitalar": 2802474156,
+  "eh_data_inicio": "2026-04-10T00:00:00Z",
+  "eh_data_encerramento": null,
+  "id_tipo_serv_extra_hospitalar": 12,
+  "eh_ds_observacao": "teste 5",
+  "eh_id_status": 0,
+  "id_internacao_parecer_pend_alta": 2802474157,
+  "pa_data_inicio": "2026-04-10T00:00:00Z",
+  "pa_data_encerramento": null,
+  "id_tipo_parecer_pend_alta": 16,
+  "pa_ds_observacao": "teste 6",
+  "pa_id_status": 0,
+  "id_internacao_procedimento_pend_alta": 2802478152,
+  "ep_data_inicio": "2026-04-10T00:00:00Z",
+  "ep_data_encerramento": null,
+  "id_procedimento": 90183100,
+  "ep_ds_observacao": "test",
+  "ep_id_status": 0
 }`
   },
   'ja-aval-hospitalista': {
-    title: 'Avaliação Hospitalista (Médico)',
+    title: 'Avaliação Hospitalista — Registro',
     sub: 'POST /sae/v1/avaliacao-hospitalista — SAE',
     request: `{
-  "id_internacao": null,
-  "id_profissional": null,
-  "data_alta_estimada": null,
-  "paciente_estavel": null,
-  "ds_revisao_caso": null,
-  "antibioticoterapia": [],
-  "oxigenioterapia": [],
-  "caso_social": null,
-  "exames_procedimento": []
+  "id_internacao": "1712251841",
+  "id_profissional": "1906649466",
+  "data_visita": "2025-09-26",
+  "data_alta_estimada_drg": "2025-09-26",
+  "id_cid_atual": "Z000",
+  "ds_revisao_caso": "Cassiano teste 2",
+  "paciente_estavel": 1,
+  "cd_tipo_paciente_instavel": 6,
+  "ds_paciente_instavel_outra": "Cassiano teste",
+  "alternativa_ambu_pend_alta": 0,
+  "ds_alternativa_ambu_pend_alta": "Cassiano teste",
+  "recomendacao_ao_med_assistente": 0,
+  "ds_recomendacao_ao_med_assistente": "Cassiano teste",
+  "cd_tp_adesao_recom_ao_med_assistente": 3,
+  "qtd_dias_adicional_perman_estimada": 10,
+  "data_alta_estimada": "2025-09-26",
+  "tipo_visita": 0,
+  "caso_social": [{
+    "data_inicio_caso_social": "2025-09-26",
+    "data_encerramento_caso_social": "2025-09-26",
+    "id_tipo_caso_social": 1,
+    "ds_observacao_caso_social": "Teste Observacao",
+    "id_status_caso_social": 1
+  }],
+  "antibioticoterapia": [{
+    "data_inicio_antibioticoterapia": "2025-09-26",
+    "data_encerramento_antibioticoterapia": "2025-09-26",
+    "id_tipo_antibioticoterapia": 1,
+    "ds_observacao_antibioticoterapia": "Teste Observacao",
+    "id_status_antibioticoterapia": 0
+  }],
+  "oxigenioterapia": [{
+    "data_inicio_oxigenioterapia": "2025-09-26",
+    "data_encerramento_oxigenioterapia": "2025-09-26",
+    "id_tipo_oxigenioterapia": 1,
+    "ds_observacao_oxigenioterapia": "Teste Observacao",
+    "id_status_oxigenioterapia": 0
+  }],
+  "transf_interna": [{
+    "data_inicio_transf_interna": "2025-09-26",
+    "data_encerramento_transf_interna": "2025-09-26",
+    "id_tipo_transf_interna": 3,
+    "ds_observacao_transf_interna": "Teste Observacao",
+    "id_status_transf_interna": 1
+  }],
+  "extra_hospitalar": [{
+    "data_inicio_extra_hospitalar": "2025-09-26",
+    "data_encerramento_extra_hospitalar": "2025-09-26",
+    "id_tipo_extra_hospitalar": 5,
+    "ds_observacao_extra_hospitalar": "Teste Observacao",
+    "id_status_extra_hospitalar": 1
+  }],
+  "parecer": [{
+    "data_inicio_parecer": "2025-09-26",
+    "data_encerramento_parecer": "2025-09-26",
+    "id_tipo_parecer": 1,
+    "ds_observacao_parecer": "Teste Observacao",
+    "id_status_parecer": 0
+  }],
+  "exames_procedimento": [{
+    "data_inicio_exames_procedimento": "2025-09-26",
+    "data_encerramento_exames_procedimento": "2025-09-26",
+    "id_procedimento_exames_procedimento": 1,
+    "ds_observacao_exames_procedimento": "Teste Observacao",
+    "id_status_exames_procedimento": 1
+  }]
 }`,
     response: `{
-  "sucesso": null,
-  "id_avaliacao": null,
-  "mensagem": null
+  "status": "Avaliação enviada com sucesso!",
+  "id_avaliacao": 2802512157
 }`
   },
   'ja-inconformidade-get': {
-    title: 'Consultar Inconformidade',
+    title: 'GetInconformidade — Consulta',
     sub: 'GET /sae/v1/inconformidade — SAE',
-    request: `// Query params
-{
-  "p_internacao": null
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/inconformidade?p_internacao={id_internacao}
+              &p_internacao_inconf_diaria={id_inconf_diaria}
+
+Parâmetros (query — um ou ambos):
+  p_internacao               — identificador da internação (ex: 2747585331)
+  p_internacao_inconf_diaria — identificador da inconformidade diária (ex: 2747636920)`,
     response: `[
   {
-    "id_inconformidade": null,
-    "id_internacao": null,
-    "en_inconformidade_tipo": null,
-    "data_inconformidade": null,
-    "observacao": null,
-    "opme": [],
-    "medicamentos": []
+    "id_internacao_inconf_diaria": 2747636920,
+    "id_internacao": 2747585331,
+    "id_responsavel": 1,
+    "nome_responsavel": "Sistema",
+    "data_criacao": "2026-01-22 18:15:38",
+    "data_inicial": null,
+    "data_final": null,
+    "data_inconformidade": "2026-01-08",
+    "acomodacao": null,
+    "id_acomodacao": null,
+    "en_inconformidade_tipo": 3,
+    "en_inconformidade_visita": null,
+    "observacao": "OBS2",
+    "opme": null,
+    "medicamentos": "0,2,4"
+  },
+  {
+    "id_internacao_inconf_diaria": 2747636636,
+    "id_internacao": 2747585331,
+    "id_responsavel": 1,
+    "nome_responsavel": "Sistema",
+    "data_criacao": "2026-01-22 18:15:15",
+    "data_inicial": null,
+    "data_final": null,
+    "data_inconformidade": "2026-01-15",
+    "acomodacao": null,
+    "id_acomodacao": null,
+    "en_inconformidade_tipo": 2,
+    "en_inconformidade_visita": null,
+    "observacao": "OBS12",
+    "opme": "0,1,4",
+    "medicamentos": null
   }
 ]`
   },
   'ja-inconformidade-post': {
-    title: 'Registrar Inconformidade',
+    title: 'PostInconformidade — Registro',
     sub: 'POST /sae/v1/inconformidade — SAE',
     request: `{
-  "id_internacao": null,
-  "id_profissional": null,
-  "en_inconformidade_tipo": null,
-  "en_inconformidade_visita": null,
-  "data_inconformidade": null,
-  "data_inicial": null,
-  "data_fim": null,
-  "opme": [],
-  "medicamentos": [],
-  "observacao": null
+  "id_internacao": 1712251841,
+  "id_profissional": 1906649466,
+  "observacao": "Observação detalhada sobre a inconformidade.",
+  "descricao": null,
+  "en_inconformidade_tipo": 2,
+  "data_inicial": "2025-01-01",
+  "data_fim": "2025-01-05",
+  "id_acomodacao": 10,
+  "en_inconformidade_visita": 2,
+  "data_inconformidade": "2025-01-10",
+  "opme": [1, 2, 3],
+  "medicamentos": [1, 2, 3]
 }`,
     response: `{
-  "sucesso": null,
-  "id_inconformidade": null,
-  "mensagem": null
+  "status": "Inconformidade enviada com sucesso!",
+  "id_internacao_inconf_diaria": 2802512166
 }`
   },
   'ja-inconformidade-put': {
-    title: 'Atualizar Inconformidade',
+    title: 'PutInconformidade — Atualização',
     sub: 'PUT /sae/v1/inconformidade — SAE',
     request: `{
-  "id_inconformidade": null,
-  "id_profissional": null,
-  "en_inconformidade_tipo": null,
-  "data_inconformidade": null,
-  "observacao": null
+  "id_internacao_inconf_diaria": 2802512166,
+  "id_internacao": 1712251841,
+  "id_profissional": 1906649466,
+  "observacao": "Texto da observação",
+  "descricao": null,
+  "data_inconformidade": "2025-01-10",
+  "en_inconformidade_tipo": 2,
+  "en_inconformidade_visita": 1,
+  "data_inicial": "2025-01-01",
+  "data_fim": "2025-01-05",
+  "id_acomodacao": 674996,
+  "opme": [4],
+  "en_medicamento": 2
 }`,
     response: `{
-  "sucesso": null,
-  "mensagem": null
+  "status": "Inconformidade atualizada com sucesso!",
+  "id_internacao_inconf_diaria": 2802512166
 }`
   },
   'ja-desospit-get': {
-    title: 'Consultar Desospitalização',
+    title: 'GetDesospitalizacao — Consulta',
     sub: 'GET /sae/v1/desospitalizacao — SAE',
-    request: `// Query params
-{
-  "p_data_inicio": null
-}`,
+    request: `GET https://api.unimedpoa.com.br/sae/v1/desospitalizacao
+  ?p_internacao_desosp={id_internacao_desosp}
+  &p_internacao={id_internacao}
+  &p_hospital={id_hospital}
+  &p_data_inicio={data_criacao}
+
+Parâmetros (query — um ou mais):
+  :p_internacao_desosp — identificador da desospitalização (ex: 2799993098)
+  :p_internacao        — identificador da internação (ex: 2791538338)
+  :p_hospital          — identificador do hospital (ex: 101332)
+  :p_data_inicio       — data de criação da desospitalização (ex: 2026-03-23)`,
     response: `[
   {
-    "id_desospitalizacao": null,
-    "id_internacao": null,
+    "id_internacao_desosp": 2799993098,
+    "id_internacao": 2791538338,
+    "carteirinha": 481920488003189,
+    "nome_paciente": "KEN ITI EDUARDO KAWAGISHI",
+    "cpf": 36994278034,
+    "instituicao_solicitante": "HOSPITAL PUC",
+    "id_hospital": 101332,
+    "data_inicio": "2026-03-24",
+    "data_fim": "2026-03-24",
+    "dt_prevista_alta": "2026-03-30",
+    "id_profissional_criacao": 2206772276,
+    "nome_responsavel": "Thais Augusto Costa",
+    "tipo_encerramento": null,
     "data_encerramento": null,
-    "observacao": null,
-    "programas": [],
-    "cuidados": []
+    "hora_saida": null,
+    "data_criacao": "2026-03-23 19:55:49",
+    "data_atualizacao": "2026-03-23 19:55:49",
+    "programas": "1,4",
+    "cuidados": "1,2,12,13,14",
+    "arquivos": "[{\"id_arquivo_lob\":2799993102,\"id_entidade_arquivo\":2799993105,\"nome\":\"PM KEN ITI EDUARDO KAWAGISHI.jpeg\"}]",
+    "endereco_completo": "RUA MARQUESA DE SANTOS 550 CASA SITIO IPIRANGA CACHOEIRINHA / Deise esposa",
+    "telefone": "51993495936",
+    "obs_telefone": "Deise - esposa",
+    "telefone_2": null,
+    "obs_telefone_2": null,
+    "nome_medico_solicitante": "Dr. Carlos Eduardo Souza",
+    "telefone_medico_solicitante": "51988880000",
+    "e_necessita_antibiotico": 1,
+    "versao": 0,
+    "observacao": "PROTOCOLO RCC\n\nRegistro Enfermagem: 20/03\nRegistro As. Social: 23/03\nPrevisão de alta: 23/03\n"
+  },
+  {
+    "id_internacao_desosp": 2799992373,
+    "id_internacao": 2797733126,
+    "carteirinha": 481013404100013,
+    "nome_paciente": "GENARO ANTONIO JONER",
+    "cpf": 18323618020,
+    "instituicao_solicitante": "HOSPITAL PUC",
+    "id_hospital": 101332,
+    "data_inicio": "2026-03-24",
+    "data_fim": "2026-04-01",
+    "dt_prevista_alta": "2026-04-01",
+    "id_profissional_criacao": 2206772276,
+    "nome_responsavel": "Thais Augusto Costa",
+    "tipo_encerramento": 0,
+    "data_encerramento": "2026-03-24",
+    "hora_saida": "11:14",
+    "data_criacao": "2026-03-23 19:55:12",
+    "data_atualizacao": "2026-03-23 19:55:12",
+    "programas": "3",
+    "cuidados": "1,6,13",
+    "arquivos": "[{\"id_arquivo_lob\":2799992378,\"id_entidade_arquivo\":2799992380,\"nome\":\"PM GENARO ANTONIO JONER.jpeg\"}]",
+    "endereco_completo": "Rua Augusto melecchi n° 22, Apto 303, Menino Deus. POA / Esposa Carla: 99236442",
+    "telefone": "51997176137",
+    "obs_telefone": "Esposa Carla",
+    "telefone_2": "51992364420",
+    "obs_telefone_2": "Carla - esposa (cel)",
+    "nome_medico_solicitante": "Dr. Roberto Alves",
+    "telefone_medico_solicitante": "51933330000",
+    "e_necessita_antibiotico": 0,
+    "versao": 0,
+    "observacao": "PROTOCOLO ATB DOMICILIAR - REMUNERAÇÃO MÉDICA\n\nRegistro Enfermagem: 23/03\nRegistro As. Social: 23/03\nProvável alta: 23/03\n*Enviaremos posteriormente o pedido de curativo PICC.\n*Dados PICC no SAE."
   }
 ]`
   },
@@ -6819,34 +7316,103 @@ const diagTips = {
     title: 'Registrar Desospitalização',
     sub: 'POST /sae/v1/desospitalizacao — SAE',
     request: `{
-  "id_internacao": null,
-  "id_profissional_criacao": null,
-  "observacao": null,
-  "endereco": null,
-  "telefone": null,
-  "antibiotico": null,
-  "programas": [],
-  "cuidados": []
+  "id_internacao": 2791538338,
+  "tipo_encerramento": null,
+  "hora_saida": null,
+  "data_encerramento": null,
+  "data_prevista_alta": "2026-03-30",
+  "data_inicio": "2026-03-24",
+  "data_fim": null,
+  "id_profissional_criacao": 2206772276,
+  "versao": 0,
+  "observacao": "PROTOCOLO RCC\n\nRegistro Enfermagem: 23/03\nPrevisão de alta: 30/03",
+  "endereco": "RUA MARQUESA DE SANTOS 550 CASA SITIO IPIRANGA CACHOEIRINHA",
+  "telefone": "51993495936",
+  "antibiotico": 0,
+  "obs_telefone": "Deise - esposa",
+  "telefone_2": "51991234567",
+  "obs_telefone_2": "João - filho",
+  "nome_medico_solicitante": "Dr. Carlos Eduardo Souza",
+  "telefone_medico_solicitante": "51988880000",
+  "programas": [1, 4],
+  "cuidados": [1, 2, 12, 13, 14],
+  "programas_detalhe": [
+    {
+      "id_tp_programa_desosp": 1,
+      "versao": 0,
+      "e_fisio_motora": 1,
+      "e_fisio_respiratoria": 0,
+      "en_tipo_antibiotico": null,
+      "ds_antibiotico_outro": null,
+      "en_motivo_uso_antibiotico": null,
+      "ds_justificativa_antibiotico": null,
+      "en_possui_cult_antibiograma": null,
+      "en_tipo_curativo": null,
+      "en_tamanho_esponja": null,
+      "ds_tamanho_esponja_outro": null,
+      "en_volume_reservatorio": null,
+      "ds_volume_reservatorio_outro": null,
+      "en_frequencia_troca": null,
+      "ds_frequencia_troca_outro": null,
+      "ds_outros": null
+    }
+  ]
 }`,
     response: `{
-  "sucesso": null,
-  "id_desospitalizacao": null,
-  "mensagem": null
+  "status": "Desospitalização enviada com sucesso!",
+  "id_internacao_desosp": 2799993098
 }`
   },
   'ja-desospit-put': {
     title: 'Atualizar Desospitalização',
     sub: 'PUT /sae/v1/desospitalizacao — SAE',
     request: `{
-  "id_desospitalizacao": null,
-  "observacao": null,
-  "tipo_encerramento": null,
-  "data_encerramento": null,
-  "hora_saida": null
+  "id_internacao_desosp": 2799993098,
+  "id_internacao": 2791538338,
+  "tipo_encerramento": 0,
+  "hora_saida": "14:30",
+  "data_encerramento": "2026-03-30",
+  "data_prevista_alta": "2026-03-30",
+  "data_inicio": "2026-03-24",
+  "data_fim": "2026-03-30",
+  "id_profissional_criacao": 2206772276,
+  "versao": 1,
+  "observacao": "PROTOCOLO RCC\n\nRegistro Enfermagem: 23/03\nAlta efetivada: 30/03",
+  "endereco": "RUA MARQUESA DE SANTOS 550 CASA SITIO IPIRANGA CACHOEIRINHA",
+  "telefone": "51993495936",
+  "antibiotico": 0,
+  "obs_telefone": "Deise - esposa",
+  "telefone_2": "51991234567",
+  "obs_telefone_2": "João - filho",
+  "nome_medico_solicitante": "Dr. Carlos Eduardo Souza",
+  "telefone_medico_solicitante": "51988880000",
+  "programas": [1, 4],
+  "cuidados": [1, 2, 12, 13, 14],
+  "programas_detalhe": [
+    {
+      "id_tp_programa_desosp": 1,
+      "versao": 1,
+      "e_fisio_motora": 1,
+      "e_fisio_respiratoria": 0,
+      "en_tipo_antibiotico": null,
+      "ds_antibiotico_outro": null,
+      "en_motivo_uso_antibiotico": null,
+      "ds_justificativa_antibiotico": null,
+      "en_possui_cult_antibiograma": null,
+      "en_tipo_curativo": null,
+      "en_tamanho_esponja": null,
+      "ds_tamanho_esponja_outro": null,
+      "en_volume_reservatorio": null,
+      "ds_volume_reservatorio_outro": null,
+      "en_frequencia_troca": null,
+      "ds_frequencia_troca_outro": null,
+      "ds_outros": null
+    }
+  ]
 }`,
     response: `{
-  "sucesso": null,
-  "mensagem": null
+  "status": "Desospitalização atualizada com sucesso!",
+  "id_internacao_desosp": 2799993098
 }`
   },
 };
