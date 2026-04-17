@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swagger UI — CareOS (Tabia) API</title>
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+<style>
+  body{margin:0;background:#fafbfd}
+  .topbar-custom{background:linear-gradient(135deg,#1a3a5c,#2E75B6);color:#fff;padding:.9rem 1.5rem;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+  .topbar-custom h1{margin:0;font-size:1.1rem;font-weight:700;font-family:'Segoe UI',system-ui,sans-serif}
+  .topbar-custom .sub{font-size:.78rem;opacity:.85;margin-top:.15rem}
+  .topbar-custom a{color:#fff;text-decoration:none;font-size:.85rem;padding:.45rem .9rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:5px;font-weight:600}
+  .topbar-custom a:hover{background:rgba(255,255,255,.25)}
+  #swagger-ui{max-width:1300px;margin:0 auto}
+</style>
+</head>
+<body>
+<div class="topbar-custom">
+  <div>
+    <h1>🩺 CareOS (Tabia) API — Swagger UI</h1>
+    <div class="sub">Fonte: openapi-careos-simple.json · versão 1 · entregue pela Tabia Health</div>
+  </div>
+  <a href="index.html">← Voltar à Wiki</a>
+</div>
+<div id="swagger-ui"></div>
+<script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+<script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
+<script>
+window.onload = function() {
+  window.ui = SwaggerUIBundle({
+    url: "openapi-careos-simple.json",
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+    layout: "StandaloneLayout",
+    docExpansion: "list",
+    filter: true,
+    tryItOutEnabled: false
+  });
+};
+</script>
+</body>
+</html>
