@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "arquitetura-healthmap",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3000", "C:/Users/Pichau/source/repos/arquitetura-healthmap"],
+      "port": 3000
+    }
+  ]
+}
