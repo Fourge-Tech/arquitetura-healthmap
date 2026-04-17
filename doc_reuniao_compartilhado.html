@@ -277,19 +277,6 @@
         <div style="margin-top:.4rem;font-size:.78rem"><strong>Impacto:</strong> TODAS as buscas de pessoa nas 5 apps.</div>
       </div>
 
-      <div class="blocker">
-        <h4>Blocker 2: Termos de Aceite não existem na Tabia</h4>
-        <p>4 endpoints (aceitar, buscar, buscar por empresa, revogar) ausentes. Tabia informou que estão em desenvolvimento.</p>
-        <div class="opts">
-          <strong>Opções</strong>
-          (a) Aguardar Tabia (saber prazo)<br>
-          (b) Manter Healthmap só para esses 4 endpoints<br>
-          (c) Criar solução própria temporária
-        </div>
-        <div style="margin-top:.4rem;font-size:.78rem"><strong>Impacto:</strong> Bloqueia Viver Bem (LGPD).</div>
-      </div>
-
-
     </div>
 
     <h3 style="margin:1rem 0 .3rem;font-size:.88rem;color:var(--blue-dark)">Blockers secundários (impacto técnico menor)</h3>
@@ -300,6 +287,7 @@
       <li>Paginação base 1 (HM) vs base 0 (Tabia) — adapter resolve</li>
       <li>Enums: tabelas de-para necessárias (status, prioridade, tipo de questão)</li>
       <li><strong>MedicaoRisco</strong>: <code>PatientDTO.tabiaScore.severity</code> e <code>severityRaw</code> já retornam risco no detalhe do paciente — sem endpoint dedicado necessário. Confirmar com Tabia o que alimenta o score (clínico vs operacional).</li>
+      <li><strong>Termos de Aceite</strong>: 4 endpoints (aceitar, buscar, buscar por empresa, revogar) em roadmap da Tabia. Manter Healthmap só para esses até entrega — não bloqueia a migração geral.</li>
     </ul>
   </div>
 </div>
