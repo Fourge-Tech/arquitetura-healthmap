@@ -765,6 +765,67 @@ function delRow(btn) {
   dirty = true;
 }
 
+// Gap detail data
+const GAP_DATA = {
+  direto: {
+    title: '✅ Equivalente Direto (8 endpoints) — mapeamento 1:1',
+    rows: [
+      ['2', 'GET .../beneficiário', 'GET /apiv1/patient'],
+      ['3', 'GET .../beneficiário/{id}', 'GET /apiv1/patient/{id}'],
+      ['4', 'GET .../dadosBeneficiarioResumido/{id}', 'GET /apiv1/patient?minimalInfo=true'],
+      ['5', 'GET .../segurança/v1/usuário', 'GET /apiv1/user + /user/search'],
+      ['15', 'GET .../questionário/{id}', 'GET /apiv1/survey/{id}'],
+    ]
+  },
+  parcial: {
+    title: '🟡 Parcial / Ajuste (8 endpoints) — precisam adapter/composição',
+    rows: [
+      ['10', 'GET .../medicaoRisco', 'tabiaScore.severity já vem no PatientDTO'],
+      ['11', 'GET .../planoAcao', 'individual-care-plan + task + event + pathway'],
+      ['12', 'POST .../programarAcao/{id}', 'POST /apiv1/task + POST /apiv1/event'],
+      ['13', 'POST .../programarAcao/{id} (lista)', 'POST .../batch'],
+      ['14', 'PUT .../realizarAcao', 'POST /apiv1/task/{id}/status'],
+      ['16', 'GET .../questaoRespostas', 'GET .../surveydata/{uid}/answer'],
+      ['17', 'POST .../responderQuestaoAvulsa', 'POST .../surveydata/{uid}/answer'],
+      ['18', 'POST .../questaoUltimaResposta', 'Composição: answer + applications'],
+      ['19', 'POST .../listarAlertasInternacao', 'GET /apiv1/event (customizado)'],
+    ]
+  },
+  dev: {
+    title: '🔴 Em desenvolvimento na Tabia (4 endpoints de Termos — bloqueia Viver Bem)',
+    rows: [
+      ['6', 'GET .../aceiteTermo', '— (em dev)'],
+      ['7', 'GET .../buscaTermoPublicadoPorEmpresa', '— (em dev)'],
+      ['8', 'GET .../buscarAceiteTermo', '— (em dev)'],
+      ['9', 'POST .../revogaTermo/{...}', '— (em dev)'],
+    ]
+  },
+  redesign: {
+    title: '🟠 Redesign necessário (1 endpoint — autenticação)',
+    rows: [
+      ['1', 'POST /oauth/token', 'API Key no header (elimina o endpoint)'],
+    ]
+  }
+};
+GAP_DATA.all = {
+  title: '📋 Todos os 19 endpoints mapeados',
+  rows: [...GAP_DATA.redesign.rows, ...GAP_DATA.direto.rows, ...GAP_DATA.dev.rows, ...GAP_DATA.parcial.rows]
+};
+
+function showGapDetail(key) {
+  const box = document.getElementById('gapDetail');
+  const d = GAP_DATA[key];
+  if (!d) return;
+  const rows = d.rows.map(r => `<tr><td style="padding:.25rem .5rem;border-bottom:1px solid #eee;color:#888">${r[0]}</td><td style="padding:.25rem .5rem;border-bottom:1px solid #eee"><code>${r[1]}</code></td><td style="padding:.25rem .5rem;border-bottom:1px solid #eee"><code style="color:var(--blue-dark)">${r[2]}</code></td></tr>`).join('');
+  box.innerHTML = `<div style="font-weight:700;color:var(--blue-dark);margin-bottom:.4rem">${d.title}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+      <thead><tr><th style="text-align:left;padding:.25rem .5rem;background:var(--blue-light);color:var(--blue-dark);font-size:.7rem">#</th><th style="text-align:left;padding:.25rem .5rem;background:var(--blue-light);color:var(--blue-dark);font-size:.7rem">Healthmap</th><th style="text-align:left;padding:.25rem .5rem;background:var(--blue-light);color:var(--blue-dark);font-size:.7rem">Tabia (CareOS)</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  box.style.display = 'block';
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
 // Carregar dados salvos ao iniciar
 document.addEventListener('DOMContentLoaded', loadDoc);
 </script>
