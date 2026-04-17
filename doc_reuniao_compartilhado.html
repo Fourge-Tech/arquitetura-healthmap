@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ata — Diagnóstico Análise APIs Tabia</title>
+<style>
+  :root{
+    --blue-dark:#1a3a5c;--blue-main:#2E75B6;--blue-light:#D5E8F0;
+    --green:#27ae60;--orange:#e67e22;--red:#e74c3c;--yellow:#f39c12;
+    --purple:#8e44ad;--bg:#f5f7fa;--text:#2c3e50;--border:#dce1e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.55}
+
+  /* Toolbar */
+  .toolbar{position:sticky;top:0;z-index:20;background:var(--blue-dark);color:#fff;padding:.6rem 1rem;display:flex;gap:.4rem;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.2);flex-wrap:wrap}
+  .toolbar .title{font-size:.85rem;font-weight:700;margin-right:auto}
+  .toolbar button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:.35rem .75rem;border-radius:5px;font-size:.78rem;cursor:pointer;font-weight:600}
+  .toolbar button:hover{background:rgba(255,255,255,.25)}
+  .toolbar .save-status{font-size:.72rem;color:#b8d8ff;margin-left:.4rem}
+
+  header{background:linear-gradient(135deg,var(--blue-dark),var(--blue-main));color:#fff;padding:1.5rem 2rem;text-align:center}
+  header h1{font-size:1.4rem;font-weight:700}
+  header .sub{opacity:.9;font-size:.85rem;margin-top:.3rem}
+
+  main{max-width:1100px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+  /* Header info */
+  .header-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-bottom:1.3rem;background:#fff;padding:1rem 1.2rem;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+  .info-item{font-size:.85rem}
+  .info-item label{display:block;font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;font-weight:700}
+  .info-item .val{color:var(--blue-dark);font-weight:600;padding:.3rem .5rem;background:#fafbfd;border-radius:4px;border:1px solid var(--border);min-height:32px}
+
+  /* Editable */
+  [contenteditable="true"]{outline:none;transition:background .15s}
+  [contenteditable="true"]:hover{background:#fff8e1}
+  [contenteditable="true"]:focus{background:#fff3c4;box-shadow:0 0 0 2px var(--yellow) inset;border-radius:3px}
+  [contenteditable="true"]:empty::before{content:attr(data-placeholder);color:#aaa;font-style:italic}
+
+  /* Blocks */
+  .section{background:#fff;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.06);margin-bottom:1.2rem;overflow:hidden}
+  .section h2{background:#fafbfd;padding:.8rem 1.1rem;border-left:4px solid var(--blue-main);font-size:1.05rem;color:var(--blue-dark);display:flex;align-items:center;gap:.5rem}
+  .section h2 .num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--blue-main);color:#fff;font-size:.78rem;font-weight:700}
+  .section .body{padding:1rem 1.1rem}
+
+  /* Status cards - blockers */
+  .blockers{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.7rem}
+  .blocker{border:2px solid var(--red);border-radius:8px;padding:.7rem .9rem;background:#fef8f7}
+  .blocker h4{font-size:.88rem;color:var(--red);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem}
+  .blocker h4::before{content:'🚨';font-size:.9rem}
+  .blocker p{font-size:.8rem;line-height:1.5}
+  .blocker .opts{margin-top:.4rem;font-size:.78rem;background:#fff;padding:.4rem .6rem;border-radius:5px;border:1px solid var(--border)}
+  .blocker .opts strong{color:var(--blue-dark);font-size:.73rem;text-transform:uppercase;letter-spacing:.03em;display:block;margin-bottom:.2rem}
+
+  /* Numbers */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-bottom:.7rem}
+  .stat{background:#fafbfd;border-radius:8px;padding:.6rem;text-align:center;border-top:3px solid var(--blue-main)}
+  .stat.green{border-top-color:var(--green)}
+  .stat.orange{border-top-color:var(--orange)}
+  .stat.red{border-top-color:var(--red)}
+  .stat .n{font-size:1.6rem;font-weight:700;color:var(--blue-dark)}
+  .stat .l{font-size:.7rem;color:#666;text-transform:uppercase;letter-spacing:.03em;margin-top:.15rem}
+
+  /* Option cards */
+  .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.7rem;margin:.5rem 0}
+  .opt-card{border:2px solid var(--border);border-radius:8px;padding:.7rem .8rem;cursor:pointer;position:relative;transition:all .15s}
+  .opt-card:hover{border-color:var(--blue-main);background:#fafbfd}
+  .opt-card.selected{border-color:var(--green);background:#e8f5e9;box-shadow:0 0 0 3px rgba(39,174,96,.15)}
+  .opt-card.selected::before{content:'✓ SELECIONADA';position:absolute;top:.3rem;right:.5rem;background:var(--green);color:#fff;font-size:.65rem;font-weight:700;padding:.15em .5em;border-radius:3px}
+  .opt-card h4{font-size:.88rem;color:var(--blue-dark);margin-bottom:.2rem;display:flex;align-items:center;gap:.4rem}
+  .opt-card h4 .letter{background:var(--blue-main);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.72rem}
+  .opt-card.selected h4 .letter{background:var(--green)}
+  .opt-card p{font-size:.78rem;color:#555}
+  .opt-card ul{margin:.3rem 0 0 1.1rem;font-size:.76rem}
+
+  /* Decision boxes */
+  .decision{background:#e8f5e9;border:2px solid var(--green);border-radius:8px;padding:.8rem 1rem;margin-bottom:.7rem}
+  .decision label{display:block;font-size:.72rem;color:var(--green);text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:.25rem}
+  .decision .content{font-size:.88rem;color:var(--blue-dark);min-height:30px;padding:.3rem .5rem;background:#fff;border-radius:4px;border:1px dashed var(--green)}
+
+  /* Action items table */
+  table.actions{width:100%;border-collapse:collapse;font-size:.84rem}
+  table.actions th,table.actions td{padding:.45rem .6rem;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+  table.actions th{background:var(--blue-light);color:var(--blue-dark);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}
+  table.actions td[contenteditable]{min-width:80px}
+  table.actions tr:hover{background:#fafbfd}
+  .row-actions{text-align:center;min-width:40px}
+  .row-actions button{background:none;border:none;cursor:pointer;color:var(--red);font-size:1rem;padding:0 .3rem}
+
+  .add-row{background:var(--blue-main);color:#fff;border:none;padding:.4rem .9rem;border-radius:4px;font-size:.78rem;cursor:pointer;font-weight:600;margin-top:.5rem}
+  .add-row:hover{background:var(--blue-dark)}
+
+  /* Status pills */
+  .pill{display:inline-block;padding:.1em .5em;border-radius:3px;font-size:.7rem;font-weight:700;color:#fff}
+  .p-pending{background:#95a5a6}
+  .p-doing{background:var(--orange)}
+  .p-done{background:var(--green)}
+  .p-blocked{background:var(--red)}
+
+  /* Attachments */
+  .attach{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.5rem;margin-top:.5rem}
+  .attach a{display:block;background:#f0f4fa;padding:.5rem .7rem;border-radius:5px;text-decoration:none;color:var(--blue-dark);font-size:.78rem;font-weight:600;border:1px solid var(--border)}
+  .attach a:hover{background:var(--blue-light);border-color:var(--blue-main)}
+  .attach a small{display:block;font-weight:400;color:#888;font-size:.68rem;margin-top:.1rem}
+
+  /* Checklist */
+  .check-list{list-style:none;margin:.3rem 0}
+  .check-list li{padding:.25rem 0 .25rem 1.5rem;position:relative;font-size:.82rem;cursor:pointer;border-bottom:1px dashed var(--border)}
+  .check-list li:hover{background:#fafbfd}
+  .check-list li::before{content:'☐';position:absolute;left:0;color:var(--blue-main);font-size:1rem}
+  .check-list li.done::before{content:'☑';color:var(--green)}
+  .check-list li.done{text-decoration:line-through;opacity:.6}
+
+  /* Notes */
+  .notes-box{background:#fff8e1;border:1px dashed var(--yellow);border-radius:6px;padding:.6rem .8rem;min-height:60px;font-size:.85rem}
+  .notes-box:empty::before{content:'📝 Notas da reunião — clique para digitar...';color:#999;font-style:italic}
+
+  /* Signatures */
+  .signatures{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.7rem;margin-top:.5rem}
+  .sig{background:#fafbfd;border:1px solid var(--border);border-radius:6px;padding:.5rem .7rem}
+  .sig label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.03em;font-weight:700;display:block;margin-bottom:.2rem}
+  .sig .name{font-size:.85rem;color:var(--blue-dark);font-weight:600;min-height:20px}
+  .sig .role{font-size:.72rem;color:#666;font-style:italic;margin-top:.15rem}
+  .sig .aprv{margin-top:.3rem;font-size:.72rem}
+  .sig .aprv label{display:inline;margin-right:.3rem;color:#666;text-transform:none;letter-spacing:0}
+
+  @media print{
+    .toolbar{display:none}
+    .section{break-inside:avoid;box-shadow:none;border:1px solid var(--border)}
+    [contenteditable="true"]:empty::before{content:''}
+    .notes-box:empty::before{content:''}
+    .row-actions{display:none}
+    .add-row{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <span class="title">📄 Ata — Diagnóstico Análise APIs Tabia</span>
+  <button onclick="saveDoc()">💾 Salvar (local)</button>
+  <button onclick="loadDoc()">📂 Carregar</button>
+  <button onclick="exportHTML()">⬇️ Exportar HTML</button>
+  <button onclick="window.print()">🖨️ Imprimir / PDF</button>
+  <button onclick="clearDoc()" style="background:rgba(231,76,60,.3)">🗑️ Limpar</button>
+  <span class="save-status" id="saveStatus"></span>
+</div>
+
+<header>
+  <h1>📋 Ata da Reunião — Diagnóstico Análise APIs Tabia</h1>
+  <div class="sub">Documento vivo compartilhado — edite inline, as decisões são salvas localmente no navegador</div>
+</header>
+
+<main>
+
+<!-- ============================================================
+     CABECALHO DA ATA
+     ============================================================ -->
+<div class="header-info">
+  <div class="info-item">
+    <label>Data</label>
+    <div class="val" contenteditable="true" data-placeholder="DD/MM/AAAA" id="f_data">17/04/2026</div>
+  </div>
+  <div class="info-item">
+    <label>Horário</label>
+    <div class="val" contenteditable="true" data-placeholder="HH:MM - HH:MM" id="f_horario">14:00 - 15:00</div>
+  </div>
+  <div class="info-item">
+    <label>Local / Plataforma</label>
+    <div class="val" contenteditable="true" data-placeholder="Ex: Teams, sala X..." id="f_local">Teams</div>
+  </div>
+  <div class="info-item">
+    <label>Facilitador (PO)</label>
+    <div class="val" contenteditable="true" data-placeholder="Nome do PO" id="f_po"></div>
+  </div>
+  <div class="info-item">
+    <label>Dev Lead</label>
+    <div class="val" contenteditable="true" data-placeholder="Nome do Dev Lead" id="f_devlead"></div>
+  </div>
+  <div class="info-item">
+    <label>Arquiteto</label>
+    <div class="val" contenteditable="true" data-placeholder="Nome" id="f_arq"></div>
+  </div>
+  <div class="info-item" style="grid-column:span 2">
+    <label>Demais participantes</label>
+    <div class="val" contenteditable="true" data-placeholder="Nomes separados por vírgula" id="f_parts"></div>
+  </div>
+  <div class="info-item">
+    <label>Ausentes</label>
+    <div class="val" contenteditable="true" data-placeholder="Nomes (se houver)" id="f_ausentes"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     1. OBJETIVO
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">1</span>Objetivo da reunião</h2>
+  <div class="body">
+    <p style="font-size:.88rem">Sair desta reunião com <strong>3 decisões</strong> e <strong>1 lista priorizada de pendências com a Tabia</strong>:</p>
+    <ol style="margin-left:1.3rem;font-size:.88rem;margin-top:.4rem">
+      <li><strong>Decisão 1:</strong> Estratégia arquitetural (Opção A, B ou C para o <code>Tabia_IS</code>)</li>
+      <li><strong>Decisão 2:</strong> Data e dono da reunião técnica com a Tabia</li>
+      <li><strong>Decisão 3:</strong> Timeline macro e critério de Go/No-Go</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ============================================================
+     2. CONTEXTO
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">2</span>Contexto e materiais de apoio</h2>
+  <div class="body">
+    <p style="font-size:.85rem">Levantamento cruzado entre:</p>
+    <ul style="margin-left:1.3rem;font-size:.85rem;margin:.3rem 0">
+      <li>Postman Collection do Healthmap (19 endpoints em uso nas 5 apps CBV)</li>
+      <li>OpenAPI <code>openapi-careos-simple.json</code> enviado pela Tabia Health</li>
+      <li>PDF comparativo enviado pela Tabia</li>
+      <li>Testes de conectividade na API de staging (<code>https://staging.tabia.health</code>)</li>
+    </ul>
+
+    <p style="font-size:.85rem;margin-top:.5rem"><strong>Materiais detalhados</strong> (abrir em segunda tela se preciso):</p>
+    <div class="attach">
+      <a href="analise_healthmap_tabia.html" target="_blank">1. Análise geral dos endpoints<small>Status de cada endpoint</small></a>
+      <a href="comparacao_profunda.html" target="_blank">2. Comparação profunda campo-a-campo<small>Todos os DTOs + glossário PT/EN</small></a>
+      <a href="testes_conectividade_tabia.html" target="_blank">3. Testes de conectividade<small>O que já validamos</small></a>
+      <a href="impacto_5_apps_outsystems.html" target="_blank">4. Impacto nas 5 apps OutSystems<small>Opções arquiteturais</small></a>
+      <a href="kickoff_migracao.html" target="_blank">5. Checklist de kickoff<small>Perguntas para Tabia + Dev Lead</small></a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     3. RESUMO DO GAP
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">3</span>Resumo do gap analysis</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat"><div class="n">19</div><div class="l">Endpoints mapeados</div></div>
+      <div class="stat green"><div class="n">8</div><div class="l">Equivalente direto</div></div>
+      <div class="stat orange"><div class="n">8</div><div class="l">Parcial / ajuste</div></div>
+      <div class="stat red"><div class="n">2</div><div class="l">Em desenvolvimento</div></div>
+      <div class="stat red"><div class="n">1</div><div class="l">Redesign necessário</div></div>
+    </div>
+
+    <p style="font-size:.85rem;margin-top:.5rem"><strong>Boa notícia:</strong> Core de Beneficiário/Paciente, Usuário, Questionário e Plano de Ação (estrutura) <strong>mapeiam diretamente</strong>. 62% já bate automático.</p>
+    <p style="font-size:.85rem"><strong>Atenção:</strong> Existem 3 blockers críticos que precisam decisão antes de codar (ver seção 4).</p>
+    <p style="font-size:.85rem"><strong>Bônus:</strong> Tabia entrega ~15 campos novos por entidade (tabiaScore, ICDs, pathways, teams, addresses estruturados, insurances multiplas) — dados que hoje não temos.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     4. BLOCKERS CRITICOS
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">4</span>Blockers críticos (exigem decisão)</h2>
+  <div class="body">
+    <div class="blockers">
+
+      <div class="blocker">
+        <h4>Blocker 1: CPF não existe no PatientDTO da Tabia</h4>
+        <p>Hoje toda busca de beneficiário é por CPF. A Tabia busca por email/celular. CPF precisaria ir em campo livre <code>extensions</code>.</p>
+        <div class="opts">
+          <strong>Opções</strong>
+          (a) Pedir à Tabia campo CPF nativo<br>
+          (b) Usar <code>person.extensions.cpf</code><br>
+          (c) Buscar por email/celular apenas
+        </div>
+        <div style="margin-top:.4rem;font-size:.78rem"><strong>Impacto:</strong> TODAS as buscas de pessoa nas 5 apps.</div>
+      </div>
+
+      <div class="blocker">
+        <h4>Blocker 2: Termos de Aceite não existem na Tabia</h4>
+        <p>4 endpoints (aceitar, buscar, buscar por empresa, revogar) ausentes. Tabia informou que estão em desenvolvimento.</p>
+        <div class="opts">
+          <strong>Opções</strong>
+          (a) Aguardar Tabia (saber prazo)<br>
+          (b) Manter Healthmap só para esses 4 endpoints<br>
+          (c) Criar solução própria temporária
+        </div>
+        <div style="margin-top:.4rem;font-size:.78rem"><strong>Impacto:</strong> Bloqueia Viver Bem (LGPD).</div>
+      </div>
+
+      <div class="blocker">
+        <h4>Blocker 3: MedicaoRisco = conceito diferente</h4>
+        <p>Healthmap = estratificação de saúde populacional (cardiovascular, diabético...). Tabia = risco de no-show em agendamento.</p>
+        <div class="opts">
+          <strong>Opções</strong>
+          (a) Usar <code>tabiaScore.severity</code> como proxy<br>
+          (b) Pedir endpoint dedicado à Tabia<br>
+          (c) Calcular externamente via CIDs + eventos
+        </div>
+        <div style="margin-top:.4rem;font-size:.78rem"><strong>Impacto:</strong> Cockpits gerenciais e alertas.</div>
+      </div>
+
+    </div>
+
+    <h3 style="margin:1rem 0 .3rem;font-size:.88rem;color:var(--blue-dark)">Blockers secundários (impacto técnico menor)</h3>
+    <ul style="margin-left:1.3rem;font-size:.82rem">
+      <li>Endpoints de WhatsApp (<code>/whatsapp-management</code>, <code>/whatsapp/logs</code>) existem mas <strong>faltam no OpenAPI</strong> — pedir documentação</li>
+      <li>Schema do <code>POST /surveydata/{uid}/answer</code> ausente no OpenAPI — pedir schema</li>
+      <li><code>questaoRespostas</code> sem filtro nativo por período — fazer client-side</li>
+      <li>Paginação base 1 (HM) vs base 0 (Tabia) — adapter resolve</li>
+      <li>Enums: tabelas de-para necessárias (status, prioridade, tipo de questão)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================
+     5. OPCOES ARQUITETURAIS
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">5</span>Opções arquiteturais — impacto nas 5 apps</h2>
+  <div class="body">
+    <p style="font-size:.85rem;margin-bottom:.5rem">Hoje as 5 apps consomem <code>Healthmap_IS</code>. Proposta: criar <code>Tabia_IS</code>. A pergunta é qual interface ele expõe.</p>
+
+    <p style="font-size:.78rem;color:#888;font-style:italic;margin-bottom:.5rem">👉 Clique na opção escolhida para marcar como selecionada.</p>
+
+    <div class="options">
+      <div class="opt-card" onclick="selectOpt(this)" data-opt="A">
+        <h4><span class="letter">A</span>Mesma interface do Healthmap_IS</h4>
+        <p>Tabia_IS expõe os mesmos nomes. 0 mudança nas apps. Mais trabalho no IS.</p>
+        <ul>
+          <li><strong>Impacto nas 5 apps:</strong> ZERO</li>
+          <li><strong>Esforço total:</strong> 2-3 sprints IS + 0.5 sprint por app</li>
+          <li><strong>Rollback:</strong> trivial (feature flag)</li>
+          <li><strong>Risco:</strong> BAIXO</li>
+          <li><strong>Recomendação técnica:</strong> ✅</li>
+        </ul>
+      </div>
+
+      <div class="opt-card" onclick="selectOpt(this)" data-opt="B">
+        <h4><span class="letter">B</span>Interface nova (nomenclatura Tabia)</h4>
+        <p>Nomes em inglês (PatientDTO). 5 apps refatoradas.</p>
+        <ul>
+          <li><strong>Impacto nas 5 apps:</strong> ALTO em todas as pontas</li>
+          <li><strong>Esforço total:</strong> 12-17 sprints</li>
+          <li><strong>Rollback:</strong> difícil</li>
+          <li><strong>Risco:</strong> ALTO</li>
+          <li><strong>Ganho:</strong> aproveita 15 campos novos</li>
+        </ul>
+      </div>
+
+      <div class="opt-card" onclick="selectOpt(this)" data-opt="C">
+        <h4><span class="letter">C</span>Híbrida (facade + gradual)</h4>
+        <p>Mantém interface atual inicialmente, migra gradualmente app por app.</p>
+        <ul>
+          <li><strong>Impacto nas 5 apps:</strong> ZERO no curto, médio no longo prazo</li>
+          <li><strong>Esforço total:</strong> médio contínuo</li>
+          <li><strong>Rollback:</strong> bom</li>
+          <li><strong>Risco:</strong> MÉDIO (2 libs vivas)</li>
+          <li><strong>Boa opção para evoluir depois da A</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     6. DECISOES (editavel ao vivo)
+     ============================================================ -->
+<div class="section" style="border:3px solid var(--green)">
+  <h2 style="border-left-color:var(--green)"><span class="num" style="background:var(--green)">6</span>Decisões tomadas na reunião</h2>
+  <div class="body">
+    <p style="font-size:.78rem;color:#888;font-style:italic;margin-bottom:.5rem">👉 Preencha ao vivo. As decisões abaixo são o principal resultado da reunião.</p>
+
+    <div class="decision">
+      <label>Decisão 1 — Estratégia arquitetural</label>
+      <div class="content" contenteditable="true" data-placeholder="Opção escolhida (A/B/C) + justificativa + quem aprovou" id="d_arq"></div>
+    </div>
+
+    <div class="decision">
+      <label>Decisão 2 — Reunião técnica com a Tabia</label>
+      <div class="content" contenteditable="true" data-placeholder="Data/hora, dono do agendamento, pauta confirmada, participantes da Tabia" id="d_tabia"></div>
+    </div>
+
+    <div class="decision">
+      <label>Decisão 3 — Timeline e critério de Go/No-Go</label>
+      <div class="content" contenteditable="true" data-placeholder="Data alvo da Onda 1, condições para dar Go, periodicidade de checkpoint" id="d_timeline"></div>
+    </div>
+
+    <div class="decision" style="border-color:var(--orange);background:#fff3e0">
+      <label style="color:var(--orange)">Decisões adicionais (se houver)</label>
+      <div class="content" contenteditable="true" data-placeholder="Outras decisões tomadas durante a reunião" id="d_extra"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     7. PERGUNTAS PARA TABIA
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">7</span>Pendências com a Tabia (pauta da reunião técnica)</h2>
+  <div class="body">
+    <p style="font-size:.78rem;color:#888;font-style:italic;margin-bottom:.5rem">👉 Marque os itens conforme forem endereçados. Itens não endereçados viram pauta da próxima reunião com a Tabia.</p>
+    <ul class="check-list" onclick="toggleCheck(event)">
+      <li>1. Suporte a busca por CPF em <code>/apiv1/patient</code> e <code>/apiv1/user</code> (ou guidance sobre extensions)</li>
+      <li>2. Timeline de entrega dos 4 endpoints de Termos de Aceite</li>
+      <li>3. Conceito de MedicaoRisco clínico — endpoint dedicado ou usar tabiaScore.severity</li>
+      <li>4. Schema oficial do <code>POST /apiv1/surveydata/{uid}/answer</code></li>
+      <li>5. Documentação completa dos endpoints de WhatsApp (<code>/whatsapp-management</code>, <code>/whatsapp/logs</code>)</li>
+      <li>6. Modelo de Event customizado para Alertas de Internação</li>
+      <li>7. Enum oficial de tipos de questão (<code>Survey.field.type</code>)</li>
+      <li>8. Enum oficial de <code>roles</code> e <code>rolesInOrganizations</code></li>
+      <li>9. Política de rate limit (requests/min por API Key)</li>
+      <li>10. Formato oficial de JSON de erro (estrutura das 4xx/5xx)</li>
+      <li>11. Solicitar API Key de staging para os devs</li>
+      <li>12. Solicitar API Key de produção (para fase posterior)</li>
+    </ul>
+
+    <h3 style="margin:.8rem 0 .3rem;font-size:.88rem;color:var(--blue-dark)">Respostas/comentários da Tabia durante a reunião</h3>
+    <div class="notes-box" contenteditable="true" id="n_tabia"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     8. ACTION ITEMS
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">8</span>Action Items (com dono e data)</h2>
+  <div class="body">
+    <p style="font-size:.78rem;color:#888;font-style:italic;margin-bottom:.5rem">👉 Toda ação precisa ter dono e data. Clique em qualquer célula para editar. Status muda clicando.</p>
+    <table class="actions" id="actionsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ação</th>
+          <th>Dono</th>
+          <th>Prazo</th>
+          <th>Status</th>
+          <th>Observações</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="actionsBody">
+        <tr>
+          <td>1</td>
+          <td contenteditable="true">Agendar reunião técnica com a Tabia (pauta: 10 pendências da seção 7)</td>
+          <td contenteditable="true" data-placeholder="Nome"></td>
+          <td contenteditable="true" data-placeholder="DD/MM"></td>
+          <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+          <td contenteditable="true" data-placeholder="..."></td>
+          <td class="row-actions"><button onclick="delRow(this)">✕</button></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td contenteditable="true">Solicitar API Key de staging à Tabia</td>
+          <td contenteditable="true" data-placeholder="Nome"></td>
+          <td contenteditable="true" data-placeholder="DD/MM"></td>
+          <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+          <td contenteditable="true" data-placeholder="..."></td>
+          <td class="row-actions"><button onclick="delRow(this)">✕</button></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td contenteditable="true">Inventário de uso do Healthmap_IS em cada uma das 5 apps (Find Usages + Manage Dependencies)</td>
+          <td contenteditable="true" data-placeholder="Nome">Cada squad</td>
+          <td contenteditable="true" data-placeholder="DD/MM"></td>
+          <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+          <td contenteditable="true" data-placeholder="..."></td>
+          <td class="row-actions"><button onclick="delRow(this)">✕</button></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td contenteditable="true">Criar Library ODC <code>Tabia_ACL_Lib</code> (estrutura inicial + importar OpenAPI)</td>
+          <td contenteditable="true" data-placeholder="Nome"></td>
+          <td contenteditable="true" data-placeholder="DD/MM"></td>
+          <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+          <td contenteditable="true" data-placeholder="..."></td>
+          <td class="row-actions"><button onclick="delRow(this)">✕</button></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td contenteditable="true">Cadastrar API Key em ODC Secrets (staging)</td>
+          <td contenteditable="true" data-placeholder="Nome"></td>
+          <td contenteditable="true" data-placeholder="DD/MM"></td>
+          <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+          <td contenteditable="true" data-placeholder="..."></td>
+          <td class="row-actions"><button onclick="delRow(this)">✕</button></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td contenteditable="true">Definir padrão de nomeação (Server Actions, mappers, converters)</td>
+          <td contenteditable="true" data-placeholder="Nome"></td>
+          <td contenteditable="true" data-placeholder="DD/MM"></td>
+          <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+          <td contenteditable="true" data-placeholder="..."></td>
+          <td class="row-actions"><button onclick="delRow(this)">✕</button></td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td contenteditable="true">Agendar próxima reunião de checkpoint</td>
+          <td contenteditable="true" data-placeholder="Nome"></td>
+          <td contenteditable="true" data-placeholder="DD/MM"></td>
+          <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+          <td contenteditable="true" data-placeholder="..."></td>
+          <td class="row-actions"><button onclick="delRow(this)">✕</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="add-row" onclick="addRow()">+ Adicionar ação</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     9. PARKING LOT
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">9</span>Parking Lot (assuntos adiados)</h2>
+  <div class="body">
+    <p style="font-size:.78rem;color:#888;font-style:italic;margin-bottom:.3rem">👉 Assuntos técnicos levantados mas que não são para decidir aqui. Cada um deve virar ação futura.</p>
+    <div class="notes-box" contenteditable="true" id="n_parking"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     10. NOTAS GERAIS
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">10</span>Notas gerais e observações</h2>
+  <div class="body">
+    <div class="notes-box" contenteditable="true" id="n_notas"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     11. APROVACOES
+     ============================================================ -->
+<div class="section">
+  <h2><span class="num">11</span>Aprovações / Ciência</h2>
+  <div class="body">
+    <p style="font-size:.82rem;margin-bottom:.4rem">Participantes abaixo dão ciência das decisões registradas nesta ata:</p>
+    <div class="signatures">
+      <div class="sig">
+        <label>PO</label>
+        <div class="name" contenteditable="true" data-placeholder="Nome"></div>
+        <div class="role">Product Owner</div>
+        <div class="aprv"><label><input type="checkbox"> De acordo</label></div>
+      </div>
+      <div class="sig">
+        <label>Dev Lead</label>
+        <div class="name" contenteditable="true" data-placeholder="Nome"></div>
+        <div class="role">Liderança Técnica</div>
+        <div class="aprv"><label><input type="checkbox"> De acordo</label></div>
+      </div>
+      <div class="sig">
+        <label>Arquiteto</label>
+        <div class="name" contenteditable="true" data-placeholder="Nome"></div>
+        <div class="role">Arquitetura de Software</div>
+        <div class="aprv"><label><input type="checkbox"> De acordo</label></div>
+      </div>
+      <div class="sig">
+        <label>Outros</label>
+        <div class="name" contenteditable="true" data-placeholder="Nome"></div>
+        <div class="role" contenteditable="true" data-placeholder="Papel">Papel</div>
+        <div class="aprv"><label><input type="checkbox"> De acordo</label></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     RODAPE
+     ============================================================ -->
+<div style="text-align:center;font-size:.75rem;color:#888;margin-top:1.5rem;padding:.8rem">
+  Documento gerado pela equipe de Arquitetura CBV — Unimed POA<br>
+  <strong>Salvamento automático ativo</strong>. As informações são gravadas no navegador (localStorage). Use o botão <strong>Exportar HTML</strong> para compartilhar.
+</div>
+
+</main>
+
+<script>
+// ============ SAVE/LOAD ============
+const STORAGE_KEY = 'ata_tabia_v1';
+const saveStatus = document.getElementById('saveStatus');
+
+function collectData() {
+  const data = {fields:{}, cells:[], checks:[], pills:[]};
+  // Campos com id
+  document.querySelectorAll('[id^="f_"], [id^="d_"], [id^="n_"]').forEach(el => {
+    data.fields[el.id] = el.innerHTML;
+  });
+  // Signature names
+  document.querySelectorAll('.sig .name, .sig .role').forEach((el, i) => {
+    data.fields['sig_' + i] = el.innerHTML;
+  });
+  // Checkboxes
+  document.querySelectorAll('input[type=checkbox]').forEach((cb, i) => {
+    data.fields['cb_' + i] = cb.checked;
+  });
+  // Action table
+  document.querySelectorAll('#actionsBody tr').forEach(tr => {
+    const row = [];
+    tr.querySelectorAll('td').forEach(td => row.push(td.innerHTML));
+    data.cells.push(row);
+  });
+  // Selected option
+  const selOpt = document.querySelector('.opt-card.selected');
+  data.selectedOpt = selOpt ? selOpt.dataset.opt : null;
+  // Checklist
+  document.querySelectorAll('.check-list li').forEach((li, i) => {
+    data.checks.push(li.classList.contains('done'));
+  });
+  return data;
+}
+
+function applyData(data) {
+  if (!data) return;
+  // Fields
+  Object.entries(data.fields || {}).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = val;
+  });
+  // Signatures
+  const sigEls = document.querySelectorAll('.sig .name, .sig .role');
+  sigEls.forEach((el, i) => {
+    const v = data.fields['sig_' + i];
+    if (v !== undefined) el.innerHTML = v;
+  });
+  // Checkboxes
+  const cbs = document.querySelectorAll('input[type=checkbox]');
+  cbs.forEach((cb, i) => {
+    const v = data.fields['cb_' + i];
+    if (v !== undefined) cb.checked = v;
+  });
+  // Action table
+  if (data.cells && data.cells.length) {
+    const body = document.getElementById('actionsBody');
+    body.innerHTML = '';
+    data.cells.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      row.forEach((cell, cidx) => {
+        const td = document.createElement('td');
+        td.innerHTML = cell;
+        if (cidx > 0 && cidx < 6 && cidx !== 4) td.setAttribute('contenteditable','true');
+        if (cidx === 4) {
+          const pill = td.querySelector('.pill');
+          if (pill) pill.setAttribute('onclick', 'cyclePill(this)');
+        }
+        if (cidx === 6) {
+          td.className = 'row-actions';
+          td.innerHTML = '<button onclick="delRow(this)">✕</button>';
+        }
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+  // Option
+  if (data.selectedOpt) {
+    document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+    const opt = document.querySelector('.opt-card[data-opt="'+data.selectedOpt+'"]');
+    if (opt) opt.classList.add('selected');
+  }
+  // Checks
+  if (data.checks) {
+    document.querySelectorAll('.check-list li').forEach((li, i) => {
+      if (data.checks[i]) li.classList.add('done');
+    });
+  }
+}
+
+function saveDoc() {
+  const data = collectData();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  flash('💾 Salvo '+new Date().toLocaleTimeString());
+}
+
+function loadDoc() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) { flash('Nenhum salvamento anterior'); return; }
+  try {
+    applyData(JSON.parse(raw));
+    flash('📂 Dados carregados');
+  } catch(e) { flash('Erro ao carregar'); }
+}
+
+function clearDoc() {
+  if (!confirm('Limpar TODOS os campos? Essa ação não pode ser desfeita.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+function exportHTML() {
+  // Serializa HTML atual
+  const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Ata_Tabia_' + new Date().toISOString().slice(0,10) + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  flash('⬇️ Arquivo exportado');
+}
+
+function flash(msg) {
+  saveStatus.textContent = msg;
+  setTimeout(() => { saveStatus.textContent = ''; }, 3000);
+}
+
+// Autosave a cada 10s se houve alteração
+let dirty = false;
+document.addEventListener('input', () => { dirty = true; });
+document.addEventListener('click', () => { dirty = true; });
+setInterval(() => {
+  if (dirty) {
+    const data = collectData();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    flash('💾 Auto-salvo '+new Date().toLocaleTimeString());
+    dirty = false;
+  }
+}, 10000);
+
+// ============ INTERACOES ============
+function selectOpt(el) {
+  document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  dirty = true;
+}
+
+function toggleCheck(e) {
+  if (e.target.tagName === 'LI') {
+    e.target.classList.toggle('done');
+    dirty = true;
+  }
+}
+
+function cyclePill(el) {
+  const states = [
+    {txt:'PENDENTE', cls:'p-pending'},
+    {txt:'EM ANDAMENTO', cls:'p-doing'},
+    {txt:'CONCLUIDO', cls:'p-done'},
+    {txt:'BLOQUEADO', cls:'p-blocked'},
+  ];
+  const cur = el.textContent.trim();
+  const idx = states.findIndex(s => s.txt === cur);
+  const nxt = states[(idx + 1) % states.length];
+  el.textContent = nxt.txt;
+  el.className = 'pill ' + nxt.cls;
+  dirty = true;
+}
+
+function addRow() {
+  const body = document.getElementById('actionsBody');
+  const n = body.children.length + 1;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${n}</td>
+    <td contenteditable="true" data-placeholder="Descrição da ação"></td>
+    <td contenteditable="true" data-placeholder="Nome"></td>
+    <td contenteditable="true" data-placeholder="DD/MM"></td>
+    <td><span class="pill p-pending" onclick="cyclePill(this)">PENDENTE</span></td>
+    <td contenteditable="true" data-placeholder="..."></td>
+    <td class="row-actions"><button onclick="delRow(this)">✕</button></td>`;
+  body.appendChild(tr);
+  dirty = true;
+}
+
+function delRow(btn) {
+  if (!confirm('Remover esta linha?')) return;
+  btn.closest('tr').remove();
+  // Renumerar
+  document.querySelectorAll('#actionsBody tr').forEach((tr, i) => {
+    tr.firstElementChild.textContent = i + 1;
+  });
+  dirty = true;
+}
+
+// Carregar dados salvos ao iniciar
+document.addEventListener('DOMContentLoaded', loadDoc);
+</script>
+
+</body>
+</html>

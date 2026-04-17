@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kickoff Migração Healthmap → Tabia</title>
+<style>
+  :root{
+    --blue-dark:#1a3a5c;--blue-main:#2E75B6;--blue-light:#D5E8F0;
+    --green:#27ae60;--orange:#e67e22;--red:#e74c3c;--yellow:#f39c12;
+    --purple:#8e44ad;--bg:#f5f7fa;--text:#2c3e50;--border:#dce1e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.55}
+  header{background:linear-gradient(135deg,var(--blue-dark),var(--blue-main));color:#fff;padding:1.5rem 2rem;text-align:center}
+  header h1{font-size:1.6rem;font-weight:700}
+  header p{opacity:.9;font-size:.9rem;margin-top:.3rem}
+
+  main{max-width:1100px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+  .nav{display:flex;gap:.5rem;justify-content:center;margin:1rem 0 1.5rem;flex-wrap:wrap}
+  .nav a{background:#fff;color:var(--blue-dark);padding:.5rem 1rem;border-radius:20px;text-decoration:none;font-size:.82rem;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:all .15s}
+  .nav a:hover{background:var(--blue-main);color:#fff;transform:translateY(-1px)}
+
+  .block{background:#fff;border-radius:12px;padding:1.2rem 1.3rem;margin-bottom:1.3rem;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .block-title{display:flex;align-items:center;gap:.6rem;font-size:1.15rem;color:var(--blue-dark);margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:2px solid var(--blue-light);font-weight:700}
+  .block-title .icon{font-size:1.6rem}
+  .block-title .count{margin-left:auto;background:var(--blue-main);color:#fff;font-size:.75rem;padding:.15em .6em;border-radius:12px;font-weight:700}
+
+  .item{display:flex;gap:.8rem;padding:.75rem .8rem;border-radius:8px;margin-bottom:.5rem;background:#fafbfd;border-left:4px solid var(--border);transition:background .15s;align-items:flex-start}
+  .item:hover{background:var(--blue-light)}
+  .item.p-high{border-left-color:var(--red)}
+  .item.p-med{border-left-color:var(--orange)}
+  .item.p-low{border-left-color:var(--green)}
+
+  .item .check{flex-shrink:0;width:22px;height:22px;border:2px solid var(--border);border-radius:5px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:.1rem}
+  .item .check:hover{border-color:var(--blue-main)}
+  .item.done .check{background:var(--green);border-color:var(--green)}
+  .item.done .check::after{content:'✓';color:#fff;font-weight:700;font-size:.9rem}
+  .item.done .txt{text-decoration:line-through;opacity:.6}
+
+  .item .txt{flex:1;font-size:.88rem}
+  .item .txt strong{color:var(--blue-dark);display:block;margin-bottom:.2rem}
+  .item .txt p{font-size:.78rem;color:#666;margin-top:.15rem}
+  .item .txt code{background:#eef3f8;padding:.08em .35em;border-radius:3px;font-size:.78rem;color:var(--blue-dark)}
+
+  .item .tag{flex-shrink:0;font-size:.65rem;font-weight:700;padding:.2em .5em;border-radius:3px;white-space:nowrap;text-transform:uppercase;letter-spacing:.03em}
+  .tag-red{background:#e74c3c;color:#fff}
+  .tag-orange{background:#e67e22;color:#fff}
+  .tag-green{background:#27ae60;color:#fff}
+  .tag-yellow{background:#f39c12;color:#fff}
+  .tag-purple{background:#8e44ad;color:#fff}
+  .tag-blue{background:#3498db;color:#fff}
+
+  /* Visao geral */
+  .overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
+  .ov-card{background:#fff;border-radius:10px;padding:1rem;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.06);border-top:4px solid var(--blue-main)}
+  .ov-card.red{border-top-color:var(--red)}
+  .ov-card.orange{border-top-color:var(--orange)}
+  .ov-card.green{border-top-color:var(--green)}
+  .ov-card.purple{border-top-color:var(--purple)}
+  .ov-card .num{font-size:2.2rem;font-weight:700;color:var(--blue-dark);line-height:1}
+  .ov-card .lbl{font-size:.78rem;color:#666;margin-top:.3rem;text-transform:uppercase;letter-spacing:.03em}
+  .ov-card .sub{font-size:.72rem;color:#888;margin-top:.2rem}
+
+  /* Ondas */
+  .waves{display:flex;gap:.6rem;overflow-x:auto;padding-bottom:.5rem}
+  .wave{flex:1;min-width:180px;background:#fafbfd;border-radius:8px;padding:.8rem;border-top:3px solid var(--blue-main)}
+  .wave.w1{border-top-color:var(--green)}
+  .wave.w2{border-top-color:var(--blue-main)}
+  .wave.w3{border-top-color:var(--orange)}
+  .wave.w4{border-top-color:var(--red)}
+  .wave.w5{border-top-color:var(--purple)}
+  .wave h4{font-size:.82rem;color:var(--blue-dark);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
+  .wave h4 .w-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--blue-main);color:#fff;font-size:.72rem;font-weight:700}
+  .wave.w1 h4 .w-num{background:var(--green)}
+  .wave.w3 h4 .w-num{background:var(--orange)}
+  .wave.w4 h4 .w-num{background:var(--red)}
+  .wave.w5 h4 .w-num{background:var(--purple)}
+  .wave ul{list-style:none;font-size:.76rem;color:#555}
+  .wave ul li{padding:.15rem 0}
+  .wave ul li::before{content:'• ';color:var(--blue-main);font-weight:700}
+
+  /* Legenda prioridade */
+  .legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.78rem;margin-bottom:1rem;padding:.5rem .8rem;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .legend strong{color:var(--blue-dark)}
+  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.3rem;vertical-align:middle}
+  .dot-red{background:var(--red)}
+  .dot-orange{background:var(--orange)}
+  .dot-green{background:var(--green)}
+
+  /* Progress */
+  .progress{margin-top:1rem;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+  .progress-bar{height:100%;background:var(--green);width:0;transition:width .3s;border-radius:3px}
+
+  .actions{text-align:center;margin:1.5rem 0}
+  .btn{display:inline-block;padding:.6rem 1.3rem;background:var(--blue-main);color:#fff;border:none;border-radius:6px;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none;margin:0 .3rem;transition:background .15s}
+  .btn:hover{background:var(--blue-dark)}
+  .btn-light{background:#fff;color:var(--blue-dark);border:1px solid var(--border)}
+  .btn-light:hover{background:var(--blue-light);color:var(--blue-dark)}
+
+  /* ODC highlight box */
+  .odc-box{background:linear-gradient(135deg,#fff5e6,#fff);border:2px solid var(--orange);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.3rem}
+  .odc-box h3{color:var(--orange);font-size:1.05rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+  .odc-box p{font-size:.85rem;line-height:1.6}
+  .odc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.8rem;margin-top:.8rem}
+  .odc-concept{background:#fff;border-radius:6px;padding:.6rem .8rem;border-left:3px solid var(--blue-main);font-size:.8rem}
+  .odc-concept strong{color:var(--blue-dark);display:block;margin-bottom:.2rem}
+  .odc-concept code{background:#eef3f8;padding:.08em .3em;border-radius:3px;font-size:.76rem}
+
+  @media print{
+    header{padding:1rem}
+    .nav,.actions{display:none}
+    .block{page-break-inside:avoid;box-shadow:none;border:1px solid var(--border)}
+    .item{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚀 Kickoff da Migração Healthmap → Tabia</h1>
+  <p>Checklist visual do que alinhar antes de codar — use com a Tabia e com o Dev Lead</p>
+</header>
+
+<main>
+
+<!-- ODC context box -->
+<div class="odc-box">
+  <h3>🏗️ Contexto: Projeto OutSystems ODC (Open Digital Cloud) Full</h3>
+  <p>A migração será <strong>100% em OutSystems ODC</strong>. Isso muda a estratégia de arquitetura: não haverá microservico externo — o <strong>adapter vira uma Library ODC</strong>, consumindo a API REST da Tabia direto do OpenAPI importado no Service Studio.</p>
+  <div class="odc-grid">
+    <div class="odc-concept">
+      <strong>Adapter (ACL)</strong>
+      ODC <strong>Library</strong> reutilizavel chamada <code>Tabia_ACL_Lib</code> — expoe Server Actions com assinatura identica ao atual <code>ModeloAssistencial_Lib</code>.
+    </div>
+    <div class="odc-concept">
+      <strong>Consume REST API</strong>
+      Importar <code>openapi-careos-simple.json</code> no Service Studio gera automaticamente <strong>Structures + Client Actions</strong> para todos os endpoints Tabia.
+    </div>
+    <div class="odc-concept">
+      <strong>Autenticação</strong>
+      API Key gerenciada via <strong>ODC Secret</strong> (Settings &gt; Secrets) — acessada via <code>GetEnvironmentSecret()</code>. Não precisa persistir em DB.
+    </div>
+    <div class="odc-concept">
+      <strong>Mappers</strong>
+      <strong>Server Actions</strong> dedicadas (ex: <code>Map_PatientDTO_to_BeneficiarioDTO</code>) — puras, sem side effects, facil testar.
+    </div>
+    <div class="odc-concept">
+      <strong>De-para de IDs</strong>
+      <strong>Entity</strong> <code>CBV_TabiaIdMapping</code> no modulo da Library com indexes por tipo + valor.
+    </div>
+    <div class="odc-concept">
+      <strong>Estratégia</strong>
+      Strangler Fig via <strong>Site Property</strong> (feature flag) por endpoint: <code>UseTabiaFor_Beneficiario = true/false</code>.
+    </div>
+  </div>
+</div>
+
+<!-- Visao geral -->
+<div class="overview">
+  <div class="ov-card red"><div class="num">8</div><div class="lbl">Blockers</div><div class="sub">alinhar com a Tabia</div></div>
+  <div class="ov-card orange"><div class="num">14</div><div class="lbl">Decisões técnicas</div><div class="sub">alinhar com o Dev Lead</div></div>
+  <div class="ov-card green"><div class="num">8</div><div class="lbl">Preparacao</div><div class="sub">tarefas internas</div></div>
+  <div class="ov-card purple"><div class="num">5</div><div class="lbl">Ondas</div><div class="sub">de migração</div></div>
+</div>
+
+<nav class="nav">
+  <a href="#tabia">📋 Para Tabia</a>
+  <a href="#devlead">👨‍💻 Para Dev Lead</a>
+  <a href="#prep">🛠️ Preparacao</a>
+  <a href="#ondas">🌊 Ondas</a>
+  <a href="#primeiras">🎯 Primeiras tasks</a>
+</nav>
+
+<div class="legend">
+  <span><strong>Prioridade:</strong></span>
+  <span><span class="dot dot-red"></span>ALTA — bloqueia inicio</span>
+  <span><span class="dot dot-orange"></span>MEDIA — define arquitetura</span>
+  <span><span class="dot dot-green"></span>BAIXA — pode ajustar depois</span>
+  <span style="margin-left:auto;color:#666">💡 Clique no checkbox para marcar como resolvido</span>
+</div>
+
+<!-- ============================================================
+     📋 PARA TABIA
+     ============================================================ -->
+<div class="block" id="tabia">
+  <div class="block-title">
+    <span class="icon">📋</span>
+    <span>Perguntas e validacoes para a Tabia Health</span>
+    <span class="count">8 itens</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>1. Suporte a busca por CPF em <code>/apiv1/patient</code> e <code>/apiv1/user</code></strong>
+      <p>O Healthmap usa CPF como chave primaria. A Tabia busca por email/cellphone. Precisamos saber:</p>
+      <p>• Posso adicionar <code>cpf</code> como query param nativo?</p>
+      <p>• Se não, devo usar <code>person.extensions.cpf</code>? Como indexar para performance?</p>
+      <p>• Onde o CPF fica armazenado em <code>PatientDTO</code>?</p>
+    </div>
+    <span class="tag tag-red">Blocker</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>2. Timeline de entrega dos endpoints de Termos de Aceite</strong>
+      <p>4 endpoints ausentes: <code>aceiteTermo</code>, <code>buscaTermoPublicadoPorEmpresa</code>, <code>buscarAceiteTermo</code>, <code>revogaTermo</code>. Bloqueia o Viver Bem inteiro.</p>
+      <p>• Quando estarao prontos?</p>
+      <p>• O modelo tera conceito de "termo por empresa"?</p>
+      <p>• Haverá versionamento (<code>versaoTermo</code>)?</p>
+    </div>
+    <span class="tag tag-red">Blocker</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>3. Conceito de MedicaoRisco (estratificação clínica)</strong>
+      <p>No Healthmap é risco de saúde populacional (BAIXO/MEDIO/ALTO). Na Tabia <code>appointment-no-show-risk</code> é risco operacional de no-show.</p>
+      <p>• Existe roadmap para endpoint de risco clínico?</p>
+      <p>• Posso usar <code>PatientDTO.tabiaScore.severity</code> como proxy?</p>
+      <p>• As faixas 0-0.33 / 0.33-0.66 / 0.66-1 são oficiais?</p>
+    </div>
+    <span class="tag tag-red">Blocker</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>4. Schema do endpoint <code>POST /apiv1/surveydata/{uid}/answer</code></strong>
+      <p>Mencionado no PDF mas ausente no OpenAPI. Crítico para registrar respostas.</p>
+      <p>• Enviar OpenAPI completo deste endpoint</p>
+      <p>• Suporta filtro por periodo?</p>
+    </div>
+    <span class="tag tag-red">Blocker</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>5. Documentação dos endpoints de WhatsApp</strong>
+      <p><code>/apiv1/whatsapp-management</code> e <code>/apiv1/whatsapp/logs</code> aparecem no PDF mas não no OpenAPI.</p>
+      <p>• Schema completo</p>
+      <p>• Como substitui o fluxo CRM Dynamics → BLIP atual?</p>
+      <p>• Templates/flows customizaveis?</p>
+    </div>
+    <span class="tag tag-red">Blocker</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>6. Modelo de Event customizado para Alertas de Internação</strong>
+      <p>Healthmap tem endpoint dedicado. Tabia sugere usar Event com formData. Precisamos definir:</p>
+      <p>• Categoria fixa "INTERNACAO" pre-cadastrada?</p>
+      <p>• Campos custom obrigatorios: <code>unidade</code>, <code>motivo</code>, <code>idGestor</code></p>
+      <p>• Qual integração alimenta os eventos (HIS hospitalar)?</p>
+    </div>
+    <span class="tag tag-orange">Alta</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>7. Enum completo de tipos de questão (Survey.field.type)</strong>
+      <p>Precisamos da lista oficial para criar tabela de-para com os tipos Healthmap (SIM_NAO, MULTIPLA_ESCOLHA, TEXTO_LIVRE, NUMERO, DATA).</p>
+      <p>• Enviar enum oficial de <code>field.type</code></p>
+    </div>
+    <span class="tag tag-orange">Alta</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>8. Enum completo de roles e rolesInOrganizations</strong>
+      <p>Para mapear tipos Healthmap (PROFISSIONAL, GESTOR, NAVEGADOR, AUDITOR).</p>
+      <p>• Lista oficial de roles e rolesInOrganizations</p>
+      <p>• Como criar role custom se necessário?</p>
+    </div>
+    <span class="tag tag-orange">Alta</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     👨‍💻 PARA DEV LEAD
+     ============================================================ -->
+<div class="block" id="devlead">
+  <div class="block-title">
+    <span class="icon">👨‍💻</span>
+    <span>Decisões técnicas para alinhar com o Dev Lead</span>
+    <span class="count">12 itens</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>1. Estrutura do adapter como Library ODC</strong>
+      <p>Decisão já tomada: adapter será <code>Tabia_ACL_Lib</code> (Library ODC) consumindo REST do OpenAPI Tabia.</p>
+      <p>• Nome final da Library</p>
+      <p>• Namespace/stage (dev/test/prd)</p>
+      <p>• Quem possui? Time CBV ou time novo?</p>
+      <p>• Relacionamento com <code>ModeloAssistencial_Lib</code> atual — deprecar ou manter em paralelo durante transição?</p>
+    </div>
+    <span class="tag tag-red">Alta</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>1b. Consume REST API do OpenAPI Tabia no Service Studio</strong>
+      <p>Importar <code>openapi-careos-simple.json</code> direto gera Structures + Client Actions automaticamente.</p>
+      <p>• Validar se o OpenAPI importa limpo (pode ter warnings por <code>map&lt;string,object&gt;</code> no Java)</p>
+      <p>• Endpoints ausentes no OpenAPI (<code>/surveydata/{uid}/answer</code>, WhatsApp) — criar manualmente</p>
+      <p>• Estratégia de atualização: re-import periodico ou manual?</p>
+    </div>
+    <span class="tag tag-red">Alta</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>2. Entity de mapeamento de IDs dentro da Library</strong>
+      <p>Entity <code>CBV_TabiaIdMapping</code> com campos: <code>EntityType</code> (Patient|User|Survey|Task), <code>CBV_Id</code>, <code>Tabia_Id</code>, <code>CreatedAt</code>, <code>LastSyncAt</code>.</p>
+      <p>• Entity pública ou privada da Library? <strong>Privada</strong> — acesso só via Server Actions</p>
+      <p>• Indexes: <code>(EntityType, CBV_Id)</code> e <code>(EntityType, Tabia_Id)</code></p>
+      <p>• Timer de sync inicial: popular via consulta combinada (CPF HM → email Tabia)</p>
+    </div>
+    <span class="tag tag-red">Alta</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>3. Feature flags via Site Property (Strangler Fig em ODC)</strong>
+      <p>Em ODC, feature flags são <strong>Site Properties</strong> ou <strong>External Configurations</strong>.</p>
+      <p>• Criar <code>UseTabiaFor_Beneficiario</code>, <code>UseTabiaFor_Questionario</code>, etc (boolean)</p>
+      <p>• Server Action <code>ShouldUseTabia(endpoint)</code> centraliza a decisão</p>
+      <p>• Rollback = trocar flag (não precisa re-deploy)</p>
+    </div>
+    <span class="tag tag-red">Alta</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>4. Onde armazenar campos sem equivalente</strong>
+      <p>Campos como <code>idExterno</code>, <code>respostaTexto</code>, <code>respostaValor</code>, <code>idDispositivoIntegracao</code> precisam de destino.</p>
+      <p>• Usar <code>person.extensions</code> (map&lt;string,string&gt;)?</p>
+      <p>• Tabela paralela no CBV?</p>
+      <p>• Padronizar chaves (<code>cbv.idExterno</code>, <code>cbv.dispositivoId</code>)</p>
+    </div>
+    <span class="tag tag-orange">Media</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>5. Tratamento de Plano de Ação (1 entidade → 4 na Tabia)</strong>
+      <p>Healthmap = PlanoAcao. Tabia = Pathway + ICP + Task + Event.</p>
+      <p>• Qual endpoint corresponde ao "plano" conceitual? <code>individual-care-plan</code></p>
+      <p>• Como unir Task + Event em uma visao? Cache/composite service?</p>
+      <p>• Templates de Pathway vao ser replicados?</p>
+    </div>
+    <span class="tag tag-orange">Media</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>6. Paginação — base 1 → base 0</strong>
+      <p>Healthmap: <code>página=1</code>. Tabia: <code>page=0</code>. Atencao com off-by-one.</p>
+      <p>• ACL sempre converte? Expor nova API em base 0 para CBV?</p>
+      <p>• <code>offset</code> → <code>page * size</code></p>
+    </div>
+    <span class="tag tag-orange">Media</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>7. Normalizacao de datas</strong>
+      <p>Healthmap usa ISO 8601 com horario. Tabia mistura ISO + epoch int64.</p>
+      <p>• Conversao no ACL sempre para ISO?</p>
+      <p>• Timezones (<code>timeZoneId</code> aparece em Event)</p>
+    </div>
+    <span class="tag tag-orange">Media</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>8. Tabela de-para de enums de status</strong>
+      <p>Criar biblioteca de conversao bidirecional:</p>
+      <p>• <code>ATIVO/INATIVO</code> ↔ <code>deathDate/blocked/status=OPEN|CLOSED</code></p>
+      <p>• <code>PENDENTE/EM_PROGRESSO/CONCLUIDO</code> ↔ <code>closed/accomplished/progress</code></p>
+      <p>• <code>BAIXO/MEDIO/ALTO</code> ↔ faixas de <code>tabiaScore.severity</code></p>
+    </div>
+    <span class="tag tag-orange">Media</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>9. API Key via ODC Secret (PRD/staging)</strong>
+      <p>Em ODC: <strong>Settings &gt; Secrets</strong> (ou <code>External Configurations</code>) — não vai para o código.</p>
+      <p>• Secrets por stage: <code>Tabia_ApiKey_Dev</code>, <code>Tabia_ApiKey_Test</code>, <code>Tabia_ApiKey_Prd</code></p>
+      <p>• Acesso via <code>GetEnvironmentSecret("TABIA_API_KEY")</code></p>
+      <p>• Rotacao — politica com Tabia</p>
+      <p>• Remover toda logica atual de OAuth2 token + refresh scheduler</p>
+    </div>
+    <span class="tag tag-orange">Media</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>9b. Base URL por ambiente (ODC Configuration)</strong>
+      <p>Dois hosts: <code>https://staging.tabia.health</code> (HMG) e <code>https://app.tabia.health</code> (PRD).</p>
+      <p>• Usar Effective URL dos REST API consumers no Service Studio</p>
+      <p>• Ou Site Property <code>Tabia_BaseUrl</code></p>
+      <p>• Garantir que dev aponta para staging automaticamente</p>
+    </div>
+    <span class="tag tag-orange">Media</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>10. Observabilidade no ODC Monitoring</strong>
+      <p>Usar o <strong>ODC Portal &gt; Monitoring</strong> já existente.</p>
+      <p>• <code>LogMessage</code> estruturado em cada mapper (payload HM in/out + tempo)</p>
+      <p>• Usar <code>TraceId</code> para correlacionar chamadas</p>
+      <p>• Alertas via Monitor &gt; Custom</p>
+      <p>• Não usa stack externa (Splunk/Datadog) — já vem no ODC</p>
+    </div>
+    <span class="tag tag-green">Baixa</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>11. Testes unitarios dos Mappers (BDD Framework)</strong>
+      <p>ODC tem BDD Framework nativo para testar Server Actions.</p>
+      <p>• Criar app de testes <code>Tabia_ACL_Lib_Tests</code></p>
+      <p>• Cenarios: Patient valido → Beneficiário, Patient sem CPF, status mapping, etc</p>
+      <p>• Rodar no pipeline via <strong>LifeTime Plugins</strong></p>
+    </div>
+    <span class="tag tag-green">Baixa</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>12. Anexos de Ação (<code>realizarAcao.arquivos[]</code>)</strong>
+      <p>Healthmap aceita array de arquivos binarios. Tabia não tem equivalente direto no TaskStatusDTO.</p>
+      <p>• Investigar <code>NoteDTO.file</code> (StorageFileDTO) na Tabia</p>
+      <p>• Talvez usar File Storage do próprio ODC e referenciar por URL</p>
+    </div>
+    <span class="tag tag-green">Baixa</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>13. Timeouts e retry dos Client Actions REST</strong>
+      <p>Por padrao ODC usa timeout default. Chamadas Tabia podem precisar ajuste.</p>
+      <p>• Configurar timeout por endpoint (ex: <code>/event?patients=...</code> pode ser lento)</p>
+      <p>• Retry policy (exponential backoff) via BPT ou logica manual</p>
+      <p>• Circuit breaker para degradacao graciosa</p>
+    </div>
+    <span class="tag tag-green">Baixa</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>14. Permissoes e roles no ODC</strong>
+      <p>A Library não expoe tela, mas os apps consumidores precisam permissao.</p>
+      <p>• Definir se a Library será pública na <strong>Forge interna</strong></p>
+      <p>• Roles de quem pode chamar cada Server Action exposta</p>
+    </div>
+    <span class="tag tag-green">Baixa</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     🛠️ PREPARACAO
+     ============================================================ -->
+<div class="block" id="prep">
+  <div class="block-title">
+    <span class="icon">🛠️</span>
+    <span>Preparacao interna antes de comecar</span>
+    <span class="count">7 itens</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>1. Acessos ao ambiente staging Tabia</strong>
+      <p><code>https://staging.tabia.health</code> — solicitar API Key para HMG.</p>
+      <p>• Ter o contrato com a Tabia ativo</p>
+      <p>• API Key separada para cada desenvolvedor?</p>
+      <p>• Quem mais precisa? QA, PO, DevOps?</p>
+    </div>
+    <span class="tag tag-red">Agora</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>2. Inventario de consumidores atuais do Healthmap no CBV</strong>
+      <p>Antes de migrar, mapear TUDO que chama Healthmap hoje.</p>
+      <p>• Modulos CBV: Viver Bem, Redes de Valor, Cockpit Nav, Auditoria, Transição, SRT</p>
+      <p>• Integrações OutSystems: ModeloAssistencial_Lib</p>
+      <p>• Jobs batch, webhooks, etc</p>
+    </div>
+    <span class="tag tag-red">Agora</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>3. Reunião de alinhamento inicial com Tabia</strong>
+      <p>Levar as 8 perguntas da secao "Para Tabia" em uma única reunião técnica.</p>
+      <p>• Agenda: blockers + timeline + acessos</p>
+      <p>• Participantes: dev lead, arquiteto Tabia, PO</p>
+    </div>
+    <span class="tag tag-orange">Semana 1</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>4. POC de importacao do OpenAPI no Service Studio</strong>
+      <p>Antes da task real, validar que o <code>openapi-careos-simple.json</code> importa sem erros graves.</p>
+      <p>• Criar Library descartavel <code>Tabia_POC</code></p>
+      <p>• Consume REST API &gt; From OpenAPI Spec</p>
+      <p>• Registrar warnings/erros</p>
+      <p>• Chamar <code>GetPatient(size=1)</code> no debug — valida API Key + base URL</p>
+    </div>
+    <span class="tag tag-orange">Semana 1</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>5. Criar Library ODC oficial <code>Tabia_ACL_Lib</code></strong>
+      <p>Depois do POC validado.</p>
+      <p>• Nome definitivo + stage dev</p>
+      <p>• Estrutura de pastas: <strong>Integrations</strong> (REST Client), <strong>Mappers</strong> (Server Actions), <strong>Entities</strong> (IdMapping)</p>
+      <p>• Primeiro commit + publish em dev</p>
+    </div>
+    <span class="tag tag-orange">Semana 1-2</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>6. Documentação viva (este próprio HTML + wiki)</strong>
+      <p>Manter os 3 arquivos atualizados conforme descobertas:</p>
+      <p>• <code>analise_healthmap_tabia.html</code> — comparação de endpoints</p>
+      <p>• <code>comparacao_profunda.html</code> — campo a campo + glossário</p>
+      <p>• <code>kickoff_migracao.html</code> — este checklist</p>
+    </div>
+    <span class="tag tag-green">Continuo</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>7. Workshop de glossário PT→EN com a equipe</strong>
+      <p>Alinhar vocabulario entre devs que conhecem Healthmap (PT) e a nova API Tabia (EN).</p>
+      <p>• Sessão de 1h com o glossário do <code>comparacao_profunda.html</code></p>
+      <p>• Deixar cheatsheet acessivel</p>
+    </div>
+    <span class="tag tag-green">Semana 2</span>
+  </div>
+
+  <div class="item p-low" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>8. Revisao do <code>ModeloAssistencial_Lib</code> atual</strong>
+      <p>Listar todas as Server Actions que hoje chamam Healthmap. São elas que o <code>Tabia_ACL_Lib</code> vai substituir.</p>
+      <p>• Gerar inventario no Service Studio (dependencias)</p>
+      <p>• Priorizar por frequência de uso em produção (ODC Monitoring)</p>
+      <p>• Isso define a ordem real das ondas de migração</p>
+    </div>
+    <span class="tag tag-green">Semana 2</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     🌊 ONDAS DE MIGRACAO
+     ============================================================ -->
+<div class="block" id="ondas">
+  <div class="block-title">
+    <span class="icon">🌊</span>
+    <span>Ondas de migração (Strangler Fig)</span>
+    <span class="count">5 ondas</span>
+  </div>
+
+  <div class="waves">
+    <div class="wave w1">
+      <h4><span class="w-num">1</span>Auth + Patient</h4>
+      <ul>
+        <li><code>/oauth/token</code> → API Key</li>
+        <li><code>GET /beneficiário</code> → <code>/patient</code></li>
+        <li><code>GET /beneficiário/{id}</code></li>
+        <li><code>/dadosResumido</code></li>
+      </ul>
+      <p style="font-size:.7rem;color:#666;margin-top:.4rem"><strong>Risco:</strong> CPF</p>
+    </div>
+    <div class="wave w2">
+      <h4><span class="w-num">2</span>Questionários</h4>
+      <ul>
+        <li><code>GET /questionário</code></li>
+        <li><code>/questaoRespostas</code></li>
+        <li><code>/responderQuestaoAvulsa</code></li>
+        <li>Externos de Survey</li>
+      </ul>
+      <p style="font-size:.7rem;color:#666;margin-top:.4rem"><strong>Risco:</strong> filtro periodo</p>
+    </div>
+    <div class="wave w3">
+      <h4><span class="w-num">3</span>Plano de Ação</h4>
+      <ul>
+        <li><code>GET /planoAcao</code> → ICP+Task+Event</li>
+        <li><code>POST /programarAcao</code></li>
+        <li><code>PUT /realizarAcao</code></li>
+      </ul>
+      <p style="font-size:.7rem;color:#666;margin-top:.4rem"><strong>Risco:</strong> redesign 1→4</p>
+    </div>
+    <div class="wave w4">
+      <h4><span class="w-num">4</span>Risco + Internação + Termos</h4>
+      <ul>
+        <li><code>/medicaoRisco</code> (proxy)</li>
+        <li><code>/listarAlertasInternacao</code></li>
+        <li>Termos (quando pronto)</li>
+      </ul>
+      <p style="font-size:.7rem;color:#666;margin-top:.4rem"><strong>Risco:</strong> deps externas</p>
+    </div>
+    <div class="wave w5">
+      <h4><span class="w-num">5</span>Mensageria</h4>
+      <ul>
+        <li>CRM Dynamics → <code>/message/send</code></li>
+        <li>WhatsApp templates</li>
+        <li>Sair do BLIP</li>
+      </ul>
+      <p style="font-size:.7rem;color:#666;margin-top:.4rem"><strong>Risco:</strong> fluxo novo</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     🎯 PRIMEIRAS TASKS SUGERIDAS
+     ============================================================ -->
+<div class="block" id="primeiras">
+  <div class="block-title">
+    <span class="icon">🎯</span>
+    <span>Primeiras 5 tasks sugeridas para a Sprint 1</span>
+    <span class="count">sprint 1</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>TASK-1: Obter API Keys (staging + PRD) e cadastrar em ODC Secrets</strong>
+      <p>Solicitar as duas keys a Tabia e cadastrar em <strong>Settings &gt; Secrets</strong> do ODC.</p>
+      <p><strong>Entrega:</strong> secrets <code>Tabia_ApiKey_Dev</code>, <code>Tabia_ApiKey_Test</code>, <code>Tabia_ApiKey_Prd</code> criados. Log de teste de leitura via <code>GetEnvironmentSecret</code>.</p>
+    </div>
+    <span class="tag tag-blue">Setup</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>TASK-2: Criar Library ODC <code>Tabia_ACL_Lib</code> e importar OpenAPI</strong>
+      <p>No Service Studio: criar Library &gt; <strong>Logic &gt; Integrations &gt; Consume REST API</strong> &gt; From OpenAPI Spec. Apontar para <code>openapi-careos-simple.json</code>.</p>
+      <p><strong>Entrega:</strong> Library publicada com Structures e Client Actions auto-geradas. Teste manual de <code>GetPatient(size=1)</code> com screenshot do response.</p>
+    </div>
+    <span class="tag tag-blue">Setup</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>TASK-3: Criar Entity <code>CBV_TabiaIdMapping</code> + Server Actions CRUD</strong>
+      <p>Entity privada da Library com Server Actions <code>GetTabiaId(EntityType, CbvId)</code> e <code>SaveMapping(...)</code>. Populacao inicial via Timer.</p>
+      <p><strong>Entrega:</strong> Entity publicada + 2 Server Actions testadas no BDD Framework.</p>
+    </div>
+    <span class="tag tag-yellow">Infra</span>
+  </div>
+
+  <div class="item p-high" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>TASK-4: Implementar 1 Server Action de adapter — <code>GetBeneficiarios</code></strong>
+      <p>Primeiro mapper end-to-end. Assinatura identica ao atual <code>ModeloAssistencial_Lib.GetBeneficiarios</code>. Internamente chama <code>Tabia.GetPatients</code> + traduz DTO.</p>
+      <p><strong>Entrega:</strong> Server Action pública retornando Page&lt;BeneficiarioDTO&gt; a partir de Tabia. <strong>Bonus:</strong> feature flag via Site Property <code>UseTabiaFor_Beneficiario</code> decide entre Healthmap e Tabia.</p>
+    </div>
+    <span class="tag tag-blue">MVP</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>TASK-5: Workshop de glossário PT→EN com toda equipe ODC</strong>
+      <p>Passar pelos 3 HTMLs gerados (<code>analise_healthmap_tabia.html</code>, <code>comparacao_profunda.html</code>, este kickoff) e criar cheatsheet no Confluence.</p>
+      <p><strong>Entrega:</strong> página no Confluence com glossário + doc PDF impresso para a sala.</p>
+    </div>
+    <span class="tag tag-purple">Alinhamento</span>
+  </div>
+
+  <div class="item p-med" onclick="toggle(this)">
+    <div class="check"></div>
+    <div class="txt">
+      <strong>TASK-6: Definir padrao de nomeacao das Server Actions do adapter</strong>
+      <p>Padronizar para equipe toda seguir. Sugestao:</p>
+      <p>• Server Action pública: <strong>mesmo nome</strong> do atual (<code>GetBeneficiarios</code>, <code>RealizarAcao</code>)</p>
+      <p>• Mapper interno: <code>Map_PatientDTO_to_BeneficiarioDTO</code></p>
+      <p>• Status converter: <code>Convert_TabiaStatus_To_HmStatus</code></p>
+      <p><strong>Entrega:</strong> doc de convencoes + code review template.</p>
+    </div>
+    <span class="tag tag-purple">Alinhamento</span>
+  </div>
+</div>
+
+<div class="actions">
+  <a class="btn" href="javascript:window.print()">🖨️ Imprimir / Salvar como PDF</a>
+  <a class="btn btn-light" href="analise_healthmap_tabia.html">← Ver análise de endpoints</a>
+  <a class="btn btn-light" href="comparacao_profunda.html">← Ver comparação profunda</a>
+</div>
+
+<div class="progress"><div class="progress-bar" id="pbar"></div></div>
+<p style="text-align:center;font-size:.78rem;color:#666;margin-top:.4rem"><span id="done-count">0</span> de <span id="total-count">0</span> itens resolvidos</p>
+
+</main>
+
+<script>
+function toggle(el){
+  el.classList.toggle('done');
+  updateProgress();
+}
+function updateProgress(){
+  const all = document.querySelectorAll('.item');
+  const done = document.querySelectorAll('.item.done');
+  document.getElementById('done-count').textContent = done.length;
+  document.getElementById('total-count').textContent = all.length;
+  const pct = all.length ? (done.length / all.length * 100) : 0;
+  document.getElementById('pbar').style.width = pct + '%';
+}
+updateProgress();
+</script>
+
+</body>
+</html>

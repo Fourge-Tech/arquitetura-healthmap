@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparação Profunda: Healthmap x Tabia — Campo a Campo</title>
+<style>
+  :root{
+    --blue-dark:#1a3a5c;--blue-main:#2E75B6;--blue-light:#D5E8F0;
+    --green:#27ae60;--orange:#e67e22;--red:#e74c3c;--yellow:#f39c12;
+    --gray-bg:#f5f7fa;--gray-border:#dce1e8;--text:#2c3e50;
+    --hm:#e8f1f9;--tb:#e8f7ee;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--gray-bg);line-height:1.55}
+  header{background:linear-gradient(135deg,var(--blue-dark),var(--blue-main));color:#fff;padding:1.5rem 2rem;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+  header h1{font-size:1.4rem;font-weight:700}
+  header .sub{opacity:.85;font-size:.82rem;margin-top:.25rem}
+  header nav{display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap}
+  header nav a{color:#fff;text-decoration:none;font-size:.75rem;padding:.25rem .65rem;border-radius:12px;background:rgba(255,255,255,.15);transition:background .15s}
+  header nav a:hover{background:rgba(255,255,255,.3)}
+  main{max-width:1280px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+  h2.section-title{font-size:1.15rem;color:var(--blue-dark);border-bottom:2px solid var(--blue-main);padding-bottom:.3rem;margin:1.5rem 0 .8rem}
+  h3.endpoint-title{font-size:1rem;color:var(--blue-dark);margin:1rem 0 .5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+
+  /* Legend */
+  .legend{background:#fff;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05);font-size:.8rem;display:flex;gap:1rem;flex-wrap:wrap}
+  .legend strong{color:var(--blue-dark)}
+
+  /* Endpoint block */
+  .ep{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:1.5rem;overflow:hidden}
+  .ep-header{padding:.8rem 1.1rem;background:#fafbfd;border-left:4px solid var(--blue-main);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;cursor:pointer}
+  .ep-header:hover{background:var(--blue-light)}
+  .ep-header .chev{margin-left:auto;color:#999;font-size:.7rem;transition:transform .2s}
+  .ep.collapsed .ep-body{display:none}
+  .ep.collapsed .chev{transform:rotate(-90deg)}
+  .ep-body{padding:1rem 1.1rem}
+
+  .method{display:inline-block;padding:.1em .45em;border-radius:3px;font-size:.72rem;font-weight:700;color:#fff}
+  .m-get{background:#27ae60}.m-post{background:#2E75B6}.m-put{background:#e67e22}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--gray-border);border-radius:6px;overflow:hidden;margin-bottom:.8rem}
+  .pair>div{padding:.7rem .9rem}
+  .pair .hm{background:var(--hm);border-right:1px solid var(--gray-border)}
+  .pair .tb{background:var(--tb)}
+  .pair h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#666;margin-bottom:.4rem;font-weight:700}
+  .pair h4.hm-h{color:#1e5d8a}
+  .pair h4.tb-h{color:#1e8449}
+  @media(max-width:760px){.pair{grid-template-columns:1fr}.pair .hm{border-right:none;border-bottom:1px solid var(--gray-border)}}
+
+  pre.code{background:#1e2a3a;color:#a8d8a8;padding:.55rem .65rem;border-radius:4px;font-size:.72rem;line-height:1.5;overflow-x:auto;white-space:pre;margin:.25rem 0;font-family:'Consolas','Courier New',monospace}
+  code.inline{background:#eef3f8;padding:.1em .35em;border-radius:3px;font-size:.78rem;color:var(--blue-dark);font-family:'Consolas','Courier New',monospace}
+
+  /* Field mapping table */
+  table.map{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:.5rem}
+  table.map th,table.map td{padding:.35rem .55rem;border-bottom:1px solid var(--gray-border);text-align:left;vertical-align:top}
+  table.map th{background:var(--blue-light);color:var(--blue-dark);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}
+  table.map td.field{font-family:'Consolas','Courier New',monospace;font-size:.76rem;color:var(--blue-dark);white-space:nowrap}
+  table.map td.type{font-family:'Consolas','Courier New',monospace;font-size:.72rem;color:#777}
+  table.map tr.new td.hm-cell{background:#fef5e7}
+  table.map tr.lost td.tb-cell{background:#fdedeb}
+  table.map tr.direct td{background:#f1faf4}
+  table.map tr.transform td{background:#fff8e1}
+
+  /* Status badges */
+  .st{display:inline-block;padding:.1em .45em;border-radius:3px;font-size:.68rem;font-weight:700;color:#fff;white-space:nowrap}
+  .st-direct{background:#27ae60}
+  .st-transform{background:#f39c12}
+  .st-new{background:#3498db}
+  .st-lost{background:#e74c3c}
+  .st-custom{background:#8e44ad}
+  .st-none{background:#95a5a6}
+
+  /* Summary boxes */
+  .summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem;margin:.6rem 0}
+  .summary-row .box{text-align:center;padding:.5rem;border-radius:6px;background:#f8f9fb;border:1px solid var(--gray-border)}
+  .summary-row .box .n{display:block;font-size:1.4rem;font-weight:700;color:var(--blue-dark)}
+  .summary-row .box .l{font-size:.7rem;color:#666;text-transform:uppercase;letter-spacing:.03em}
+
+  .alert{padding:.55rem .8rem;border-radius:0 5px 5px 0;font-size:.8rem;margin:.5rem 0}
+  .alert-red{background:#fdecea;border-left:3px solid var(--red)}
+  .alert-orange{background:#fff3e0;border-left:3px solid var(--orange)}
+  .alert-yellow{background:#fff8e1;border-left:3px solid var(--yellow)}
+  .alert-green{background:#e8f5e9;border-left:3px solid var(--green)}
+  .alert-blue{background:#e3f2fd;border-left:3px solid var(--blue-main)}
+
+  .note{font-size:.76rem;color:#777;font-style:italic;margin-top:.4rem}
+  .big-badge{display:inline-block;padding:.15em .55em;border-radius:4px;font-size:.7rem;font-weight:700}
+  .bb-blocker{background:var(--red);color:#fff}
+  .bb-redesign{background:var(--orange);color:#fff}
+  .bb-dev{background:#fadbd8;color:#c0392b}
+  .bb-ok{background:#d5f5e3;color:#1e8449}
+
+  .toc{background:#fff;border-radius:10px;padding:1rem;margin-bottom:1.5rem;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .toc h3{font-size:.9rem;color:var(--blue-dark);margin-bottom:.5rem}
+  .toc ol{margin-left:1.2rem;font-size:.82rem;columns:2;column-gap:1.5rem}
+  .toc ol li{padding:.15rem 0;break-inside:avoid}
+  .toc ol li a{color:var(--blue-main);text-decoration:none}
+  .toc ol li a:hover{text-decoration:underline}
+  @media(max-width:600px){.toc ol{columns:1}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Comparação Profunda — Healthmap x Tabia (CareOS)</h1>
+  <div class="sub">Análise campo-a-campo de <strong>request/response</strong> — baseada na Postman Collection (uso real Healthmap) e OpenAPI CareOS (Tabia)</div>
+  <nav>
+    <a href="#legenda">Legenda</a>
+    <a href="#resumo">Resumo</a>
+    <a href="#ep-1">Auth</a>
+    <a href="#ep-2">Beneficiário</a>
+    <a href="#ep-5">Usuário</a>
+    <a href="#ep-6">Termos</a>
+    <a href="#ep-10">Risco</a>
+    <a href="#ep-11">Plano de Ação</a>
+    <a href="#ep-14">Questionários</a>
+    <a href="#ep-18">Internação</a>
+    <a href="#ep-19">Externos</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= GLOSSARIO DE CORRELACOES ================= -->
+<div class="ep" id="glossário">
+  <div class="ep-header" onclick="tg(this)" style="border-left-color:#8e44ad">
+    <strong>🔤 Glossário de correlacoes PT → EN (nomes parecidos)</strong>
+    <span style="font-size:.75rem;color:#666;font-weight:400">— muitos "sem equivalente" são só traduções</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="alert alert-blue">
+      <strong>Contexto:</strong> Healthmap usa nomenclatura em portugues; Tabia (CareOS) usa ingles + convencoes healthtech internacionais (FHIR, HL7). Muitos campos que parecem "ausentes" na Tabia são apenas traduções ou sinonimos técnicos — ou estão em uma estrutura aninhada diferente.
+    </div>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Entidades principais (nível alto)</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">Beneficiário</td><td class="field">Patient</td><td><span class="st st-direct">ALTA</span></td><td>Tradução direta. Conceito identico: pessoa que recebe cuidado.</td></tr>
+      <tr class="direct"><td class="field">Usuário</td><td class="field">User</td><td><span class="st st-direct">ALTA</span></td><td>Tradução direta. Profissional/gestor que acessa o sistema.</td></tr>
+      <tr class="direct"><td class="field">Pessoa</td><td class="field">Person</td><td><span class="st st-direct">ALTA</span></td><td>Tabia separa Person (dados pessoais) de User (credencial) e Patient (rol clínico).</td></tr>
+      <tr class="direct"><td class="field">Profissional</td><td class="field">Professional</td><td><span class="st st-direct">ALTA</span></td><td>ProfessionalDTO.</td></tr>
+      <tr class="transform"><td class="field">Questionário</td><td class="field">Survey</td><td><span class="st st-direct">ALTA</span></td><td>Sinonimo técnico healthtech. "Survey" é padrao FHIR/HL7.</td></tr>
+      <tr class="transform"><td class="field">Questão</td><td class="field">Field (do Survey) / Question</td><td><span class="st st-direct">ALTA</span></td><td>Tabia chama de <code class="inline">SurveyDTO.fields[]</code>.</td></tr>
+      <tr class="transform"><td class="field">Resposta de Questão</td><td class="field">Answer (dentro de SurveyData)</td><td><span class="st st-direct">ALTA</span></td><td>Respostas estão em <code class="inline">SurveyApplication.answers</code>.</td></tr>
+      <tr class="transform"><td class="field">Aplicação de Questionário</td><td class="field">Survey Application</td><td><span class="st st-direct">ALTA</span></td><td>Uma instancia do questionário respondida por um paciente.</td></tr>
+      <tr class="transform"><td class="field">Plano de Ação</td><td class="field">Individual Care Plan (ICP)</td><td><span class="st st-transform">MEDIA</span></td><td>Conceito similar, estrutura diferente (Tabia modulariza em 4).</td></tr>
+      <tr class="transform"><td class="field">Ação</td><td class="field">Task</td><td><span class="st st-direct">ALTA</span></td><td>Unidade executavel de trabalho.</td></tr>
+      <tr class="transform"><td class="field">Evento (clínico)</td><td class="field">Event</td><td><span class="st st-direct">ALTA</span></td><td>Marco/ocorrencia na jornada do paciente.</td></tr>
+      <tr class="transform"><td class="field">Jornada / Linha de Cuidado</td><td class="field">Pathway</td><td><span class="st st-direct">ALTA</span></td><td>Template de jornada clínica.</td></tr>
+      <tr class="transform"><td class="field">Medição de Risco</td><td class="field">Tabia Score / No-show Risk</td><td><span class="st st-transform">BAIXA</span></td><td>Nomes parecem relacionados mas <strong>conceitos diferentes</strong> (clínico vs operacional).</td></tr>
+      <tr class="transform"><td class="field">Internação</td><td class="field">Event (type=Hospitalization)</td><td><span class="st st-transform">MEDIA</span></td><td>Tabia não tem entidade dedicada — vira Event customizado.</td></tr>
+      <tr class="transform"><td class="field">Mensagem / WhatsApp</td><td class="field">Chat Message</td><td><span class="st st-direct">ALTA</span></td><td>ChatMessageDTO.</td></tr>
+      <tr class="lost"><td class="field">Termo (de Aceite)</td><td class="field">Consent Form?</td><td><span class="st st-lost">N/A</span></td><td>Tabia não tem domínio. Provavel nome futuro: "consent".</td></tr>
+      <tr class="transform"><td class="field">Empresa</td><td class="field">Organization</td><td><span class="st st-direct">ALTA</span></td><td>Multi-tenant.</td></tr>
+      <tr class="transform"><td class="field">Linha de Cuidado</td><td class="field">Pathway / Program</td><td><span class="st st-direct">ALTA</span></td><td>Uma jornada específica (diabetes, hipertensao, etc).</td></tr>
+      <tr class="transform"><td class="field">Alerta de Internação</td><td class="field">Event (categories: INTERNACAO)</td><td><span class="st st-transform">MEDIA</span></td><td>Via customizacao de Event.</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Campos de pessoa (Patient / User / Person)</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">id</td><td class="field">id</td><td><span class="st st-direct">ALTA</span></td><td>int64 em ambos.</td></tr>
+      <tr class="direct"><td class="field">nome</td><td class="field">fullName</td><td><span class="st st-direct">ALTA</span></td><td>Nome completo.</td></tr>
+      <tr class="direct"><td class="field">nomePreferido / apelido</td><td class="field">preferredName</td><td><span class="st st-direct">ALTA</span></td><td>Não existia no Healthmap — novo.</td></tr>
+      <tr class="direct"><td class="field">cpf</td><td class="field">— (extensions.cpf?)</td><td><span class="st st-lost">NAO MAPEAVEL</span></td><td>Brasil-específico. Não há campo internacional equivalente. Usar <code class="inline">person.extensions</code> ou adicionar contact com type=CPF.</td></tr>
+      <tr class="transform"><td class="field">cnpj</td><td class="field">— (extensions?)</td><td><span class="st st-lost">NAO MAPEAVEL</span></td><td>Idem CPF.</td></tr>
+      <tr class="transform"><td class="field">rg</td><td class="field">— (extensions?)</td><td><span class="st st-lost">NAO MAPEAVEL</span></td><td>Idem. Documento brasileiro.</td></tr>
+      <tr class="direct"><td class="field">email</td><td class="field">email</td><td><span class="st st-direct">ALTA</span></td><td>Identico.</td></tr>
+      <tr class="direct"><td class="field">telefone</td><td class="field">phoneNumber</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">celular</td><td class="field">cellphone / phoneNumber</td><td><span class="st st-direct">ALTA</span></td><td>Query param <code class="inline">cellphone</code> existe.</td></tr>
+      <tr class="direct"><td class="field">dataNascimento</td><td class="field">birthDate</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">dataObito</td><td class="field">deathDate</td><td><span class="st st-direct">ALTA</span></td><td>Novo na Tabia.</td></tr>
+      <tr class="direct"><td class="field">sexo</td><td class="field">biologicalSex</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">genero</td><td class="field">gender</td><td><span class="st st-direct">ALTA</span></td><td>Tabia separa gender de biologicalSex.</td></tr>
+      <tr class="transform"><td class="field">numeroCarteirinha</td><td class="field">insuranceIdNumber / medicalRecordId</td><td><span class="st st-transform">MEDIA</span></td><td>Carteirinha do plano de saúde: <code class="inline">insuranceIdNumber</code>. Prontuario medico: <code class="inline">medicalRecordId</code>.</td></tr>
+      <tr class="transform"><td class="field">numeroMatricula</td><td class="field">medicalRecordId</td><td><span class="st st-transform">MEDIA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">idExterno</td><td class="field">extensions.externalId (sugerido)</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td>Via extensions.</td></tr>
+      <tr class="direct"><td class="field">idioma / idiomaPreferido</td><td class="field">preferredLanguage</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">observações / notas</td><td class="field">notes[]</td><td><span class="st st-direct">ALTA</span></td><td>Array de NoteDTO.</td></tr>
+      <tr class="transform"><td class="field">tipo (BENEFICIARIO, PROFISSIONAL)</td><td class="field">— (roles / tags)</td><td><span class="st st-transform">BAIXA</span></td><td>Tabia não tem "tipo". Classifica via <code class="inline">roles[]</code> (user) ou <code class="inline">tags[]</code> (patient).</td></tr>
+      <tr class="transform"><td class="field">status (ATIVO/INATIVO)</td><td class="field">deathDate / blocked / status</td><td><span class="st st-transform">MEDIA</span></td><td>Inferido. Patient: vivo = deathDate=null. User: blocked=false.</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Endereço / Contato</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">endereço</td><td class="field">patientAddresses[]</td><td><span class="st st-direct">ALTA</span></td><td>Tabia permite multiplos endereços.</td></tr>
+      <tr class="direct"><td class="field">logradouro / rua</td><td class="field">streetName</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">numero</td><td class="field">streetNumber</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">complemento</td><td class="field">addressComplement</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">cidade</td><td class="field">city</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">estado / uf</td><td class="field">state</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">cep</td><td class="field">zipCode</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">pais</td><td class="field">country</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">bairro</td><td class="field">— (não mapeado)</td><td><span class="st st-lost">NAO MAPEAVEL</span></td><td>Não aparece no PatientAddressDTO. Pode ir em complement.</td></tr>
+      <tr class="transform"><td class="field">contatos</td><td class="field">contacts[]</td><td><span class="st st-direct">ALTA</span></td><td>Array com tipo + valor.</td></tr>
+      <tr class="transform"><td class="field">contato.tipo (TELEFONE, EMAIL, WHATSAPP)</td><td class="field">contact.type</td><td><span class="st st-direct">ALTA</span></td><td>Tabia aceita varios tipos.</td></tr>
+      <tr class="transform"><td class="field">contato.valor</td><td class="field">contact.value</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Plano de Ação / Task / Event</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">idCliente</td><td class="field">patient.id / patientId</td><td><span class="st st-direct">ALTA</span></td><td>"Cliente" no Healthmap = paciente.</td></tr>
+      <tr class="transform"><td class="field">descrição (do plano)</td><td class="field">name (do ICP)</td><td><span class="st st-transform">MEDIA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">descrição (da ação)</td><td class="field">title (da task)</td><td><span class="st st-transform">MEDIA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">observações</td><td class="field">instructions</td><td><span class="st st-transform">MEDIA</span></td><td>"Observações" viram "instrucoes" no contexto Tabia.</td></tr>
+      <tr class="direct"><td class="field">dataInicio</td><td class="field">pathwayStartDate / startDate</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">dataFim</td><td class="field">pathwayEndDate / endDate</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">dataAgendamento</td><td class="field">scheduledAt / targetDate</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataLimite / prazo</td><td class="field">dueDate</td><td><span class="st st-direct">ALTA</span></td><td>Convencao em ingles.</td></tr>
+      <tr class="direct"><td class="field">dataRealizacao</td><td class="field">effectiveDate / dateClosed</td><td><span class="st st-transform">MEDIA</span></td><td>Tabia seta automático.</td></tr>
+      <tr class="direct"><td class="field">dataCriacao</td><td class="field">dateCreated / createdAt / creationDate</td><td><span class="st st-direct">ALTA</span></td><td>Convencao variada.</td></tr>
+      <tr class="transform"><td class="field">responsavel / idProfissional</td><td class="field">assignee / assigneeId</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">criadoPor</td><td class="field">createdBy</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">fechadoPor</td><td class="field">closedBy</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">status (fechada/aberta)</td><td class="field">closed (boolean)</td><td><span class="st st-transform">MEDIA</span></td><td>Tabia booleaniza.</td></tr>
+      <tr class="transform"><td class="field">status (realizada/concluida)</td><td class="field">accomplished (boolean)</td><td><span class="st st-transform">MEDIA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">resultado</td><td class="field">progress (enum)</td><td><span class="st st-transform">MEDIA</span></td><td>PLANNED, STARTED, ACCOMPLISHED, NOT_ACCOMPLISHED.</td></tr>
+      <tr class="transform"><td class="field">motivoNaoRealizacao</td><td class="field">nonAccomplishmentReason</td><td><span class="st st-direct">ALTA</span></td><td>Tradução direta.</td></tr>
+      <tr class="transform"><td class="field">categoria / tipo de ação</td><td class="field">categories[]</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">recomendações</td><td class="field">recommendations[]</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">equipe</td><td class="field">team</td><td><span class="st st-direct">ALTA</span></td><td>TeamDTO.</td></tr>
+      <tr class="transform"><td class="field">arquivado</td><td class="field">archived</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">adiadoPara</td><td class="field">postponedTo</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Questionário / Survey</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">nome (do questionário)</td><td class="field">name (do survey)</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">descrição</td><td class="field">— (não existe)</td><td><span class="st st-lost">SEM EQUIV.</span></td><td>Survey Tabia não tem descrição.</td></tr>
+      <tr class="transform"><td class="field">questões[]</td><td class="field">fields[]</td><td><span class="st st-transform">MEDIA</span></td><td>"Field" é convencao de form-builder.</td></tr>
+      <tr class="transform"><td class="field">questão.texto / enunciado</td><td class="field">field.title</td><td><span class="st st-transform">MEDIA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">questão.tipo</td><td class="field">field.type</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">questão.obrigatória</td><td class="field">field.required</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">opções (da questão)</td><td class="field">choices[]</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">opção.código / valor</td><td class="field">choice.value / choiceId</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">opção.descrição / label</td><td class="field">choice.label</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">peso / pontuacao</td><td class="field">weight / score</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">versao</td><td class="field">— (dirty / publishedAt)</td><td><span class="st st-transform">BAIXA</span></td><td>Tabia não versiona numericamente.</td></tr>
+      <tr class="transform"><td class="field">ativo / publicado</td><td class="field">publishedAt (null/date)</td><td><span class="st st-transform">MEDIA</span></td><td>Publicado = publishedAt != null.</td></tr>
+      <tr class="transform"><td class="field">dataResposta</td><td class="field">finishedAt / answeredAt</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">respostas[]</td><td class="field">answers (map)</td><td><span class="st st-transform">MEDIA</span></td><td>Estrutura diferente (map vs array).</td></tr>
+      <tr class="transform"><td class="field">resposta (valor)</td><td class="field">answer.value</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataEntrega</td><td class="field">deliveredAt</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataInicio (resposta)</td><td class="field">startedAt</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataTermino</td><td class="field">finishedAt</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataExpiracao</td><td class="field">expirationAt</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">statusQuestionario / situacao</td><td class="field">status</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">codigoInternoPessoa (externo)</td><td class="field">person.id</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">codigoInternoQuestionario (externo)</td><td class="field">survey.id</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">codigoExternoQuestao</td><td class="field">field.id / fieldId</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Plano de Saúde / Insurance</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">plano / convenio</td><td class="field">healthInsurance / insurance</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">numeroCarteirinha</td><td class="field">insuranceIdNumber</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">planoPrincipal / preferencial</td><td class="field">preferred / preferredInsurance</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Paginação</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">pageSize / itensPorPagina</td><td class="field">size</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">pageNumber / página</td><td class="field">page / number</td><td><span class="st st-transform">MEDIA</span></td><td>Cuidado: Healthmap usa <code class="inline">página</code> base 1, Tabia usa <code class="inline">page</code> base 0.</td></tr>
+      <tr class="transform"><td class="field">offset</td><td class="field">— (calcular: page*size)</td><td><span class="st st-transform">MEDIA</span></td><td>Derivado.</td></tr>
+      <tr class="direct"><td class="field">totalElements / totalRegistros</td><td class="field">totalElements</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="direct"><td class="field">totalPages / totalPaginas</td><td class="field">totalPages</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">conteudo / content</td><td class="field">content</td><td><span class="st st-direct">ALTA</span></td><td>Array de resultados.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="field">first / last / empty / numberOfElements / sort</td><td><span class="st st-new">NOVO TABIA</span></td><td>Metadados extras de Spring Data.</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">CID / Diagnostico</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">cid / cid10</td><td class="field">icd / icds[]</td><td><span class="st st-direct">ALTA</span></td><td>ICD = International Classification of Diseases. Tabia suporta v8, v9, v10, v11.</td></tr>
+      <tr class="transform"><td class="field">codigoCid</td><td class="field">icd.code</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">descricaoCid</td><td class="field">icd.name</td><td><span class="st st-direct">ALTA</span></td><td>—</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Sucesso / Resposta de operação</h4>
+    <table class="map">
+      <tr><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Confianca</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">sucesso (boolean)</td><td class="field">— (HTTP 2xx)</td><td><span class="st st-transform">BAIXA</span></td><td>Tabia usa status HTTP. Response é o objeto criado.</td></tr>
+      <tr class="transform"><td class="field">mensagem</td><td class="field">— (em error responses)</td><td><span class="st st-transform">BAIXA</span></td><td>—</td></tr>
+      <tr class="transform"><td class="field">idResposta (da operação)</td><td class="field">{entity}.id no response</td><td><span class="st st-transform">MEDIA</span></td><td>Tabia retorna o objeto completo; pegar o id.</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Convencoes de nomenclatura</h4>
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap — padroes</h4>
+        <ul style="font-size:.8rem;margin-left:1rem">
+          <li><strong>camelCase</strong> em portugues: <code class="inline">idCliente</code>, <code class="inline">numeroCarteirinha</code>, <code class="inline">dataAgendamento</code></li>
+          <li><strong>prefixo "id"</strong> para chaves estrangeiras: <code class="inline">idCliente</code>, <code class="inline">idProfissional</code>, <code class="inline">idQuestionario</code></li>
+          <li><strong>status como string UPPER_CASE:</strong> <code class="inline">"ATIVO"</code>, <code class="inline">"PENDENTE"</code>, <code class="inline">"EM_PROGRESSO"</code></li>
+          <li><strong>tipo como string UPPER_CASE:</strong> <code class="inline">"BENEFICIARIO"</code>, <code class="inline">"PROFISSIONAL"</code></li>
+          <li><strong>DTOs sufixados com "DTO":</strong> <code class="inline">BeneficiarioDTO</code>, <code class="inline">PlanoAcaoDTO</code></li>
+          <li><strong>datas em ISO com hora:</strong> <code class="inline">"2026-03-15T10:30:00"</code></li>
+        </ul>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia — padroes</h4>
+        <ul style="font-size:.8rem;margin-left:1rem">
+          <li><strong>camelCase</strong> em ingles: <code class="inline">patientId</code>, <code class="inline">medicalRecordId</code>, <code class="inline">targetDate</code></li>
+          <li><strong>referência objeto:</strong> <code class="inline">patient: {id, name}</code> em vez de <code class="inline">patientId</code></li>
+          <li><strong>status como enum formal:</strong> <code class="inline">PLANNED</code>, <code class="inline">STARTED</code>, <code class="inline">ACCOMPLISHED</code>, <code class="inline">NOT_ACCOMPLISHED</code></li>
+          <li><strong>booleanos em vez de status:</strong> <code class="inline">closed</code>, <code class="inline">accomplished</code>, <code class="inline">archived</code>, <code class="inline">blocked</code></li>
+          <li><strong>DTOs sufixados com "DTO":</strong> <code class="inline">PatientDTO</code>, <code class="inline">TaskDTO</code></li>
+          <li><strong>datas misturam ISO + epoch int64:</strong> <code class="inline">"2026-03-15"</code> ou <code class="inline">1742040600000</code></li>
+          <li><strong>sufixo "At" para timestamps:</strong> <code class="inline">createdAt</code>, <code class="inline">finishedAt</code>, <code class="inline">deliveredAt</code>, <code class="inline">readAt</code></li>
+          <li><strong>prefixo "date" para datas puras:</strong> <code class="inline">dateCreated</code>, <code class="inline">dateClosed</code>, <code class="inline">dueDate</code>, <code class="inline">birthDate</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .3rem">Enums de status — tabela de-para</h4>
+    <table class="map">
+      <tr><th>Contexto</th><th>Healthmap (PT)</th><th>Tabia (EN)</th><th>Observação</th></tr>
+      <tr class="transform"><td>Pessoa ativa</td><td class="field">status = "ATIVO"</td><td class="field">deathDate = null <strong>e</strong> blocked = false</td><td>Inferido.</td></tr>
+      <tr class="transform"><td>Pessoa inativa</td><td class="field">status = "INATIVO"</td><td class="field">blocked = true</td><td>—</td></tr>
+      <tr class="transform"><td>Plano</td><td class="field">status = "ATIVO"</td><td class="field">status = "OPEN"</td><td>—</td></tr>
+      <tr class="transform"><td>Plano</td><td class="field">status = "FINALIZADO"</td><td class="field">status = "CLOSED"</td><td>—</td></tr>
+      <tr class="transform"><td>Plano</td><td class="field">status = "EM_CRIACAO"</td><td class="field">status = "CREATING"</td><td>—</td></tr>
+      <tr class="transform"><td>Ação</td><td class="field">statusAcao = "PENDENTE"</td><td class="field">closed=false, accomplished=false</td><td>—</td></tr>
+      <tr class="transform"><td>Ação</td><td class="field">statusAcao = "EM_PROGRESSO"</td><td class="field">progress = "STARTED"</td><td>—</td></tr>
+      <tr class="transform"><td>Ação</td><td class="field">statusAcao = "CONCLUIDO"</td><td class="field">closed=true, accomplished=true</td><td>Ou progress=ACCOMPLISHED.</td></tr>
+      <tr class="transform"><td>Ação</td><td class="field">statusAcao = "NAO_REALIZADO"</td><td class="field">closed=true, accomplished=false</td><td>Ou progress=NOT_ACCOMPLISHED.</td></tr>
+      <tr class="transform"><td>Risco</td><td class="field">statusRisco = "BAIXO"</td><td class="field">tabiaScore.severity &lt; 0.33</td><td>Faixa aproximada.</td></tr>
+      <tr class="transform"><td>Risco</td><td class="field">statusRisco = "MEDIO"</td><td class="field">0.33 &lt;= severity &lt; 0.66</td><td>Faixa aproximada.</td></tr>
+      <tr class="transform"><td>Risco</td><td class="field">statusRisco = "ALTO"</td><td class="field">severity &gt;= 0.66</td><td>Faixa aproximada.</td></tr>
+      <tr class="transform"><td>Questionário</td><td class="field">tipo = "SIM_NAO"</td><td class="field">type = "YES_NO"</td><td>—</td></tr>
+      <tr class="transform"><td>Questionário</td><td class="field">tipo = "MULTIPLA_ESCOLHA"</td><td class="field">type = "MULTIPLE_CHOICE"</td><td>—</td></tr>
+      <tr class="transform"><td>Questionário</td><td class="field">tipo = "TEXTO_LIVRE"</td><td class="field">type = "TEXT" / "FREE_TEXT"</td><td>Confirmar enum real.</td></tr>
+      <tr class="transform"><td>Questionário</td><td class="field">tipo = "NUMERO"</td><td class="field">type = "NUMBER" / "NUMERIC"</td><td>Confirmar.</td></tr>
+      <tr class="transform"><td>Questionário</td><td class="field">tipo = "DATA"</td><td class="field">type = "DATE"</td><td>—</td></tr>
+      <tr class="transform"><td>Usuário</td><td class="field">tipo = "PROFISSIONAL"</td><td class="field">roles inclui "PROFESSIONAL"</td><td>—</td></tr>
+      <tr class="transform"><td>Usuário</td><td class="field">tipo = "GESTOR"</td><td class="field">roles inclui "MANAGER" ou "ADMIN"</td><td>—</td></tr>
+      <tr class="transform"><td>Usuário</td><td class="field">tipo = "NAVEGADOR"</td><td class="field">roles inclui "NAVIGATOR"</td><td>Confirmar.</td></tr>
+      <tr class="transform"><td>Prioridade</td><td class="field">prioridade = "ALTA"</td><td class="field">— (via tags ou categories)</td><td>Sem equivalente direto.</td></tr>
+    </table>
+
+    <div class="alert alert-green">
+      <strong>Resumo da análise de nomes:</strong>
+      <ul style="margin-top:.3rem;margin-left:1.2rem;font-size:.82rem">
+        <li><strong>~75% dos campos</strong> tem correspondência direta por tradução (nome→fullName, telefone→phoneNumber, dataNascimento→birthDate)</li>
+        <li><strong>~15% tem correspondência estrutural</strong> (status string → booleans, idCliente → patient.id)</li>
+        <li><strong>~7% precisam de <code class="inline">extensions</code></strong> (CPF, CNPJ, idExterno, idDispositivoIntegracao)</li>
+        <li><strong>~3% são conceitos realmente ausentes</strong> (Termos de Aceite, MedicaoRisco clínico)</li>
+        <li>Principal armadilha: <strong>CPF</strong> não é "campo esquecido" — é convencao brasileira sem padrao internacional. Precisa ser decisão explicita com Tabia</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ================= LEGENDA ================= -->
+<div id="legenda" class="legend">
+  <span><strong>Legenda de status:</strong></span>
+  <span><span class="st st-direct">DIRETO</span> campo com equivalente exato (só renomear)</span>
+  <span><span class="st st-transform">TRANSFORMAR</span> campo existe mas precisa conversao/mapeamento</span>
+  <span><span class="st st-new">NOVO TABIA</span> campo que a Tabia oferece a mais</span>
+  <span><span class="st st-lost">SEM EQUIV.</span> campo Healthmap que a Tabia não tem</span>
+  <span><span class="st st-custom">CUSTOMIZAR</span> depende de customizacao/extensions</span>
+  <span><span class="st st-none">N/A</span> não aplicavel</span>
+</div>
+
+<!-- ================= RESUMO ================= -->
+<div id="resumo" class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <strong>Resumo geral da comparação profunda</strong>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="summary-row">
+      <div class="box"><span class="n">19</span><span class="l">Endpoints analisados</span></div>
+      <div class="box"><span class="n">~80</span><span class="l">Campos Healthmap</span></div>
+      <div class="box"><span class="n">~220</span><span class="l">Campos Tabia</span></div>
+      <div class="box"><span class="n">62%</span><span class="l">Cobertura direta</span></div>
+      <div class="box"><span class="n">8</span><span class="l">Blockers</span></div>
+    </div>
+    <div class="alert alert-blue">
+      <strong>Principais achados:</strong>
+      <ul style="margin-top:.3rem;margin-left:1.2rem;font-size:.8rem">
+        <li><strong>Volume de dados:</strong> Tabia retorna muito mais informação por entidade (tabiaScore, pathways, ICDs, teams) — response mais rico, mas também mais complexo de consumir</li>
+        <li><strong>Identificadores:</strong> Healthmap usa <code class="inline">CPF</code> como chave primaria de busca; Tabia usa <code class="inline">id (int64)</code> + <code class="inline">email/cellphone</code>. CPF não aparece no PatientDTO — <strong>precisa ficar em extensions</strong> ou campo custom</li>
+        <li><strong>Enumeracoes:</strong> Healthmap usa strings livres ("ATIVO", "ALTO"); Tabia usa enums formais (PLANNED|STARTED|ACCOMPLISHED). Migração exige tabela de-para</li>
+        <li><strong>Datas:</strong> Healthmap usa ISO 8601 com horario ("2026-01-01T10:00:00"); Tabia mistura ISO + epoch timestamps (int64). Precisa normalizar</li>
+        <li><strong>Paginação:</strong> Healthmap = <code class="inline">pageSize/offset/pageNumber</code>; Tabia = <code class="inline">size/page/number</code> — field mapping trivial mas numerico</li>
+        <li><strong>Termos de Aceite:</strong> Domain inteiro ausente na Tabia (4 endpoints) — <span class="big-badge bb-blocker">BLOCKER</span></li>
+        <li><strong>MedicaoRisco:</strong> Conceito completamente diferente (no-show vs saúde populacional) — <span class="big-badge bb-blocker">BLOCKER</span></li>
+        <li><strong>Plano de Ação:</strong> 1 entidade Healthmap → 4 entidades Tabia (Pathway+ICP+Task+Event) — <span class="big-badge bb-redesign">REDESIGN</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOC ================= -->
+<div class="toc">
+  <h3>Indice de endpoints analisados</h3>
+  <ol>
+    <li><a href="#ep-1">1. POST /oauth/token</a></li>
+    <li><a href="#ep-2">2. GET /beneficiário (lista)</a></li>
+    <li><a href="#ep-3">3. GET /beneficiário/{id}</a></li>
+    <li><a href="#ep-4">4. GET /dadosBeneficiarioResumido/{id}</a></li>
+    <li><a href="#ep-5">5. GET /segurança/v1/usuário</a></li>
+    <li><a href="#ep-6">6. GET /termo/aceiteTermo</a></li>
+    <li><a href="#ep-7">7. GET /termo/buscaTermoPublicadoPorEmpresa</a></li>
+    <li><a href="#ep-8">8. GET /termo/buscarAceiteTermo</a></li>
+    <li><a href="#ep-9">9. POST /termo/revogaTermo</a></li>
+    <li><a href="#ep-10">10. GET /risco/medicaoRisco</a></li>
+    <li><a href="#ep-11">11. GET /planoacao/planoAcao</a></li>
+    <li><a href="#ep-12">12. POST /programarAcao/{idCliente}</a></li>
+    <li><a href="#ep-13">13. PUT /realizarAcao</a></li>
+    <li><a href="#ep-14">14. GET /questionário/{id}</a></li>
+    <li><a href="#ep-15">15. GET /questaoRespostas</a></li>
+    <li><a href="#ep-16">16. POST /responderQuestaoAvulsa</a></li>
+    <li><a href="#ep-17">17. POST /questaoUltimaResposta</a></li>
+    <li><a href="#ep-18">18. POST /listarAlertasInternacao</a></li>
+    <li><a href="#ep-19">19. Externos (responderAvaliacao, relatório, sintetico)</a></li>
+  </ol>
+</div>
+
+<!-- =========================================================
+     1. AUTH
+     ========================================================= -->
+<h2 class="section-title" id="ep-1">1. Autenticação</h2>
+
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-post">POST</span>
+    <strong>/oauth/token</strong>
+    <span class="big-badge bb-redesign">FLUXO DIFERENTE</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap — Request</h4>
+<pre class="code">POST https://healthmapv3-api-unimedpa-prd.healthmap.com.br/oauth/token
+Basic Auth: user=hmap, pass=@Hm4p@
+Header: KeyDS=unimedpoa
+
+Body (form-urlencoded):
+  username={user}
+  password={pass}
+  grant_type=password</pre>
+        <h4 class="hm-h" style="margin-top:.5rem">Response</h4>
+<pre class="code">{
+  "access_token": "eyJhbGci...",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+// usado como Authorization: Bearer {token}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia — Autenticação</h4>
+<pre class="code">// Base URLs:
+//   https://app.tabia.health       (PRD)
+//   https://staging.tabia.health   (HMG)
+
+// Em cada request:
+Header: api-key: {API_KEY}
+// API Key estática por ambiente — não expira</pre>
+      </div>
+    </div>
+
+    <table class="map">
+      <tr><th>Campo Healthmap</th><th>Tipo</th><th>Status</th><th>Campo Tabia</th><th>Observação</th></tr>
+      <tr class="lost"><td class="field hm-cell">Basic Auth (hmap:@Hm4p@)</td><td class="type">credencial</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field tb-cell">—</td><td>Tabia não usa Basic Auth. Substituido por API Key.</td></tr>
+      <tr class="lost"><td class="field hm-cell">username / password</td><td class="type">form-data</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field tb-cell">—</td><td>Não há login de usuário para integração. API Key direta.</td></tr>
+      <tr class="lost"><td class="field hm-cell">grant_type=password</td><td class="type">string</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field tb-cell">—</td><td>Não aplicavel — sem fluxo OAuth2.</td></tr>
+      <tr class="transform"><td class="field hm-cell">KeyDS</td><td class="type">header</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field tb-cell">base URL diferente</td><td>PRD/HMG viram hosts distintos em vez de header.</td></tr>
+      <tr class="transform"><td class="field hm-cell">access_token</td><td class="type">string</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field tb-cell">api-key</td><td>Bearer dinâmico → API Key estática.</td></tr>
+      <tr class="lost"><td class="field hm-cell">expires_in</td><td class="type">int</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field tb-cell">—</td><td>API Key não expira — elimina logica de refresh.</td></tr>
+      <tr class="lost"><td class="field hm-cell">aKEY (header extra)</td><td class="type">header</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field tb-cell">—</td><td>Apenas em endpoints externos. Removido.</td></tr>
+    </table>
+
+    <div class="alert alert-green"><strong>Impacto positivo:</strong> Simplificacao significativa. Remover: client OAuth2, refresh token scheduler, gestão de expiração, headers KeyDS e aKEY.</div>
+  </div>
+</div>
+
+<!-- =========================================================
+     2. Beneficiário — LISTA
+     ========================================================= -->
+<h2 class="section-title" id="ep-2">2. Beneficiário → Patient</h2>
+
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/beneficiário/v1/beneficiário</strong>
+    <span class="big-badge bb-ok">EQUIVALENTE com blockers</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap — Request (query)</h4>
+<pre class="code">GET /api/beneficiário/v1/beneficiário
+Headers: Authorization: Bearer {token}, KeyDS: production
+Query:
+  cpf=12345678900
+  email=joao@example.com
+  id=12345
+  nome=Joao Silva
+  numeroCarteirinha=123456789
+  status=ATIVO
+  tipo=BENEFICIARIO
+  offset=0
+  pageSize=20</pre>
+        <h4 class="hm-h" style="margin-top:.5rem">Response (Page&lt;BeneficiarioDTO&gt;)</h4>
+<pre class="code">{
+  "content":[{
+    "id": 12345,
+    "nome": "Joao Silva",
+    "cpf": "12345678901",
+    "email": "joao@example.com",
+    "tipo": "BENEFICIARIO",
+    "status": "ATIVO",
+    "numeroCarteirinha": "ABC123456",
+    "idExterno": "EXT001"
+  }],
+  "totalElements": 100,
+  "totalPages": 10,
+  "number": 0,
+  "size": 10
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia — Request (query)</h4>
+<pre class="code">GET https://app.tabia.health/apiv1/patient
+Header: api-key: {API_KEY}
+Query:
+  page=0
+  size=20
+  sort=fullName,asc
+  email=...
+  cellphone=...
+  minimalInfo=true|false
+  // não há filtro CPF, nome, carteirinha nativos</pre>
+        <h4 class="tb-h" style="margin-top:.5rem">Response (Page&lt;PatientDTO&gt;)</h4>
+<pre class="code">{
+  "content":[{
+    "id": 12345,
+    "fullName": "Joao Silva",
+    "preferredName": "Joao",
+    "gender": "MALE",
+    "biologicalSex": "MALE",
+    "birthDate": "1990-05-15",
+    "deathDate": null,
+    "phoneNumber": "51999999999",
+    "email": "joao@example.com",
+    "medicalRecordId": "ABC123456",
+    "since": "2024-01-01T00:00:00Z",
+    "patientAddresses": [...],
+    "healthInsurances": [...],
+    "tags": [...],
+    "pathways": [...],
+    "contacts": [...],
+    "individualCarePlans": [...],
+    "tabiaScore": {...},
+    "icds": [...],
+    "teams": [...],
+    "preferredLanguage": "pt-BR"
+  }],
+  "totalPages": 10,
+  "totalElements": 100,
+  "size": 20,
+  "number": 0,
+  "first": true,
+  "last": false,
+  "numberOfElements": 20,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+
+    <h4 style="margin:.8rem 0 .3rem;font-size:.88rem;color:var(--blue-dark)">Mapeamento campo-a-campo (Request)</h4>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Tipo</th><th>Status</th><th>Tabia</th><th>Tipo</th><th>Observação</th></tr>
+      <tr class="lost"><td class="field">cpf</td><td class="type">string(11)</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td class="type">—</td><td><span class="big-badge bb-blocker">BLOCKER</span> Tabia não expoe filtro CPF. Confirmar se pode adicionar ou usar <code class="inline">extensions.cpf</code>.</td></tr>
+      <tr class="direct"><td class="field">email</td><td class="type">string</td><td><span class="st st-direct">DIRETO</span></td><td class="field">email</td><td class="type">string</td><td>Nome identico.</td></tr>
+      <tr class="direct"><td class="field">id</td><td class="type">int64</td><td><span class="st st-direct">DIRETO</span></td><td class="field">id</td><td class="type">int64</td><td>IDs internos diferentes — precisa mapping table CBV↔Tabia.</td></tr>
+      <tr class="lost"><td class="field">nome</td><td class="type">string</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td class="type">—</td><td>Não há filtro por nome em <code class="inline">/apiv1/patient</code>. Usar <code class="inline">search</code> textual se disponivel.</td></tr>
+      <tr class="lost"><td class="field">numeroCarteirinha</td><td class="type">string</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td class="type">—</td><td>Filtro não existe. Campo aparece no response como <code class="inline">medicalRecordId</code> ou <code class="inline">healthInsurances[].insuranceIdNumber</code>.</td></tr>
+      <tr class="transform"><td class="field">status</td><td class="type">string</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">—</td><td class="type">—</td><td>Não há filtro direto. Pode mapear para <code class="inline">statuses</code> em outros endpoints.</td></tr>
+      <tr class="lost"><td class="field">tipo=BENEFICIARIO</td><td class="type">string</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td class="type">—</td><td>Tabia não diferencia tipos — todo mundo é Patient ou User.</td></tr>
+      <tr class="transform"><td class="field">offset</td><td class="type">int</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">page</td><td class="type">int</td><td>Converter: <code class="inline">page = offset / pageSize</code>.</td></tr>
+      <tr class="transform"><td class="field">pageSize</td><td class="type">int</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">size</td><td class="type">int</td><td>Renomeacao direta.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">sort</td><td class="type">string</td><td>Ordenacao nativa <code class="inline">sort=campo,asc|desc</code>.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">minimalInfo</td><td class="type">boolean</td><td>Retorno reduzido na mesma chamada.</td></tr>
+    </table>
+
+    <h4 style="margin:.8rem 0 .3rem;font-size:.88rem;color:var(--blue-dark)">Mapeamento campo-a-campo (Response)</h4>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Tipo</th><th>Status</th><th>Tabia</th><th>Tipo</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">id</td><td class="type">int64</td><td><span class="st st-direct">DIRETO</span></td><td class="field">id</td><td class="type">int64</td><td>Necessário tabela CBV↔Tabia ID.</td></tr>
+      <tr class="transform"><td class="field">nome</td><td class="type">string</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">fullName</td><td class="type">string</td><td>Renomear. Tabia também tem <code class="inline">preferredName</code>.</td></tr>
+      <tr class="lost"><td class="field">cpf</td><td class="type">string(11)</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">extensions.cpf?</td><td class="type">map</td><td><span class="big-badge bb-blocker">BLOCKER</span> Não há campo CPF no PatientDTO. Provavelmente cai em <code class="inline">person.extensions</code> (map custom) ou em <code class="inline">contacts</code> com type=CPF.</td></tr>
+      <tr class="direct"><td class="field">email</td><td class="type">string</td><td><span class="st st-direct">DIRETO</span></td><td class="field">email</td><td class="type">string</td><td>—</td></tr>
+      <tr class="transform"><td class="field">tipo=BENEFICIARIO</td><td class="type">string</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td class="type">—</td><td>Todos são Patient. Para distinguir perfis, usar <code class="inline">tags</code>.</td></tr>
+      <tr class="transform"><td class="field">status=ATIVO|INATIVO</td><td class="type">string</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">deathDate (+ since)</td><td class="type">date</td><td>Tabia não tem status texto. Infere atividade via <code class="inline">deathDate=null</code> e <code class="inline">since</code>.</td></tr>
+      <tr class="transform"><td class="field">numeroCarteirinha</td><td class="type">string</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">medicalRecordId<br>ou healthInsurances[].insuranceIdNumber</td><td class="type">string</td><td>Depende do significado. <code class="inline">medicalRecordId</code> = prontuario; <code class="inline">insuranceIdNumber</code> = carteirinha plano.</td></tr>
+      <tr class="lost"><td class="field">idExterno</td><td class="type">string</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">extensions?</td><td class="type">map</td><td>Não há campo idExterno. Armazenar em <code class="inline">person.extensions</code>.</td></tr>
+      <tr class="transform"><td class="field">dataNascimento</td><td class="type">date</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">birthDate</td><td class="type">date</td><td>Renomear. Mesmo formato ISO.</td></tr>
+      <tr class="transform"><td class="field">telefone</td><td class="type">string</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">phoneNumber</td><td class="type">string</td><td>Renomear.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">preferredName</td><td class="type">string</td><td>Nome preferido.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">gender / biologicalSex</td><td class="type">string</td><td>Sexo biologico e genero separados.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">deathDate</td><td class="type">date</td><td>Obito — campo rico para reconciliacao.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">since</td><td class="type">date-time</td><td>Data de entrada na organização.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">patientAddresses[]</td><td class="type">array</td><td>Endereços multiplos. Healthmap não retornava.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">healthInsurances[]</td><td class="type">array</td><td>Planos de saúde multiplos com preferred.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">tags[]</td><td class="type">array</td><td>Tags arbitrarias (id, content, color, expression).</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">pathways[]</td><td class="type">array</td><td>Jornadas de cuidado em que está inscrito.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">contacts[]</td><td class="type">array</td><td>Multiplos canais de contato (WhatsApp, email secundario, etc).</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">individualCarePlans[]</td><td class="type">array</td><td>Planos de cuidado individuais embutidos.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">tabiaScore</td><td class="type">object</td><td>Score proprietario (timeliness, noShowRate, severity, etc). Não existia.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">icds[]</td><td class="type">array</td><td>CIDs ativos (condições clínicas).</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">teams[]</td><td class="type">array</td><td>Equipes assistenciais.</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">preferredLanguage</td><td class="type">string</td><td>Idioma preferido.</td></tr>
+      <tr class="transform"><td class="field">content[]</td><td class="type">array</td><td><span class="st st-direct">DIRETO</span></td><td class="field">content[]</td><td class="type">array</td><td>—</td></tr>
+      <tr class="direct"><td class="field">totalElements</td><td class="type">long</td><td><span class="st st-direct">DIRETO</span></td><td class="field">totalElements</td><td class="type">long</td><td>—</td></tr>
+      <tr class="direct"><td class="field">totalPages</td><td class="type">int</td><td><span class="st st-direct">DIRETO</span></td><td class="field">totalPages</td><td class="type">int</td><td>—</td></tr>
+      <tr class="direct"><td class="field">number</td><td class="type">int</td><td><span class="st st-direct">DIRETO</span></td><td class="field">number</td><td class="type">int</td><td>Página atual.</td></tr>
+      <tr class="direct"><td class="field">size</td><td class="type">int</td><td><span class="st st-direct">DIRETO</span></td><td class="field">size</td><td class="type">int</td><td>—</td></tr>
+      <tr class="new"><td class="field">—</td><td class="type">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">first / last / empty / numberOfElements</td><td class="type">boolean/int</td><td>Metadados extras de paginação.</td></tr>
+    </table>
+
+    <div class="alert alert-red"><strong>Blockers:</strong>
+      <ul style="margin-top:.3rem;margin-left:1.2rem;font-size:.78rem">
+        <li><strong>CPF</strong> — sem filtro nem campo de response. Confirmar com Tabia se pode adicionar ou se deve ir em <code class="inline">extensions</code>.</li>
+        <li><strong>Filtro por nome</strong> — sem equivalente nativo.</li>
+        <li><strong>idExterno</strong> — precisa ir em <code class="inline">extensions</code>.</li>
+      </ul>
+    </div>
+    <div class="alert alert-green"><strong>Ganhos:</strong> Tabia retorna ~15 campos adicionais (addresses, insurances, tags, pathways, ICDs, teams, tabiaScore) sem necessidade de chamadas extras.</div>
+  </div>
+</div>
+
+<!-- =========================================================
+     3. Beneficiário por ID
+     ========================================================= -->
+<div class="ep collapsed" id="ep-3">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/beneficiário/v1/beneficiário/{id}</strong>
+    <span class="big-badge bb-ok">EQUIVALENTE</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap</h4>
+<pre class="code">GET /api/beneficiário/v1/beneficiário/12345
+Headers: Authorization, KeyDS
+
+Response (BeneficiarioDTO completo):
+{
+  "id": 12345,
+  "nome": "Joao Silva",
+  "cpf": "12345678901",
+  "email": "joao@example.com",
+  "tipo": "BENEFICIARIO",
+  "status": "ATIVO",
+  "numeroCarteirinha": "ABC123456",
+  "idExterno": "EXT001",
+  "dataNascimento": "1990-05-15",
+  "telefone": "51999999999"
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia</h4>
+<pre class="code">GET /apiv1/patient/{id}
+Header: api-key
+
+Response: PatientDTO completo
+(mesmos campos do /apiv1/patient)
+{
+  "id": 12345,
+  "fullName": "Joao Silva",
+  ...
+  "patientAddresses": [...],
+  "associatedProfessionals": [...],
+  "events": [...],
+  "previewedEvents": [...],
+  "notes": [...],
+  "individualCarePlans": [...],
+  "tabiaScore": {...},
+  "patientChangeHistory": [...],
+  ...
+}</pre>
+      </div>
+    </div>
+    <p class="note">Mesmo mapeamento do #2. Adicional: <code class="inline">associatedProfessionals</code>, <code class="inline">events</code>, <code class="inline">previewedEvents</code>, <code class="inline">notes</code>, <code class="inline">patientChangeHistory</code> vem preenchidos (não eram retornados no Healthmap).</p>
+    <div class="alert alert-orange"><strong>Cuidado:</strong> ID Healthmap <code class="inline">12345</code> ≠ ID Tabia <code class="inline">12345</code>. Implementar tabela <code class="inline">cbv_patient_id_mapping(hm_id, tabia_id)</code> antes de migrar chamadas por ID.</div>
+  </div>
+</div>
+
+<!-- =========================================================
+     4. Dados Resumidos
+     ========================================================= -->
+<div class="ep collapsed" id="ep-4">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/beneficiário/v1/beneficiário/dadosBeneficiarioResumido/{id}</strong>
+    <span class="big-badge bb-ok">EQUIVALENTE</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (BeneficiarioResumidoDTO)</h4>
+<pre class="code">{
+  "id": 12345,
+  "nome": "Joao Silva",
+  "cpf": "12345678901",
+  "numeroCarteirinha": "ABC123456",
+  "email": "joao@example.com",
+  "dataNascimento": "1990-05-15",
+  "status": "ATIVO"
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia — 2 opções</h4>
+<pre class="code">// Opção A — dados só da organização atual
+GET /apiv1/patient/{id}/data-on-current-organization
+{
+  "medicalRecordId": "ABC123456",
+  "since": "2024-01-01T00:00:00",
+  "insurances": [{
+    "personId": 12345,
+    "insuranceId": 88,
+    "preferred": true,
+    "insuranceIdNumber": "ABC123456"
+  }]
+}
+
+// Opção B — patient minimo (paginado)
+GET /apiv1/patient?minimalInfo=true
+// Retorna PatientDTO mais enxuto</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">id</td><td><span class="st st-direct">DIRETO</span></td><td class="field">personId (em insurances[]) / id</td><td>—</td></tr>
+      <tr class="lost"><td class="field">nome</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Não vem em <code class="inline">data-on-current-organization</code>. Usar Opção B.</td></tr>
+      <tr class="lost"><td class="field">cpf</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Mesmo blocker do #2.</td></tr>
+      <tr class="transform"><td class="field">numeroCarteirinha</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">medicalRecordId ou insurances[].insuranceIdNumber</td><td>Dois candidatos.</td></tr>
+      <tr class="transform"><td class="field">email</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">(Opção B) email</td><td>Opção A não retorna email.</td></tr>
+      <tr class="transform"><td class="field">dataNascimento</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">(Opção B) birthDate</td><td>—</td></tr>
+      <tr class="transform"><td class="field">status</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">deathDate / since</td><td>—</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">since</td><td>Data de entrada na organização (Opção A).</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">insurances[] completo</td><td>Lista de planos com preferred.</td></tr>
+    </table>
+    <div class="alert alert-yellow"><strong>Recomendação:</strong> Usar <code class="inline">GET /apiv1/patient?minimalInfo=true&amp;id={id}</code> (Opção B) porque retorna nome, email, birthDate. A Opção A é só para contexto organizacional.</div>
+  </div>
+</div>
+
+<!-- =========================================================
+     5. Usuário
+     ========================================================= -->
+<h2 class="section-title" id="ep-5">3. Segurança / Usuário</h2>
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/segurança/v1/usuário</strong>
+    <span class="big-badge bb-ok">EQUIVALENTE com blocker</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (Page&lt;Usuário&gt;)</h4>
+<pre class="code">GET /api/segurança/v1/usuário
+Query: cpf, email, id, nome, status, tipo, offset, pageSize
+
+Response:
+{
+  "content":[{
+    "id": 11001,
+    "nome": "Dr. Carlos Santos",
+    "cpf": "98765432101",
+    "email": "carlos@healthmap.com.br",
+    "tipo": "PROFISSIONAL",
+    "status": "ATIVO"
+  }],
+  "totalElements": 200, ...
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (Page&lt;UserDTO&gt;)</h4>
+<pre class="code">GET /apiv1/user
+GET /apiv1/user/search   (busca textual)
+Header: api-key
+Query: page, size, sort
+
+Response:
+{
+  "content":[{
+    "id": 11001,
+    "email": "carlos@healthmap.com.br",
+    "phoneNumber": "51999...",
+    "blocked": false,
+    "person": {
+      "id": 9001,
+      "fullName": "Dr. Carlos Santos",
+      "preferredName": "Carlos",
+      "gender": "MALE",
+      "biologicalSex": "MALE",
+      "birthDate": "1975-03-10",
+      "status": "ACTIVE",
+      "fhirId": "...",
+      "roles": [...],
+      "rolesInOrganizations": [...],
+      "contacts": [...],
+      "extensions": {...},
+      "preferredLanguage": "pt-BR"
+    },
+    "preferences": {...}
+  }]
+}</pre>
+      </div>
+    </div>
+
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">id</td><td><span class="st st-direct">DIRETO</span></td><td class="field">id (UserDTO)</td><td>ID de usuário.</td></tr>
+      <tr class="transform"><td class="field">nome</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">person.fullName</td><td>Campo aninhado em <code class="inline">person</code>.</td></tr>
+      <tr class="lost"><td class="field">cpf</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">person.extensions.cpf?</td><td><span class="big-badge bb-blocker">BLOCKER</span> Mesmo problema do Patient. Armazenar em <code class="inline">extensions</code>.</td></tr>
+      <tr class="direct"><td class="field">email</td><td><span class="st st-direct">DIRETO</span></td><td class="field">email (UserDTO)</td><td>—</td></tr>
+      <tr class="transform"><td class="field">tipo=PROFISSIONAL|GESTOR|...</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">person.roles[] / rolesInOrganizations[]</td><td>Tabia tem papel granular. Mapear tipo → role.</td></tr>
+      <tr class="transform"><td class="field">status=ATIVO|INATIVO</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">blocked + person.status</td><td><code class="inline">blocked=true</code> ou <code class="inline">status=INACTIVE</code> → INATIVO.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">phoneNumber</td><td>Telefone do usuário.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">blocked</td><td>Flag de bloqueio.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">person.fhirId</td><td>Integração FHIR.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">preferences</td><td>UserPreferencesDTO — configurações de UI/notificacao.</td></tr>
+    </table>
+    <div class="alert alert-orange">
+      <strong>Atencao estrutural:</strong> Healthmap trata Usuário como entidade plana. Tabia separa <code class="inline">User</code> (autenticação) de <code class="inline">Person</code> (dados pessoais). Toda leitura precisa ir em <code class="inline">user.person.*</code>.
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     6-9. Termos de Aceite
+     ========================================================= -->
+<h2 class="section-title" id="ep-6">4. Termos de Aceite (4 endpoints)</h2>
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <strong>4 endpoints /api/termo/v1/termo/*</strong>
+    <span class="big-badge bb-blocker">BLOCKER TOTAL</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="alert alert-red"><strong>Domínio inteiro ausente na Tabia.</strong> Todos os 4 endpoints de termos estão em desenvolvimento. Este é o blocker mais crítico: impede migração do modulo Viver Bem.</div>
+
+    <h3 class="endpoint-title" id="ep-6"><span class="method m-get">GET</span> /termo/aceiteTermo</h3>
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap</h4>
+<pre class="code">Query: idPessoa=12345, idTermo=67890
+Response: { "aceito": true }</pre>
+      </div>
+      <div class="tb"><h4 class="tb-h">Tabia</h4><p style="font-size:.82rem;color:#c0392b;font-weight:600">Endpoint não existe. Em desenvolvimento.</p></div>
+    </div>
+
+    <h3 class="endpoint-title" id="ep-7"><span class="method m-get">GET</span> /termo/buscaTermoPublicadoPorEmpresa</h3>
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap</h4>
+<pre class="code">Query: idEmpresa=11111
+Response:
+{
+  "id": 8001,
+  "titulo": "Termo de Consentimento",
+  "conteudo": "...",
+  "versao": 1,
+  "dataPublicacao": "2026-01-01T00:00:00",
+  "ativo": true
+}</pre>
+      </div>
+      <div class="tb"><h4 class="tb-h">Tabia</h4><p style="font-size:.82rem;color:#c0392b;font-weight:600">Endpoint não existe.</p></div>
+    </div>
+
+    <h3 class="endpoint-title" id="ep-8"><span class="method m-get">GET</span> /termo/buscarAceiteTermo</h3>
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap</h4>
+<pre class="code">Query: idPessoa, idTermo
+Response:
+{
+  "id": 9001,
+  "idPessoa": 12345,
+  "idTermo": 8001,
+  "dataAceite": "2026-02-15T09:30:00",
+  "versaoTermo": 1
+}</pre>
+      </div>
+      <div class="tb"><h4 class="tb-h">Tabia</h4><p style="font-size:.82rem;color:#c0392b;font-weight:600">Endpoint não existe.</p></div>
+    </div>
+
+    <h3 class="endpoint-title" id="ep-9"><span class="method m-post">POST</span> /termo/revogaTermo/{idPessoa}/{idTermo}/{idEmpresa}</h3>
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap</h4>
+<pre class="code">POST sem body
+PathParams: idPessoa, idTermo, idEmpresa
+Response: { "sucesso": true, "mensagem": "..." }</pre>
+      </div>
+      <div class="tb"><h4 class="tb-h">Tabia</h4><p style="font-size:.82rem;color:#c0392b;font-weight:600">Endpoint não existe.</p></div>
+    </div>
+
+    <div class="alert alert-orange"><strong>Ação obrigatória:</strong>
+      <ul style="margin-top:.3rem;margin-left:1.2rem;font-size:.78rem">
+        <li>Obter timeline formal da Tabia para entrega dos 4 endpoints</li>
+        <li>Validar se o modelo Tabia tera conceito de "termo por empresa" (idEmpresa é chave em 3 de 4 endpoints HM)</li>
+        <li>Definir se aceite versionado (<code class="inline">versaoTermo</code>) será suportado</li>
+        <li>Considerar solução temporaria: manter Healthmap só para este domínio até entrega Tabia</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     10. MedicaoRisco
+     ========================================================= -->
+<h2 class="section-title" id="ep-10">5. Estratificação de Risco</h2>
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/risco/v1/medicaoRisco</strong>
+    <span class="big-badge bb-blocker">CONCEITO DIFERENTE</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (Page&lt;MedicaoRisco&gt;)</h4>
+<pre class="code">Query: idCliente=12345, status=ATIVO, offset, pageSize
+
+Response:
+{
+  "content":[{
+    "id": 5001,
+    "idCliente": 12345,
+    "statusRisco": "ALTO",
+    "dataAvaliacao": "2026-02-20T10:30:00",
+    "descrição": "Risco cardiovascular elevado"
+  }],
+  "totalElements": 50, ...
+}
+
+// Conceito: estratificação de SAUDE POPULACIONAL
+// Classifica risco clínico do beneficiário</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (2 endpoints — conceitos diferentes)</h4>
+<pre class="code">// A) AppointmentInteractionStatisticsDTO
+GET /apiv1/appointment-no-show-risk/stats
+{
+  "total": 150,
+  "details": {
+    "HIGH_RISK":   { "status": "string", "count": 25 },
+    "MEDIUM_RISK": { "status": "string", "count": 60 },
+    "LOW_RISK":    { "status": "string", "count": 65 }
+  }
+}
+// Conceito: risco do paciente FALTAR AO AGENDAMENTO
+
+// B) Page&lt;EventMetricDTO&gt;
+GET /apiv1/event-metric
+{
+  "content":[{
+    "id": 1,
+    "type": "DAYS_OF_DEVIATION",
+    "date": "2026-04-17",
+    "value": 3.5,
+    "event": { "id": 99, "name": "..." }
+  }]
+}
+// Conceito: metricas operacionais de desvio</pre>
+      </div>
+    </div>
+
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="lost"><td class="field">idCliente (filtro)</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Risco Tabia é agregado, não por paciente individual.</td></tr>
+      <tr class="lost"><td class="field">statusRisco=BAIXO|MEDIO|ALTO</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">tabiaScore.severity (proxy)</td><td>Pode ser aproximado via <code class="inline">PatientDTO.tabiaScore.severity</code> (double 0-1).</td></tr>
+      <tr class="lost"><td class="field">dataAvaliacao</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Não há histórico de avaliações de risco clínico.</td></tr>
+      <tr class="lost"><td class="field">descrição</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>—</td></tr>
+    </table>
+
+    <div class="alert alert-red">
+      <strong>Blocker crítico:</strong> Conceitos fundamentalmente diferentes.
+      <ul style="margin-top:.3rem;margin-left:1.2rem;font-size:.78rem">
+        <li><strong>Healthmap</strong> = risco clínico/saúde populacional do beneficiário (cardiovascular, diabetico, etc)</li>
+        <li><strong>Tabia</strong> = risco de no-show em agendamento + metricas operacionais</li>
+        <li>Campo proxy possivel: <code class="inline">PatientDTO.tabiaScore.severity</code> e <code class="inline">severityRaw</code></li>
+      </ul>
+    </div>
+    <div class="alert alert-blue"><strong>Ações:</strong>
+      <ol style="margin-top:.3rem;margin-left:1.2rem;font-size:.78rem">
+        <li>Validar com Tabia se existe roadmap de estratificação clínica</li>
+        <li>Avaliar usar <code class="inline">tabiaScore.severity</code> como proxy temporario</li>
+        <li>Alternativa: calcular risco externamente via dados de <code class="inline">PatientDTO.icds[]</code> (CIDs) e <code class="inline">events[]</code></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     11-13. Plano de Ação
+     ========================================================= -->
+<h2 class="section-title" id="ep-11">6. Plano de Ação (3 endpoints)</h2>
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/planoacao/v1/planoAcao</strong>
+    <span class="big-badge bb-redesign">REDESIGN 1→4 ENTIDADES</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap — 1 entidade</h4>
+<pre class="code">GET /api/planoacao/v1/planoAcao
+Query: id, idCliente, status, statusAcao, offset, size, semLimite
+
+Response (Page&lt;PlanoAcaoDTO&gt;):
+{
+  "content":[{
+    "id": 3001,
+    "idCliente": 12345,
+    "status": "ATIVO",
+    "descrição": "Plano cardiovascular",
+    "dataInicio": "2026-01-01T00:00:00",
+    "dataFim": "2026-12-31T23:59:59",
+    "statusAcao": "EM_PROGRESSO"
+  }]
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia — 4 entidades</h4>
+<pre class="code">// 1. Individual Care Plan (o "plano" em si)
+GET /apiv1/individual-care-plan
+{
+  "id": 3001,
+  "name": "Cardio",
+  "patient": {"id":12345,"name":"..."},
+  "pathway": { PathwayDTO completo },
+  "pathwayStartDate": "2026-01-01",
+  "pathwayEndDate": "2026-12-31",
+  "pathwayStartReason": {...},
+  "pathwayEndReason": {...},
+  "bodyPart": {...},
+  "status": "OPEN|CLOSED|CLOSING|CREATING|TRANSFERRING",
+  "creationDate": "2026-01-01T00:00:00",
+  "createdBy": {...},
+  "individualCarePlanEndType": "CONCLUDED|TRANSFERRED"
+}
+
+// 2. Pathway (jornada de cuidado — template)
+GET /apiv1/pathway
+
+// 3. Task (tarefas/ações)
+GET /apiv1/task
+
+// 4. Event (marcos/eventos)
+GET /apiv1/event</pre>
+      </div>
+    </div>
+
+    <table class="map">
+      <tr><th>Healthmap (PlanoAcaoDTO)</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">id</td><td><span class="st st-direct">DIRETO</span></td><td class="field">IndividualCarePlanDTO.id</td><td>—</td></tr>
+      <tr class="transform"><td class="field">idCliente</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">patient.id</td><td>Aninhado.</td></tr>
+      <tr class="transform"><td class="field">descrição</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">name</td><td>—</td></tr>
+      <tr class="transform"><td class="field">status=ATIVO|INATIVO</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">status=OPEN|CLOSED|...</td><td>Tabia tem 5 estados. <code class="inline">ATIVO→OPEN</code>, <code class="inline">INATIVO→CLOSED</code>.</td></tr>
+      <tr class="transform"><td class="field">dataInicio</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">pathwayStartDate</td><td>Muda de datetime para date.</td></tr>
+      <tr class="transform"><td class="field">dataFim</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">pathwayEndDate</td><td>—</td></tr>
+      <tr class="transform"><td class="field">statusAcao (dentro do plano)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">task.closed/accomplished/progress</td><td><strong>Muda de entidade:</strong> statusAcao não é do plano, é da Task (outro endpoint).</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">pathway</td><td>Jornada-template associada.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">bodyPart</td><td>Parte do corpo (para cuidados cirurgicos, etc).</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">pathwayStartReason / pathwayEndReason</td><td>Motivos de inicio/fim estruturados.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">individualCarePlanEndType</td><td>CONCLUDED ou TRANSFERRED.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">createdBy, finishedBy, creationDate</td><td>Auditoria built-in.</td></tr>
+    </table>
+    <div class="alert alert-orange"><strong>Adapter essencial:</strong> Adapter traduz <code class="inline">PlanoAcaoDTO</code> em composição de chamadas:
+      <ol style="margin-top:.3rem;margin-left:1.2rem;font-size:.78rem">
+        <li><code class="inline">GET /individual-care-plan?patient={id}</code> — planos ativos</li>
+        <li><code class="inline">GET /task?patient={id}</code> — ações/tarefas</li>
+        <li><code class="inline">GET /event?patients={id}</code> — marcos</li>
+        <li><code class="inline">GET /pathway/{id}</code> — template da jornada</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- 12. Programar Ação -->
+<div class="ep" id="ep-12">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-post">POST</span>
+    <strong>/planoAcao/programarAcao/{idCliente}</strong>
+    <span class="big-badge bb-redesign">REDESIGN</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (AcaoPlanoAcaoDTO)</h4>
+<pre class="code">POST .../programarAcao/{idCliente}
+Body:
+{
+  "idAcao": 101,
+  "descrição": "Realizar consulta",
+  "dataAgendamento": "2026-03-15T10:30:00",
+  "dataLimite": "2026-03-31T23:59:59",
+  "prioridade": "ALTA",
+  "status": "PENDENTE",
+  "idProfissional": 54321,
+  "observações": "Seguimento clínico"
+}
+Response: { "sucesso": true, "mensagem": "..." }</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (TaskDTO)</h4>
+<pre class="code">POST /apiv1/task
+Body:
+{
+  "title": "Realizar consulta",
+  "instructions": "Seguimento clínico",
+  "assignee": { "id": 54321 },
+  "dueDate": "2026-03-31",
+  "patient": { "id": 12345 },
+  "event": { "id": ... },
+  "taskSpecificationId": 101,
+  "categories": [...],
+  "managed": true
+}
+Response: TaskDTO completo (com id gerado)
+
+// Para lotes: POST /apiv1/task/batch/*
+// Para eventos: POST /apiv1/event</pre>
+      </div>
+    </div>
+
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">idAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">taskSpecificationId</td><td>Template da ação.</td></tr>
+      <tr class="transform"><td class="field">descrição</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">title</td><td>—</td></tr>
+      <tr class="lost"><td class="field">dataAgendamento (datetime)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">event.scheduledAt / dueDate</td><td>Tabia separa data-alvo (event) de prazo (dueDate).</td></tr>
+      <tr class="transform"><td class="field">dataLimite</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">dueDate</td><td>Muda de datetime para date.</td></tr>
+      <tr class="lost"><td class="field">prioridade=ALTA|MEDIA|BAIXA</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">categories[] ou via tag</td><td>Tabia não tem campo prioridade. Usar categoria ou tag.</td></tr>
+      <tr class="transform"><td class="field">status=PENDENTE</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">closed=false, accomplished=false</td><td>Booleanos separados.</td></tr>
+      <tr class="transform"><td class="field">idProfissional</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">assignee.id</td><td>—</td></tr>
+      <tr class="transform"><td class="field">observações</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">instructions</td><td>—</td></tr>
+      <tr class="transform"><td class="field">idCliente (pathParam)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">patient.id (no body)</td><td>Passa de path para body.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">managed, formSchema, team, event</td><td>Campos adicionais opcionais.</td></tr>
+    </table>
+    <div class="alert alert-yellow"><strong>Response body diferente:</strong> Healthmap retorna <code class="inline">{sucesso, mensagem}</code>. Tabia retorna <code class="inline">TaskDTO</code> completo com ID gerado — adapter precisa reduzir ou expor o ID para tracking.</div>
+  </div>
+</div>
+
+<!-- 13. Realizar Ação -->
+<div class="ep" id="ep-13">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-put">PUT</span>
+    <strong>/planoAcao/realizarAcao</strong>
+    <span class="big-badge bb-ok">EQUIVALENTE</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (RealizarAcaoDTO)</h4>
+<pre class="code">PUT /planoAcao/realizarAcao
+Body:
+{
+  "idAcaoPlanoAcao": 67890,
+  "idCliente": 12345,
+  "dataRealizacao": "2026-03-15T15:45:00",
+  "resultado": "CONCLUIDO",
+  "observações": "Ação finalizada",
+  "arquivos": []
+}
+Response: { "sucesso": true }</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (TaskStatusDTO)</h4>
+<pre class="code">POST /apiv1/task/{id}/status
+Body:
+{
+  "id": 67890,
+  "closed": true,
+  "accomplished": true,
+  "assigneeId": 54321,
+  "taskNonAccomplishmentReasonId": null,
+  "taskNonAccomplishmentReasonDescription": null
+}
+Response: TaskDTO completo</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">idAcaoPlanoAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">id (no path + body)</td><td>ID da Task.</td></tr>
+      <tr class="lost"><td class="field">idCliente</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Tabia infere pela Task.</td></tr>
+      <tr class="lost"><td class="field">dataRealizacao</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Tabia seta automaticamente <code class="inline">dateClosed</code> = agora.</td></tr>
+      <tr class="transform"><td class="field">resultado=CONCLUIDO|NAO_REALIZADO</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">closed + accomplished</td><td><code class="inline">CONCLUIDO → closed=true, accomplished=true</code><br><code class="inline">NAO_REALIZADO → closed=true, accomplished=false</code> + reasonId</td></tr>
+      <tr class="transform"><td class="field">observações</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">taskNonAccomplishmentReasonDescription</td><td>Só se <code class="inline">accomplished=false</code>.</td></tr>
+      <tr class="lost"><td class="field">arquivos[]</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">—</td><td>Sem equivalente direto. Usar NoteDTO com file, ou endpoint de upload separado.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">taskNonAccomplishmentReasonId</td><td>Catalogo de motivos estruturados.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">assigneeId</td><td>Pode reassignar no ato do close.</td></tr>
+    </table>
+    <div class="alert alert-orange"><strong>Metodo muda:</strong> <code class="inline">PUT</code> → <code class="inline">POST</code>. <strong>Path muda:</strong> sem id no URL → id no URL.</div>
+  </div>
+</div>
+
+<!-- =========================================================
+     14-17. Questionários
+     ========================================================= -->
+<h2 class="section-title" id="ep-14">7. Questionários (4 endpoints)</h2>
+
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/questionário/{id}</strong>
+    <span class="big-badge bb-ok">EQUIVALENTE</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap</h4>
+<pre class="code">GET /questionário/{id}
+{
+  "id": 6001,
+  "nome": "Avaliação de Saúde",
+  "descrição": "...",
+  "versao": 1,
+  "ativo": true,
+  "questões": [{
+    "id": 7001,
+    "texto": "Possui alergias?",
+    "tipo": "SIM_NAO",
+    "obrigatória": true
+  }]
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (SurveyDTO)</h4>
+<pre class="code">GET /apiv1/survey/{id}
+{
+  "id": 6001,
+  "name": "Avaliação de Saúde",
+  "createdAt": "...",
+  "publishedAt": "...",
+  "expirationAt": "...",
+  "dirty": false,
+  "applicationCount": 123,
+  "doneApplicationsCount": 87,
+  "fields":[{
+    "id": 7001,
+    "name": "alergias",
+    "type": "YES_NO",
+    "title": "Possui alergias?",
+    "description": null,
+    "condition": null,
+    "weight": 1.0,
+    "required": true,
+    "config": {...},
+    "choices":[{
+      "id": 1, "label": "Sim",
+      "score": 1.0, "value": "yes"
+    },{ "id": 2, "label": "Não", ... }]
+  }]
+}</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="direct"><td class="field">id</td><td><span class="st st-direct">DIRETO</span></td><td class="field">id</td><td>—</td></tr>
+      <tr class="transform"><td class="field">nome</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">name</td><td>Renomear.</td></tr>
+      <tr class="lost"><td class="field">descrição</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Não há descrição no SurveyDTO.</td></tr>
+      <tr class="lost"><td class="field">versao</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">dirty / publishedAt</td><td>Sem versionamento numerico. <code class="inline">dirty=true</code> indica alteracoes pendentes.</td></tr>
+      <tr class="transform"><td class="field">ativo</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">publishedAt != null</td><td>Derivado.</td></tr>
+      <tr class="transform"><td class="field">questões[]</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">fields[]</td><td>Renomear.</td></tr>
+      <tr class="transform"><td class="field">questões[].texto</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">fields[].title</td><td>—</td></tr>
+      <tr class="transform"><td class="field">questões[].tipo=SIM_NAO|MULTIPLA|...</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">fields[].type</td><td>Tipos diferentes — tabela de-para.</td></tr>
+      <tr class="transform"><td class="field">questões[].obrigatória</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">fields[].required</td><td>—</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">fields[].weight</td><td>Peso para scoring.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">fields[].condition</td><td>Regras condicionais (branching).</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">fields[].choices[]</td><td>Opções estruturadas (com score).</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">applicationCount / doneApplicationsCount</td><td>Estatisticas built-in.</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="ep collapsed" id="ep-15">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/questionário/questaoRespostas</strong>
+    <span class="big-badge bb-redesign">PARCIAL — sem filtro por periodo</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap</h4>
+<pre class="code">GET /questaoRespostas
+Query:
+  idQuestao, codigoBeneficiario, codigoExterno,
+  dataInicioResposta, dataFimResposta,
+  trazerUltimaQuestaoRespondida, offset, pageSize
+
+Response (Page&lt;QuestaoRespostaDTO&gt;):
+{
+  "content":[{
+    "idQuestao": 7001,
+    "codigoBeneficiario": 12345,
+    "resposta": "SIM",
+    "dataResposta": "2026-02-20T10:15:00",
+    "codigoExterno": "EXT001"
+  }]
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia</h4>
+<pre class="code">// Não há endpoint por (idQuestao + periodo).
+// Fluxo composto:
+1) GET /apiv1/survey/{id}/applications
+   Retorna applications com answers
+2) GET /apiv1/surveydata/{uid}
+   Retorna SurveyApplicationDTO:
+{
+  "uid": "...",
+  "survey": {...},
+  "person": {"id","name","medicalRecordId"},
+  "status": "string",
+  "answers": {
+    "7001": [ {"value":"SIM", "answeredAt":"..."} ]
+  },
+  "finishedAt": "...",
+  "lang": "pt-BR"
+}</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="lost"><td class="field">idQuestao (filtro)</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Tabia busca por survey, não por questão.</td></tr>
+      <tr class="lost"><td class="field">dataInicioResposta / dataFimResposta</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td><span class="big-badge bb-blocker">BLOCKER</span> Sem filtro por periodo. Filtrar client-side por <code class="inline">finishedAt</code>.</td></tr>
+      <tr class="lost"><td class="field">codigoBeneficiario</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">person.id (filtro client-side)</td><td>Filtrar pos-chamada.</td></tr>
+      <tr class="transform"><td class="field">resposta</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">answers[idQuestao][0].value</td><td>Nested map.</td></tr>
+      <tr class="transform"><td class="field">dataResposta</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">finishedAt (da application)</td><td>Nível da aplicação, não da resposta.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">answers com score, weight, choice</td><td>Respostas estruturadas com metadata.</td></tr>
+    </table>
+    <div class="alert alert-red"><strong>Blocker:</strong> Filtro nativo por periodo e por idQuestao não existe na Tabia. Requer:
+      <ol style="margin-top:.3rem;margin-left:1.2rem;font-size:.78rem">
+        <li>Listar applications por survey</li>
+        <li>Filtrar client-side por periodo (<code class="inline">finishedAt</code>)</li>
+        <li>Extrair respostas específicas de <code class="inline">answers[idQuestao]</code></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="ep collapsed" id="ep-16">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-post">POST</span>
+    <strong>/responderQuestaoAvulsa</strong>
+    <span class="big-badge bb-redesign">FLUXO 2 PASSOS</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (ResponderQuestaoDTO)</h4>
+<pre class="code">POST /responderQuestaoAvulsa
+Body:
+{
+  "idQuestao": 54321,
+  "idCliente": 12345,
+  "resposta": "sim",
+  "respostaTexto": "Descrição",
+  "respostaValor": 8.5,
+  "dataResposta": "2026-03-15T14:30:00",
+  "idDispositivoIntegracao": 99999
+}
+Response: { "sucesso": true, ... }</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (2 passos)</h4>
+<pre class="code">// Passo 1 — criar SurveyApplication
+POST /apiv1/survey/{surveyId}/applications
+{
+  "patientIds": [12345],
+  "messageChannelId": ...,
+  "expirationAt": "2026-04-15",
+  "properties": {...},
+  "context": {...}
+}
+// retorna (sem schema no OpenAPI) - uid da application
+
+// Passo 2 — registrar resposta (endpoint no PDF, não no OpenAPI)
+POST /apiv1/surveydata/{uid}/answer
+{
+  "fieldId": 54321,
+  "value": "sim",
+  ...
+}</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia (2 passos)</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">idQuestao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">fieldId (passo 2)</td><td>—</td></tr>
+      <tr class="transform"><td class="field">idCliente</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">patientIds[] (passo 1)</td><td>Array — permite batch.</td></tr>
+      <tr class="transform"><td class="field">resposta (string)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">value (passo 2)</td><td>—</td></tr>
+      <tr class="lost"><td class="field">respostaTexto</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Respostas livres usam o mesmo <code class="inline">value</code>.</td></tr>
+      <tr class="lost"><td class="field">respostaValor (numerico)</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>—</td></tr>
+      <tr class="lost"><td class="field">dataResposta</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Tabia usa timestamp server.</td></tr>
+      <tr class="lost"><td class="field">idDispositivoIntegracao</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">context/properties (passo 1)</td><td>Map flexivel.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">messageChannelId</td><td>Dispara via WhatsApp/email junto com a aplicação.</td></tr>
+      <tr class="new"><td class="field">—</td><td><span class="st st-new">NOVO TABIA</span></td><td class="field">expirationAt</td><td>Data de expiração da aplicação.</td></tr>
+    </table>
+    <div class="alert alert-orange"><strong>Impacto:</strong> Healthmap = 1 chamada. Tabia = 2 chamadas + schema da resposta não está no OpenAPI público (endpoint <code class="inline">/surveydata/{uid}/answer</code> mencionado no PDF mas ausente no JSON). Confirmar schema real com time Tabia.</div>
+  </div>
+</div>
+
+<div class="ep collapsed" id="ep-17">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-post">POST</span>
+    <strong>/questaoUltimaResposta</strong>
+    <span class="big-badge bb-dev">EM DEV HM</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (em desenvolvimento)</h4>
+<pre class="code">POST /questaoUltimaResposta
+Body: { "idCliente": "12345", "idQuestionario": "789" }
+Response:
+{
+  "idQuestionario": "789",
+  "nomeQuestionario": "Avaliação Inicial",
+  "dataQuestionarioRespondido": "2026-02-05T14:32:00",
+  "questões":[
+    {"nomeQuestao":"Pratica atividade fisica?","resposta":"Sim"},
+    {"nomeQuestao":"Doenca cronica?","resposta":"Não"}
+  ]
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (composição)</h4>
+<pre class="code">// 1) GET /apiv1/survey/{id}/applications
+//    ?patientId=12345&sort=finishedAt,desc&size=1
+// 2) Extrair primeiro .uid
+// 3) GET /apiv1/surveydata/{uid}
+// 4) Montar resposta a partir de .answers
+
+Dados equivalentes:
+{
+  "survey.id": ...,
+  "survey.name": ...,
+  "finishedAt": ...,
+  "answers": { "fieldId": [...] }
+}</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">idQuestionario</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">survey.id</td><td>—</td></tr>
+      <tr class="transform"><td class="field">nomeQuestionario</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">survey.name</td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataQuestionarioRespondido</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">finishedAt</td><td>—</td></tr>
+      <tr class="transform"><td class="field">questões[].nomeQuestao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">survey.fields[].title</td><td>Join por fieldId.</td></tr>
+      <tr class="transform"><td class="field">questões[].resposta</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">answers[fieldId][0].value</td><td>Nested.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- =========================================================
+     18. Internação
+     ========================================================= -->
+<h2 class="section-title" id="ep-18">8. Alertas de Internação</h2>
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-post">POST</span>
+    <strong>/api/internação/v1/listarAlertasInternacao</strong>
+    <span class="big-badge bb-redesign">VIA EVENTOS CUSTOMIZADOS</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap (InternacaoDTO)</h4>
+<pre class="code">POST .../listarAlertasInternacao
+Query:
+  idGestor=54321
+  dataInternacao=2026-01-01
+  dataSaida=2026-03-31
+  página=1
+  itensPorPagina=25
+
+Response:
+{
+  "totalRegistros": 45,
+  "página": 1,
+  "itensPorPagina": 25,
+  "internações":[{
+    "id": 4001,
+    "idPaciente": 12345,
+    "dataInternacao": "2026-02-10T08:00:00",
+    "dataSaida": "2026-02-17T16:30:00",
+    "motivo": "Cirurgia programada",
+    "unidade": "UTI"
+  }]
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (EventListItemDTO via customizacao)</h4>
+<pre class="code">GET /apiv1/event
+Query:
+  size=25
+  page=0
+  statuses=[...]
+  progress=[...]
+  patients=[...]
+  minTargetDate=2026-01-01
+  maxTargetDate=2026-03-31
+  tags=[...]   // filtrar por tag "INTERNACAO"
+
+Response (Page&lt;EventListItemDTO&gt;):
+{
+  "content":[{
+    "id": 4001,
+    "name": "Internação UTI",
+    "categories":[{"id":1,"name":"INTERNACAO"}],
+    "targetDate": "2026-02-10",
+    "effectiveDate": "2026-02-17",
+    "scheduledAt": "2026-02-10",
+    "progress": "ACCOMPLISHED",
+    "source": "INTEGRATION",
+    "patient": {"id":12345,"name":"..."},
+    "pathway": {...},
+    "individualCarePlan": {...},
+    "formData": {
+      "unidade": "UTI",
+      "motivo": "Cirurgia programada",
+      "idGestor": 54321
+    }
+  }]
+}</pre>
+      </div>
+    </div>
+
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">HTTP POST</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">HTTP GET</td><td>Query string em vez de body.</td></tr>
+      <tr class="transform"><td class="field">idGestor</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">formData.idGestor (custom)</td><td>Sem campo nativo — via formData.</td></tr>
+      <tr class="transform"><td class="field">dataInternacao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">minTargetDate</td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataSaida</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">maxTargetDate ou maxEffectiveDate</td><td>Depende do significado.</td></tr>
+      <tr class="transform"><td class="field">página</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">page</td><td>Base 0 na Tabia.</td></tr>
+      <tr class="transform"><td class="field">itensPorPagina</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">size</td><td>—</td></tr>
+      <tr class="direct"><td class="field">id</td><td><span class="st st-direct">DIRETO</span></td><td class="field">id</td><td>—</td></tr>
+      <tr class="transform"><td class="field">idPaciente</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">patient.id</td><td>Aninhado.</td></tr>
+      <tr class="transform"><td class="field">dataInternacao (response)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">targetDate ou scheduledAt</td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataSaida (response)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">effectiveDate</td><td>—</td></tr>
+      <tr class="custom"><td class="field">motivo</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">formData.motivo</td><td>Custom.</td></tr>
+      <tr class="custom"><td class="field">unidade</td><td><span class="st st-custom">CUSTOMIZAR</span></td><td class="field">formData.unidade</td><td>Custom.</td></tr>
+      <tr class="transform"><td class="field">totalRegistros</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">totalElements</td><td>—</td></tr>
+    </table>
+
+    <div class="alert alert-orange"><strong>Ações necessárias com Tabia:</strong>
+      <ol style="margin-top:.3rem;margin-left:1.2rem;font-size:.78rem">
+        <li>Definir categoria "INTERNACAO" no sistema Tabia</li>
+        <li>Criar modelo de Event com campos customizados: <code class="inline">unidade</code>, <code class="inline">motivo</code>, <code class="inline">idGestor</code></li>
+        <li>Configurar integração que crie Events a partir da fonte original (HIS hospitalar)</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     19. Externos
+     ========================================================= -->
+<h2 class="section-title" id="ep-19">9. Endpoints Externos (sem Swagger Healthmap)</h2>
+
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-post">POST</span>
+    <strong>/api/v1/questionário/responderAvaliacao</strong>
+    <span class="big-badge bb-redesign">AUTH DIFERENTE</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap externo</h4>
+<pre class="code">// Auth própria (diferente do OAuth2)
+POST unimedpa.healthmap.com.br/api/v1/usuário/loginAPI
+Body: {"usuário":"integração.viverbem","senha":"..."}
+Response: {"token":"...","tipo":"Bearer","expiresIn":3600}
+
+// Headers
+  aKEY: he@lthM@P00987sK5Y
+  Authorization: Bearer {token_loginAPI}
+
+POST unimedpa.healthmap.com.br/api/v1/questionário/responderAvaliacao
+Body:
+{
+  "codigoInternoPessoa": "1034427",
+  "codigoInternoQuestionario": "355",
+  "tipoValidacaoQuestoes": "ignorar",
+  "usarCodigoInternoQuestao": "True",
+  "respostas":[
+    {"codigoExternoQuestao":"3887","opções":[{"código":"11098"}]},
+    {"codigoExternoQuestao":"3888","opções":[{"código":"11101"}]},
+    ...
+  ]
+}
+
+Response:
+{
+  "sucesso": true,
+  "mensagem": "Avaliação respondida",
+  "idResposta": 98765,
+  "codigoInternoPessoa": "1034427",
+  "codigoInternoQuestionario": "355"
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (SurveyApplication + answer)</h4>
+<pre class="code">// Mesma API Key padrao
+POST /apiv1/survey/{id}/applications
+{
+  "patientIds": [1034427],
+  "expirationAt": "2026-04-30"
+}
+
+// Entao multiplas chamadas:
+POST /apiv1/surveydata/{uid}/answer (por resposta)
+
+// Ou fluxo completo de SurveyApplication:
+{
+  "uid": "...",
+  "survey": { "id": 355 },
+  "person": { "id": 1034427 },
+  "status": "COMPLETED",
+  "answers": {
+    "3887": [{"choiceId": 11098}],
+    "3888": [{"choiceId": 11101}]
+  }
+}</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="lost"><td class="field">Auth loginAPI + aKEY</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">api-key</td><td>Auth unificada.</td></tr>
+      <tr class="transform"><td class="field">codigoInternoPessoa</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">patientIds[] / person.id</td><td>—</td></tr>
+      <tr class="transform"><td class="field">codigoInternoQuestionario</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">survey.id (path param)</td><td>—</td></tr>
+      <tr class="lost"><td class="field">tipoValidacaoQuestoes=ignorar</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Sem flag de bypass de validação.</td></tr>
+      <tr class="lost"><td class="field">usarCodigoInternoQuestao</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Tabia sempre usa IDs internos.</td></tr>
+      <tr class="transform"><td class="field">respostas[].codigoExternoQuestao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">answers[fieldId] (key do map)</td><td>—</td></tr>
+      <tr class="transform"><td class="field">respostas[].opções[].código</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">answers[fieldId][0].choiceId</td><td>—</td></tr>
+      <tr class="transform"><td class="field">idResposta (resp)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">SurveyApplication.id ou uid</td><td>—</td></tr>
+    </table>
+    <div class="alert alert-green"><strong>Ganho:</strong> Elimina auth dupla (OAuth2 + loginAPI). Padronizacao total com resto da API.</div>
+  </div>
+</div>
+
+<div class="ep collapsed">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/v1/consultas/dadosQuestionariosSintetico</strong>
+    <span class="big-badge bb-redesign">COMPOSICAO</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="alert alert-yellow"><strong>Sem payload documentado no Healthmap.</strong> Não foi possivel mapear campos exatos. Assumindo que retorna agregacao de questionários por periodo/populacao.</div>
+    <div class="pair">
+      <div class="hm"><h4 class="hm-h">Healthmap</h4><pre class="code">Sem Swagger.
+Sem payload documentado no index.html.
+
+Conhecido: agrega dados sinteticos
+de questionários (totais, medias, etc).</pre></div>
+      <div class="tb"><h4 class="tb-h">Tabia (composição)</h4>
+<pre class="code">// Combinar 3 endpoints:
+
+GET /apiv1/survey/{id}/stats
+Response: [{"status":"COMPLETED","count":87}]
+
+GET /apiv1/survey/{id}/applications
+Response: Page&lt;SurveyApplicationDTO&gt;
+
+GET /apiv1/surveydata/{uid}
+Response: SurveyApplicationDTO individual
+
+GET /apiv1/survey/{id}/details
+Response: [{"title","type","choiceId","choiceLabel","count"}]
+// agregacao por questão e escolha</pre></div>
+    </div>
+    <div class="alert alert-orange">Solicitar formalmente a Healthmap o contrato deste endpoint para mapping preciso.</div>
+  </div>
+</div>
+
+<div class="ep collapsed">
+  <div class="ep-header" onclick="tg(this)">
+    <span class="method m-get">GET</span>
+    <strong>/api/v1/relatório/listar-ações</strong>
+    <span class="big-badge bb-redesign">COMPOSICAO VIA TASK+EVENT</span>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <div class="pair">
+      <div class="hm">
+        <h4 class="hm-h">Healthmap externo</h4>
+<pre class="code">GET .../relatório/listar-ações
+Query:
+  codigoAcao=245
+  statusAcao=4
+  periodoIniExecPrevAcao=2026-03-01
+  periodoFimExecPrevAcao=2026-04-22
+  periodoIniExecRealAcao=
+  periodoFimExecRealAcao=
+  codigoGestor=1767469
+  codigoExternoPaciente=
+  statusPaciente=A
+  página=1
+  quantidade=213
+
+Response:
+{
+  "conteudo":[{
+    "id": "4258579",
+    "codigoAcao": "245",
+    "nomeAcao": "Monitoramento",
+    "statusAcao": "4",
+    "dataExecPrev": "2026-04-06 12:00:00.0",
+    "dataExecReal": "",
+    "nomePaciente": "GENI MORAES...",
+    "codigoPaciente": "80134327004",
+    "nomeGestor": "ELEONORA MOLINA..."
+  }],
+  "paginaAtual": "1",
+  "totalRegistros": "2716",
+  "totalPaginas": "2716"
+}</pre>
+      </div>
+      <div class="tb">
+        <h4 class="tb-h">Tabia (task + event compostos)</h4>
+<pre class="code">// Varios endpoints conforme contexto:
+GET /apiv1/task (Page&lt;TaskListItemDTO&gt;)
+GET /apiv1/event (Page&lt;EventListItemDTO&gt;)
+
+// TaskListItemDTO:
+{
+  "id": 4258579,
+  "title": "Monitoramento",
+  "closed": false,
+  "accomplished": false,
+  "dueDate": "2026-04-06",
+  "dateClosed": null,
+  "patient": {"id","name","medicalRecordId"},
+  "assignee": PersonDTO (nomeGestor)
+}</pre>
+      </div>
+    </div>
+    <table class="map">
+      <tr><th>Healthmap (listar-ações)</th><th>Status</th><th>Tabia</th><th>Observação</th></tr>
+      <tr class="transform"><td class="field">codigoAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">taskSpecificationId / categories</td><td>—</td></tr>
+      <tr class="transform"><td class="field">statusAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">closed / accomplished</td><td>Código numerico → 2 booleans.</td></tr>
+      <tr class="transform"><td class="field">periodoIniExecPrevAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">minTargetDate (event) / dueDate &gt;= (task)</td><td>—</td></tr>
+      <tr class="transform"><td class="field">periodoFimExecPrevAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">maxTargetDate / dueDate &lt;=</td><td>—</td></tr>
+      <tr class="transform"><td class="field">periodoIniExecRealAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">minEffectiveDate / dateClosed &gt;=</td><td>—</td></tr>
+      <tr class="transform"><td class="field">periodoFimExecRealAcao</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">maxEffectiveDate / dateClosed &lt;=</td><td>—</td></tr>
+      <tr class="lost"><td class="field">codigoGestor</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">assignee.id (task)</td><td>—</td></tr>
+      <tr class="transform"><td class="field">codigoExternoPaciente</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">patient.medicalRecordId ou patients[]</td><td>—</td></tr>
+      <tr class="lost"><td class="field">statusPaciente</td><td><span class="st st-lost">SEM EQUIV.</span></td><td class="field">—</td><td>Não há filtro ativo/inativo direto.</td></tr>
+      <tr class="transform"><td class="field">nomePaciente (resp)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">patient.name</td><td>—</td></tr>
+      <tr class="transform"><td class="field">nomeGestor (resp)</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">assignee.fullName</td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataExecPrev</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">dueDate / targetDate</td><td>—</td></tr>
+      <tr class="transform"><td class="field">dataExecReal</td><td><span class="st st-transform">TRANSFORMAR</span></td><td class="field">dateClosed / effectiveDate</td><td>—</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- =========================================================
+     CONCLUSAO
+     ========================================================= -->
+<h2 class="section-title">10. Conclusão e próximos passos</h2>
+<div class="ep">
+  <div class="ep-header" onclick="tg(this)">
+    <strong>Sintese dos gaps e ações prioritárias</strong>
+    <span class="chev">&#9660;</span>
+  </div>
+  <div class="ep-body">
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin-bottom:.4rem">Blockers (resolver antes de codar)</h4>
+    <table class="map">
+      <tr><th>#</th><th>Blocker</th><th>Impacto</th><th>Ação</th></tr>
+      <tr><td>1</td><td>CPF não está no PatientDTO/UserDTO</td><td>Afeta TODA busca de pessoa</td><td>Confirmar com Tabia se pode: (a) adicionar filtro CPF nativo (b) usar <code class="inline">extensions.cpf</code></td></tr>
+      <tr><td>2</td><td>Termos de Aceite inexistentes</td><td>Bloqueia Viver Bem inteiro</td><td>Timeline formal da Tabia</td></tr>
+      <tr><td>3</td><td>MedicaoRisco = conceito diferente</td><td>Estratificação populacional sem equivalente</td><td>Avaliar <code class="inline">tabiaScore.severity</code> como proxy + roadmap de endpoint clínico</td></tr>
+      <tr><td>4</td><td>questaoRespostas sem filtro de periodo</td><td>Relatórios temporais</td><td>Filtrar client-side ou pedir filtro nativo</td></tr>
+      <tr><td>5</td><td>idExterno, respostaTexto, respostaValor perdidos</td><td>Campos auxiliares</td><td>Usar <code class="inline">extensions</code> ou <code class="inline">context</code></td></tr>
+      <tr><td>6</td><td>WhatsApp endpoints ausentes no OpenAPI</td><td>Mensageria</td><td>Obter OpenAPI do modulo whatsapp-management</td></tr>
+      <tr><td>7</td><td><code class="inline">POST /surveydata/{uid}/answer</code> ausente no OpenAPI</td><td>Resposta de questionário</td><td>Obter schema real</td></tr>
+      <tr><td>8</td><td>Arquivos em realizarAcao</td><td>Anexos em ações</td><td>Definir modelo (NoteDTO com file? Upload separado?)</td></tr>
+    </table>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .4rem">Tabelas de-para necessárias</h4>
+    <ul style="font-size:.82rem;margin-left:1.2rem">
+      <li><strong>ID mapping:</strong> <code class="inline">cbv_to_tabia_patient_id</code>, <code class="inline">cbv_to_tabia_user_id</code>, <code class="inline">cbv_to_tabia_survey_id</code>, <code class="inline">cbv_to_tabia_task_id</code></li>
+      <li><strong>Status mapping:</strong> <code class="inline">ATIVO/INATIVO</code> → <code class="inline">deathDate + since</code> (pacientes); <code class="inline">ATIVO/INATIVO</code> → <code class="inline">OPEN/CLOSED/CLOSING/CREATING/TRANSFERRING</code> (planos)</li>
+      <li><strong>Tipo de questão:</strong> <code class="inline">SIM_NAO, MULTIPLA, TEXTO, NUMERO</code> → <code class="inline">YES_NO, MULTIPLE_CHOICE, TEXT, NUMBER</code> (confirmar enum Tabia)</li>
+      <li><strong>Tipo de usuário:</strong> <code class="inline">PROFISSIONAL, GESTOR, NAVEGADOR</code> → <code class="inline">roles[]</code></li>
+      <li><strong>Prioridade:</strong> <code class="inline">ALTA, MEDIA, BAIXA</code> → tags ou categories</li>
+      <li><strong>statusAcao:</strong> <code class="inline">PENDENTE, EM_PROGRESSO, CONCLUIDO, NAO_REALIZADO</code> → combinacoes de <code class="inline">closed + accomplished</code></li>
+      <li><strong>statusRisco:</strong> <code class="inline">BAIXO, MEDIO, ALTO</code> → faixas de <code class="inline">tabiaScore.severity</code></li>
+    </ul>
+
+    <h4 style="font-size:.9rem;color:var(--blue-dark);margin:.8rem 0 .4rem">Estratégia recomendada de adapter</h4>
+    <div class="alert alert-blue">
+      <ol style="margin-left:1.2rem;font-size:.82rem">
+        <li>Criar <strong>Anti-Corruption Layer</strong> que expoe interface identica ao Healthmap atual para o CBV</li>
+        <li>Internamente, traduzir requests/responses usando as tabelas de-para acima</li>
+        <li>Manter CBV ignorante da mudanca — Healthmap pode ser desligado após o adapter estabilizar</li>
+        <li>Implementar em ondas: (1) Auth+Patient, (2) Survey, (3) PlanoAcao, (4) Risco+Internação+Termos, (5) Mensageria</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function tg(el){ el.parentElement.classList.toggle('collapsed'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impacto nas 5 Apps Front — Troca Healthmap_IS → Tabia_IS</title>
+<style>
+  :root{
+    --blue-dark:#1a3a5c;--blue-main:#2E75B6;--blue-light:#D5E8F0;
+    --green:#27ae60;--orange:#e67e22;--red:#e74c3c;--yellow:#f39c12;
+    --purple:#8e44ad;--bg:#f5f7fa;--text:#2c3e50;--border:#dce1e8;
+    --hm:#2E75B6;--tb:#27ae60;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.55}
+  header{background:linear-gradient(135deg,var(--blue-dark),var(--blue-main));color:#fff;padding:1.5rem 2rem;text-align:center}
+  header h1{font-size:1.4rem;font-weight:700}
+  header p{opacity:.9;font-size:.88rem;margin-top:.3rem}
+  main{max-width:1200px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+  .block{background:#fff;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.06);margin-bottom:1.3rem;overflow:hidden}
+  .block h2{background:#fafbfd;padding:.8rem 1.1rem;border-left:4px solid var(--blue-main);font-size:1.05rem;color:var(--blue-dark);display:flex;align-items:center;gap:.5rem}
+  .block .body{padding:1rem 1.1rem}
+
+  /* Diagrama arquitetural */
+  .arch{display:flex;align-items:stretch;gap:.5rem;flex-wrap:wrap;justify-content:center;padding:1rem 0}
+  .arch-col{display:flex;flex-direction:column;gap:.5rem;align-items:center;min-width:140px}
+  .arch-apps{display:flex;flex-direction:column;gap:.35rem;min-width:140px}
+  .app-box,.is-box,.api-box{border-radius:8px;padding:.5rem .7rem;text-align:center;font-weight:600;font-size:.78rem;min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.3;border:2px solid transparent}
+  .app-box{background:#fff;border-color:var(--border);color:var(--text)}
+  .app-box small{font-size:.65rem;color:#999;font-weight:400;margin-top:.1rem}
+  .is-box{background:var(--blue-main);color:#fff;min-height:90px;min-width:180px;font-size:.88rem}
+  .is-box.tabia{background:var(--green)}
+  .is-box.facade{background:var(--purple)}
+  .is-box small{font-size:.7rem;opacity:.9;font-weight:400;margin-top:.2rem}
+  .api-box{background:#f0f4fa;border-color:var(--blue-dark);color:var(--blue-dark);min-height:60px;min-width:140px}
+  .api-box.tabia{background:#e8f5e9;border-color:var(--green);color:var(--green)}
+  .arrow{font-size:1.6rem;color:var(--blue-main);display:flex;align-items:center;margin:0 .3rem}
+  .arrow.tabia{color:var(--green)}
+  .arch-label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.05em;text-align:center;margin-bottom:.2rem}
+
+  /* Option cards */
+  .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin:.8rem 0}
+  .opt{border-radius:10px;overflow:hidden;border:2px solid var(--border)}
+  .opt.recommended{border-color:var(--green);box-shadow:0 0 0 3px rgba(39,174,96,.15)}
+  .opt-head{padding:.7rem .9rem;background:#fafbfd;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border)}
+  .opt-head .letter{width:30px;height:30px;border-radius:50%;background:var(--blue-main);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+  .opt.a .letter{background:var(--green)}
+  .opt.b .letter{background:var(--orange)}
+  .opt.c .letter{background:var(--purple)}
+  .opt-head h3{font-size:.9rem;color:var(--blue-dark);margin:0}
+  .opt-head .badge{margin-left:auto;font-size:.68rem;font-weight:700;padding:.15em .5em;border-radius:3px;background:var(--green);color:#fff}
+  .opt-body{padding:.8rem .9rem;font-size:.82rem}
+  .opt-body h4{font-size:.76rem;color:#666;text-transform:uppercase;letter-spacing:.03em;margin:.5rem 0 .25rem}
+  .opt-body h4:first-child{margin-top:0}
+  .opt-body ul{list-style:none;font-size:.78rem}
+  .opt-body ul li{padding:.12rem 0;padding-left:1.1rem;position:relative}
+  .opt-body ul li.pro::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
+  .opt-body ul li.con::before{content:'✗';position:absolute;left:0;color:var(--red);font-weight:700}
+  .opt-body ul li.neutral::before{content:'•';position:absolute;left:0;color:#888;font-weight:700}
+
+  /* Comparison table */
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th,td{padding:.55rem .7rem;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:var(--blue-light);color:var(--blue-dark);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
+  td code{background:#eef3f8;padding:.08em .35em;border-radius:3px;font-size:.78rem;color:var(--blue-dark);font-family:'Consolas',monospace}
+  tr.highlight td{background:#e8f5e9}
+
+  .impact{display:inline-block;padding:.15em .55em;border-radius:3px;font-size:.7rem;font-weight:700;color:#fff;white-space:nowrap}
+  .i-zero{background:var(--green)}
+  .i-low{background:#16a085}
+  .i-med{background:var(--orange)}
+  .i-high{background:var(--red)}
+  .i-crit{background:#c0392b}
+
+  .alert{padding:.6rem .9rem;border-radius:5px;font-size:.85rem;margin:.6rem 0}
+  .alert-green{background:#e8f5e9;border-left:3px solid var(--green)}
+  .alert-orange{background:#fff3e0;border-left:3px solid var(--orange)}
+  .alert-red{background:#fdecea;border-left:3px solid var(--red)}
+  .alert-blue{background:#e3f2fd;border-left:3px solid var(--blue-main)}
+
+  pre{background:#1e2a3a;color:#a8d8a8;padding:.6rem .75rem;border-radius:5px;font-size:.75rem;line-height:1.5;overflow-x:auto;font-family:'Consolas',monospace;margin:.3rem 0;white-space:pre;word-break:normal}
+
+  .checklist{list-style:none;margin-top:.5rem}
+  .checklist li{padding:.35rem 0;padding-left:1.5rem;position:relative;font-size:.85rem;border-bottom:1px dashed var(--border)}
+  .checklist li::before{content:'☐';position:absolute;left:0;color:var(--blue-main);font-size:1rem}
+
+  .note{font-size:.78rem;color:#777;font-style:italic;margin-top:.4rem}
+
+  .tab-switch{display:flex;gap:.3rem;margin-bottom:.6rem;border-bottom:2px solid var(--border)}
+  .tab-switch button{background:none;border:none;padding:.4rem .8rem;font-size:.82rem;cursor:pointer;color:#666;font-weight:600;border-bottom:3px solid transparent;margin-bottom:-2px}
+  .tab-switch button.active{color:var(--blue-main);border-bottom-color:var(--blue-main)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  @media(max-width:700px){
+    .arch{flex-direction:column;align-items:stretch}
+    .arrow{transform:rotate(90deg);margin:0 auto}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏗️ Impacto nas 5 Apps Front — Troca <code>Healthmap_IS</code> → <code>Tabia_IS</code></h1>
+  <p>Análise arquitetural: quando as apps front precisam mudar e quando não precisam</p>
+</header>
+
+<main>
+
+<!-- ======================================================
+     1. Estado Atual
+     ====================================================== -->
+<div class="block">
+  <h2>📍 1. Estado atual (hoje)</h2>
+  <div class="body">
+    <div class="arch">
+      <div class="arch-col">
+        <div class="arch-label">5 Apps Front</div>
+        <div class="arch-apps">
+          <div class="app-box">App 1<small>Viver Bem</small></div>
+          <div class="app-box">App 2<small>Redes de Valor</small></div>
+          <div class="app-box">App 3<small>Cockpit Nav.</small></div>
+          <div class="app-box">App 4<small>Auditoria</small></div>
+          <div class="app-box">App 5<small>Transição / SRT</small></div>
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="arch-col" style="justify-content:center;display:flex">
+        <div class="is-box">Healthmap_IS<small>Integration Service (ODC Library)</small></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="arch-col" style="justify-content:center;display:flex">
+        <div class="api-box">API Healthmap<small>OAuth2 Bearer<br>KeyDS header</small></div>
+      </div>
+    </div>
+
+    <p style="font-size:.85rem;margin-top:.5rem">Cada uma das 5 apps chama <strong>Server Actions</strong> do <code>Healthmap_IS</code> com assinaturas tipo:</p>
+<pre>GetBeneficiarios(CPF, Email, Nome, PageSize, Offset) : BeneficiarioDTO_List
+GetBeneficiarioById(Id) : BeneficiarioDTO
+GetPlanoAcao(IdCliente) : PlanoAcaoDTO_List
+ProgramarAcao(IdCliente, Acao : AcaoDTO) : Boolean
+RealizarAcao(RealizarAcaoDTO) : Boolean
+GetMedicaoRisco(IdCliente) : MedicaoRiscoDTO_List
+ResponderQuestaoAvulsa(ResponderQuestaoDTO) : Boolean
+...</pre>
+    <p class="note">As apps usam esses Server Actions em <strong>Screen Actions</strong>, <strong>Aggregates</strong>, <strong>Data Actions</strong>, <strong>Local Variables</strong> e fazem <strong>binding na UI</strong> com os campos dos DTOs (<code>BeneficiarioDTO.Nome</code>, <code>.CPF</code>, <code>.NumeroCarteirinha</code>, etc).</p>
+  </div>
+</div>
+
+<!-- ======================================================
+     2. Três opções de arquitetura
+     ====================================================== -->
+<div class="block">
+  <h2>🎯 2. Três opções para o estado-alvo — qual adotar?</h2>
+  <div class="body">
+    <div class="options">
+      <div class="opt a recommended">
+        <div class="opt-head">
+          <div class="letter">A</div>
+          <h3>Tabia_IS com <strong>MESMA interface</strong></h3>
+          <span class="badge">RECOMENDADO</span>
+        </div>
+        <div class="opt-body">
+          <h4>Como funciona</h4>
+          <p>Novo <code>Tabia_IS</code> expõe <strong>os mesmos nomes</strong> de Server Actions, Structures e campos. Por dentro, traduz para a API Tabia.</p>
+          <h4>Impacto nas 5 apps</h4>
+          <ul>
+            <li class="pro"><strong>ZERO</strong> mudanças de código</li>
+            <li class="pro">Trocar só a <strong>dependência</strong> (Healthmap_IS → Tabia_IS)</li>
+            <li class="pro">Rollback fácil</li>
+            <li class="con">Tabia_IS mais complexo (precisa traduzir tudo)</li>
+            <li class="con">Não aproveita campos novos da Tabia (tabiaScore, pathways)</li>
+          </ul>
+          <h4>Esforço</h4>
+          <p><strong>Alto no IS, baixo nas apps.</strong> Trabalho concentrado em 1 lib.</p>
+        </div>
+      </div>
+
+      <div class="opt b">
+        <div class="opt-head">
+          <div class="letter">B</div>
+          <h3>Tabia_IS com <strong>nova interface</strong> (PT→EN)</h3>
+        </div>
+        <div class="opt-body">
+          <h4>Como funciona</h4>
+          <p>Novo <code>Tabia_IS</code> expõe nomes Tabia (<code>GetPatients</code>, <code>PatientDTO</code>). As 5 apps são refatoradas.</p>
+          <h4>Impacto nas 5 apps</h4>
+          <ul>
+            <li class="con"><strong>MUDAR em TODAS as pontas:</strong> Screens, Actions, Aggregates, Local Variables, UI bindings</li>
+            <li class="con">Toda referência a <code>.Nome</code>, <code>.CPF</code>, <code>.NumeroCarteirinha</code> vira <code>.FullName</code>, <code>.Extensions.Cpf</code>, <code>.MedicalRecordId</code></li>
+            <li class="pro">Aproveita 100% dos campos novos da Tabia</li>
+            <li class="pro">Código final mais limpo</li>
+            <li class="con">Risco alto de regressão</li>
+          </ul>
+          <h4>Esforço</h4>
+          <p><strong>Alto no IS + alto nas 5 apps.</strong> Multiplica pelo número de telas/actions.</p>
+        </div>
+      </div>
+
+      <div class="opt c">
+        <div class="opt-head">
+          <div class="letter">C</div>
+          <h3>Facade + migração gradual</h3>
+        </div>
+        <div class="opt-body">
+          <h4>Como funciona</h4>
+          <p>Mantém <code>Healthmap_IS</code> como <strong>facade</strong> que chama o novo <code>Tabia_IS</code>. Com tempo, cada app migra para usar <code>Tabia_IS</code> direto.</p>
+          <h4>Impacto nas 5 apps</h4>
+          <ul>
+            <li class="pro">Transição gradual, app por app</li>
+            <li class="pro">Permite convivência Healthmap + Tabia durante meses</li>
+            <li class="con">2 libs vivas em paralelo (complexidade operacional)</li>
+            <li class="con">Facade tem mesmo custo da Opção A</li>
+            <li class="neutral">Útil se as apps forem migrar <strong>de verdade</strong> para a interface nova no futuro</li>
+          </ul>
+          <h4>Esforço</h4>
+          <p><strong>Médio contínuo.</strong> Dispersão de esforço por várias sprints.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-green">
+      <strong>💡 Recomendação:</strong> <strong>Opção A</strong> para a primeira fase (destravar a migração sem mexer nas 5 apps), e <strong>Opção C</strong> em médio prazo se fizer sentido modernizar o código das apps com a nomenclatura Tabia.
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     3. Diagrama da opção A (recomendada)
+     ====================================================== -->
+<div class="block">
+  <h2>🎨 3. Diagrama — como fica a arquitetura na Opção A</h2>
+  <div class="body">
+    <div class="arch">
+      <div class="arch-col">
+        <div class="arch-label">5 Apps Front<br>(sem mudanças)</div>
+        <div class="arch-apps">
+          <div class="app-box" style="border-color:var(--green)">App 1<small>✓ Sem alteração</small></div>
+          <div class="app-box" style="border-color:var(--green)">App 2<small>✓ Sem alteração</small></div>
+          <div class="app-box" style="border-color:var(--green)">App 3<small>✓ Sem alteração</small></div>
+          <div class="app-box" style="border-color:var(--green)">App 4<small>✓ Sem alteração</small></div>
+          <div class="app-box" style="border-color:var(--green)">App 5<small>✓ Sem alteração</small></div>
+        </div>
+      </div>
+      <div class="arrow tabia">→</div>
+      <div class="arch-col" style="justify-content:center;display:flex">
+        <div class="is-box tabia">Tabia_IS<small>Mesma interface do Healthmap_IS antigo<br>+ tradução interna<br>+ feature flag</small></div>
+      </div>
+      <div class="arrow tabia">→</div>
+      <div class="arch-col" style="justify-content:center;display:flex">
+        <div class="api-box tabia">API Tabia<small>api-key header<br>https://staging.tabia.health</small></div>
+      </div>
+    </div>
+    <p style="font-size:.85rem;margin-top:.6rem;text-align:center;color:#666">As 5 apps continuam chamando <code>GetBeneficiarios()</code>, <code>GetPlanoAcao()</code>, etc exatamente igual. O <code>Tabia_IS</code> é responsável por todo o trabalho de tradução.</p>
+  </div>
+</div>
+
+<!-- ======================================================
+     4. Tabela de impacto detalhada
+     ====================================================== -->
+<div class="block">
+  <h2>📊 4. Impacto detalhado por área — Opção A vs Opção B</h2>
+  <div class="body">
+    <table>
+      <tr>
+        <th>Área nas 5 apps</th>
+        <th>Opção A (mesma interface)</th>
+        <th>Opção B (nova interface)</th>
+      </tr>
+      <tr>
+        <td><strong>Dependência do módulo</strong><br>(Manage Dependencies)</td>
+        <td><span class="impact i-low">BAIXO</span> Trocar referência <code>Healthmap_IS</code> → <code>Tabia_IS</code> em cada app</td>
+        <td><span class="impact i-low">BAIXO</span> Mesma coisa</td>
+      </tr>
+      <tr>
+        <td><strong>Server Action calls</strong><br><code>GetBeneficiarios</code>, <code>GetPlanoAcao</code>, etc</td>
+        <td><span class="impact i-zero">ZERO</span> Nomes mantidos</td>
+        <td><span class="impact i-high">ALTO</span> Renomear todas as chamadas</td>
+      </tr>
+      <tr>
+        <td><strong>Structures / DTOs</strong><br><code>BeneficiarioDTO</code>, <code>PlanoAcaoDTO</code>, etc</td>
+        <td><span class="impact i-zero">ZERO</span> Structures mantidas com mesmos campos</td>
+        <td><span class="impact i-crit">CRÍTICO</span> Trocar para <code>PatientDTO</code>, <code>IndividualCarePlanDTO</code>...</td>
+      </tr>
+      <tr>
+        <td><strong>Local variables / aggregates</strong></td>
+        <td><span class="impact i-zero">ZERO</span> Tipos não mudam</td>
+        <td><span class="impact i-high">ALTO</span> Todos os tipos precisam ser trocados</td>
+      </tr>
+      <tr>
+        <td><strong>UI bindings</strong><br><code>Expression</code>: <code>BeneficiarioDTO.Nome</code></td>
+        <td><span class="impact i-zero">ZERO</span> Campos continuam <code>.Nome</code>, <code>.CPF</code></td>
+        <td><span class="impact i-crit">CRÍTICO</span> Cada expression na UI precisa mudar para <code>.FullName</code>, <code>.Extensions.Cpf</code>...</td>
+      </tr>
+      <tr>
+        <td><strong>Labels / textos fixos</strong><br>"Beneficiário", "Questionário"</td>
+        <td><span class="impact i-zero">ZERO</span> Labels em PT mantidas</td>
+        <td><span class="impact i-low">BAIXO</span> Pode manter em PT (só nomes técnicos mudam)</td>
+      </tr>
+      <tr>
+        <td><strong>Screen Actions / Data Actions</strong><br>que invocam o IS</td>
+        <td><span class="impact i-zero">ZERO</span> Lógica mantida</td>
+        <td><span class="impact i-high">ALTO</span> Refatorar fluxos inteiros</td>
+      </tr>
+      <tr>
+        <td><strong>Validações / BPMs / Timers</strong></td>
+        <td><span class="impact i-zero">ZERO</span></td>
+        <td><span class="impact i-med">MÉDIO</span> Se algum dependia de campos específicos</td>
+      </tr>
+      <tr>
+        <td><strong>Relatórios / Dashboards</strong></td>
+        <td><span class="impact i-zero">ZERO</span></td>
+        <td><span class="impact i-med">MÉDIO</span> Queries podem precisar ajuste</td>
+      </tr>
+      <tr>
+        <td><strong>Testes end-to-end</strong></td>
+        <td><span class="impact i-med">MÉDIO</span> Validar regressão após migração</td>
+        <td><span class="impact i-high">ALTO</span> Reescrever grande parte</td>
+      </tr>
+      <tr class="highlight">
+        <td><strong>Esforço total estimado</strong></td>
+        <td><strong>2-3 sprints no IS + 0.5 sprint por app</strong></td>
+        <td><strong>2-3 sprints no IS + 2-3 sprints por app × 5 = ~12-17 sprints</strong></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ======================================================
+     5. Exemplo visual de impacto em 1 tela
+     ====================================================== -->
+<div class="block">
+  <h2>🔍 5. Exemplo prático — uma tela "Listar Beneficiários" em cada opção</h2>
+  <div class="body">
+
+    <div class="tab-switch">
+      <button class="active" onclick="tab(this,'tab-a')">Opção A (recomendada)</button>
+      <button onclick="tab(this,'tab-b')">Opção B</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-a">
+      <h4 style="font-size:.85rem;color:var(--blue-dark);margin-bottom:.3rem">Tela antes e depois</h4>
+<pre>ANTES (hoje):
+  Aggregate: GetBeneficiarios (Healthmap_IS)
+  Screen Variable: BeneficiariosList as BeneficiarioDTO List
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#f39c12">Nome</span>
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#f39c12">CPF</span>
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#f39c12">NumeroCarteirinha</span>
+
+DEPOIS (com Tabia_IS opção A):
+  Aggregate: GetBeneficiarios (<span style="color:#27ae60">Tabia_IS</span>)   <span style="color:#27ae60">← ÚNICA mudança</span>
+  Screen Variable: BeneficiariosList as BeneficiarioDTO List
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#27ae60">Nome</span>               <span style="color:#888">← sem mudança</span>
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#27ae60">CPF</span>                <span style="color:#888">← sem mudança</span>
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#27ae60">NumeroCarteirinha</span>  <span style="color:#888">← sem mudança</span></pre>
+      <div class="alert alert-green"><strong>Só 1 alteração por app:</strong> trocar a referência do módulo no Manage Dependencies.</div>
+    </div>
+
+    <div class="tab-panel" id="tab-b">
+      <h4 style="font-size:.85rem;color:var(--blue-dark);margin-bottom:.3rem">Tela antes e depois</h4>
+<pre>ANTES (hoje):
+  Aggregate: GetBeneficiarios (Healthmap_IS)
+  Screen Variable: BeneficiariosList as BeneficiarioDTO List
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#f39c12">Nome</span>
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#f39c12">CPF</span>
+  UI Column: Expression = BeneficiariosList.Current.<span style="color:#f39c12">NumeroCarteirinha</span>
+
+DEPOIS (com Tabia_IS opção B):
+  Aggregate: <span style="color:#e74c3c">GetPatients</span> (Tabia_IS)
+  Screen Variable: <span style="color:#e74c3c">PatientsList</span> as <span style="color:#e74c3c">PatientDTO</span> List
+  UI Column: Expression = PatientsList.Current.<span style="color:#e74c3c">FullName</span>
+  UI Column: Expression = PatientsList.Current.<span style="color:#e74c3c">Extensions.Cpf</span>          <span style="color:#888">← via extensions</span>
+  UI Column: Expression = PatientsList.Current.<span style="color:#e74c3c">MedicalRecordId</span>         <span style="color:#888">← ou InsuranceIdNumber</span>
+
+  <span style="color:#e74c3c">+ ajustar todos os filtros de busca, validações, ifs,
+    client actions, etc que referenciam esses campos</span></pre>
+      <div class="alert alert-red"><strong>Multiplicar por cada tela, cada combo, cada formulário.</strong> Em 5 apps com dezenas de telas = trabalho massivo.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================
+     6. Como mapear os impactos no OutSystems
+     ====================================================== -->
+<div class="block">
+  <h2>🔎 6. Como descobrir exatamente onde impacta (ferramentas OutSystems)</h2>
+  <div class="body">
+    <p style="font-size:.85rem;margin-bottom:.6rem">Para cada uma das 5 apps front, antes de decidir:</p>
+
+    <table>
+      <tr><th>Ferramenta ODC</th><th>Como usar</th><th>O que descobrir</th></tr>
+      <tr>
+        <td><strong>Manage Dependencies</strong></td>
+        <td>Abrir a app no Service Studio → botão <em>Manage Dependencies</em> → filtrar por <code>Healthmap_IS</code></td>
+        <td>Lista de TODAS as Server Actions, Structures e Entities consumidas. Exporte esse relatório.</td>
+      </tr>
+      <tr>
+        <td><strong>Find Usages</strong> (Ctrl+Shift+U)</td>
+        <td>Em cada Structure importada (ex: <code>BeneficiarioDTO</code>), botão direito → <em>Find Usages</em></td>
+        <td>Onde cada DTO é usado: variables, aggregates, actions, expressions</td>
+      </tr>
+      <tr>
+        <td><strong>True Change</strong></td>
+        <td>Após trocar a dependência, rodar <em>True Change</em> antes de publicar</td>
+        <td>Lista todas as quebras de contrato. Em Opção A: deve ser zero. Em Opção B: centenas.</td>
+      </tr>
+      <tr>
+        <td><strong>ODC Portal → Architecture</strong></td>
+        <td>Portal da app → aba Architecture → grafo de dependências</td>
+        <td>Visão macro de quais apps consomem o IS</td>
+      </tr>
+      <tr>
+        <td><strong>Refactoring Report</strong></td>
+        <td>Service Studio 11+ tem relatório de impacto</td>
+        <td>Sugere renomear/substituir em lote</td>
+      </tr>
+    </table>
+
+    <h4 style="margin:.8rem 0 .3rem;font-size:.88rem;color:var(--blue-dark)">Checklist de inventário (rodar em cada uma das 5 apps)</h4>
+    <ul class="checklist">
+      <li>Listar todas as Server Actions de <code>Healthmap_IS</code> consumidas (Manage Dependencies)</li>
+      <li>Para cada Server Action, listar em quantas telas/actions ela aparece (Find Usages)</li>
+      <li>Listar todas as Structures importadas de <code>Healthmap_IS</code></li>
+      <li>Para cada Structure, listar quantas variables/aggregates/expressions a referenciam</li>
+      <li>Identificar campos específicos mais usados (<code>.Nome</code>, <code>.CPF</code>, <code>.NumeroCarteirinha</code>, etc)</li>
+      <li>Contar total de telas impactadas por app</li>
+      <li>Exportar relatório consolidado para comparar Opção A vs B</li>
+    </ul>
+
+    <div class="alert alert-blue"><strong>💡 Dica prática:</strong> Peça para cada squad da app rodar esse inventário em 1 dia. Com os números na mesa, a escolha entre A e B fica óbvia.</div>
+  </div>
+</div>
+
+<!-- ======================================================
+     7. Pontos de atenção mesmo na Opção A
+     ====================================================== -->
+<div class="block">
+  <h2>⚠️ 7. Cuidados mesmo escolhendo a Opção A (mesma interface)</h2>
+  <div class="body">
+    <p style="font-size:.85rem;margin-bottom:.5rem">Tabia_IS com mesma interface <strong>não significa</strong> que tudo vai funcionar igual automaticamente. Atenção para:</p>
+
+    <table>
+      <tr><th>#</th><th>Ponto</th><th>Risco / Ação</th></tr>
+      <tr>
+        <td>1</td>
+        <td><strong>Campos sem equivalente</strong> (idExterno, respostaTexto, respostaValor)</td>
+        <td>Podem vir <strong>nulos</strong> ou <strong>vazios</strong> em telas que hoje esperam valor. Validar onde são usados antes.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><strong>CPF em <code>extensions</code> na Tabia</strong></td>
+        <td>Adapter precisa buscar de <code>person.extensions.cpf</code>. Se extensão não estiver setada, CPF volta vazio.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><strong>Enums mapeados</strong> (ATIVO → OPEN, PENDENTE → closed/accomplished)</td>
+        <td>Se app faz <code>if status = "ATIVO"</code>, precisa continuar funcionando. Adapter deve retornar sempre "ATIVO"/"INATIVO" como string.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><strong>Paginação base 1 vs 0</strong></td>
+        <td>Healthmap usa base 1, Tabia base 0. Adapter deve ajustar. Validar com paginações grandes.</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><strong>IDs diferentes</strong></td>
+        <td>IDs Healthmap ≠ Tabia. Adapter deve retornar o ID Healthmap (via tabela de-para) — ou validar se as apps armazenam esses IDs em entities locais.</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><strong>Latência</strong></td>
+        <td>~460ms por chamada. Se app faz 10 chamadas sequenciais, soma 4.6s. Avaliar timeouts e loadings.</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td><strong>Termos de Aceite</strong> (4 endpoints ausentes na Tabia)</td>
+        <td>Bloqueia Viver Bem. Solução: manter <code>Healthmap_IS</code> temporariamente SÓ para esses 4 endpoints.</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td><strong>MedicaoRisco</strong> (conceito diferente)</td>
+        <td>Se app mostra <code>statusRisco = "ALTO"</code>, o adapter precisa derivar de <code>tabiaScore.severity</code>. Testar.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ======================================================
+     8. Roadmap sugerido
+     ====================================================== -->
+<div class="block">
+  <h2>🚀 8. Roadmap sugerido</h2>
+  <div class="body">
+    <table>
+      <tr><th>Fase</th><th>O que fazer</th><th>Quem</th></tr>
+      <tr>
+        <td><strong>Semana 1</strong></td>
+        <td>Cada squad roda o inventário (Manage Dependencies + Find Usages) nas 5 apps e entrega números consolidados</td>
+        <td>Squads das 5 apps</td>
+      </tr>
+      <tr>
+        <td><strong>Semana 1-2</strong></td>
+        <td>Decisão formal: Opção A, B ou C (com números na mão)</td>
+        <td>Dev Lead + Arquitetura</td>
+      </tr>
+      <tr>
+        <td><strong>Semana 2-3</strong></td>
+        <td>Começar <code>Tabia_IS</code> com 1 endpoint (Beneficiário) mantendo interface idêntica à atual</td>
+        <td>Time ACL</td>
+      </tr>
+      <tr>
+        <td><strong>Semana 3-4</strong></td>
+        <td>Validar em 1 app piloto (a de menor risco) com feature flag ativada só em dev</td>
+        <td>Time ACL + 1 squad</td>
+      </tr>
+      <tr>
+        <td><strong>Semana 5+</strong></td>
+        <td>Expandir endpoint por endpoint, ativar feature flag por app</td>
+        <td>Time ACL</td>
+      </tr>
+      <tr>
+        <td><strong>Mês 3</strong></td>
+        <td>Aposentar <code>Healthmap_IS</code> quando todas as 5 apps estiverem 100% no <code>Tabia_IS</code></td>
+        <td>Dev Lead</td>
+      </tr>
+    </table>
+
+    <div class="alert alert-green" style="margin-top:1rem">
+      <strong>Resultado esperado:</strong> Com Opção A + feature flag, cada uma das 5 apps migra com <strong>1 pequeno PR</strong> (trocar dependência) e rollback instantâneo se quebrar.
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     9. Resumo decisório
+     ====================================================== -->
+<div class="block">
+  <h2>✅ 9. Resumo decisório (para levar à reunião)</h2>
+  <div class="body">
+    <table>
+      <tr><th>Pergunta</th><th>Resposta</th></tr>
+      <tr><td>As 5 apps precisam ser alteradas?</td><td><strong>Opção A: NÃO</strong> (só trocar dependência). Opção B: SIM, em todas as pontas.</td></tr>
+      <tr><td>Vou quebrar nomenclatura de objetos?</td><td>Só na Opção B. Na Opção A, <code>BeneficiarioDTO.Nome</code>, <code>.CPF</code> continuam iguais.</td></tr>
+      <tr><td>Preciso refatorar UI?</td><td>Só na Opção B. Na Opção A, bindings continuam intactos.</td></tr>
+      <tr><td>E os campos novos que a Tabia oferece?</td><td>Opção A perde eles. Se quiser aproveitar, aplicar Opção C (migração gradual posterior).</td></tr>
+      <tr><td>Qual é mais seguro?</td><td>Opção A — mudança isolada, rollback fácil.</td></tr>
+      <tr><td>Qual é mais rápido para entrar em produção?</td><td>Opção A — sem retrabalho nas 5 apps.</td></tr>
+      <tr><td>E no futuro, se quiser modernizar?</td><td>Aplicar Opção C por cima da A — migrar apps uma por uma para a interface Tabia.</td></tr>
+    </table>
+
+    <div class="alert alert-green" style="margin-top:1rem;text-align:center">
+      <strong>Recomendação final:</strong> Ir de <strong>Opção A</strong>.<br>
+      <span style="font-size:.82rem">Trabalho concentrado no novo <code>Tabia_IS</code>, apps intactas, rollback trivial. Se no futuro a equipe quiser usar os campos novos da Tabia, migra gradualmente (Opção C).</span>
+    </div>
+
+    <p style="text-align:center;margin-top:1rem;font-size:.85rem">
+      <a href="kickoff_migracao.html" style="color:var(--blue-main);text-decoration:none;font-weight:600">← Ver checklist de kickoff</a>
+      &nbsp;•&nbsp;
+      <a href="comparacao_profunda.html" style="color:var(--blue-main);text-decoration:none;font-weight:600">Ver comparação profunda de campos →</a>
+    </p>
+  </div>
+</div>
+
+</main>
+
+<script>
+function tab(btn, id){
+  document.querySelectorAll('.tab-switch button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+</script>
+
+</body>
+</html>

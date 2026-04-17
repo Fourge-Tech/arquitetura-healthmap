@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise Comparativa: Healthmap x Tabia (CareOS)</title>
+<style>
+  :root {
+    --blue-dark: #1a3a5c;
+    --blue-main: #2E75B6;
+    --blue-light: #D5E8F0;
+    --green: #27ae60;
+    --orange: #e67e22;
+    --red: #e74c3c;
+    --yellow: #f39c12;
+    --gray-bg: #f5f7fa;
+    --gray-border: #dce1e8;
+    --text: #2c3e50;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--gray-bg);
+    line-height: 1.6;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-main));
+    color: #fff;
+    padding: 2rem 2rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  }
+  header h1 { font-size: 1.6rem; font-weight: 700; }
+  header p { opacity: .85; font-size: .85rem; margin-top: .3rem; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  /* --- cards --- */
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: .85rem 1.2rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    user-select: none;
+    border-left: 4px solid var(--blue-main);
+    background: #fafbfd;
+  }
+  .card-header:hover { background: var(--blue-light); }
+  .card-header .chevron {
+    margin-left: auto;
+    transition: transform .2s;
+    font-size: .75rem;
+    color: #999;
+  }
+  .card.collapsed .card-body { display: none; }
+  .card.collapsed .chevron { transform: rotate(-90deg); }
+  .card-body { padding: 1rem 1.2rem 1.2rem; }
+
+  /* --- summary boxes --- */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .75rem;
+    margin-bottom: 1rem;
+  }
+  .summary-box {
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    color: #fff;
+    font-weight: 700;
+  }
+  .summary-box .num { font-size: 2rem; display: block; }
+  .summary-box .label { font-size: .78rem; opacity: .9; }
+  .bg-blue { background: var(--blue-main); }
+  .bg-green { background: var(--green); }
+  .bg-orange { background: var(--orange); }
+  .bg-red { background: var(--red); }
+  .bg-yellow { background: var(--yellow); }
+
+  /* --- tables --- */
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: .5rem; }
+  th, td { padding: .55rem .7rem; text-align: left; border-bottom: 1px solid var(--gray-border); }
+  th { background: var(--blue-light); color: var(--blue-dark); font-weight: 600; white-space: nowrap; }
+  tr:hover td { background: #f0f6fb; }
+  td code { background: #eef3f8; padding: .15em .4em; border-radius: 3px; font-size: .82rem; color: var(--blue-dark); }
+
+  /* --- badges --- */
+  .badge {
+    display: inline-block;
+    padding: .15em .55em;
+    border-radius: 4px;
+    font-size: .75rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-equiv   { background: #d5f5e3; color: #1e8449; }
+  .badge-parcial { background: #fdebd0; color: #b9770e; }
+  .badge-dev     { background: #fadbd8; color: #c0392b; }
+  .badge-diff    { background: #e8daef; color: #6c3483; }
+  .badge-blocker { background: #e74c3c; color: #fff; }
+  .badge-alto    { background: #e67e22; color: #fff; }
+  .badge-medio   { background: #f39c12; color: #fff; }
+
+  /* --- alert --- */
+  .alert {
+    border-left: 4px solid var(--red);
+    background: #fdf2f2;
+    padding: .75rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin: .75rem 0;
+    font-size: .85rem;
+  }
+  .alert strong { color: var(--red); }
+
+  /* --- checklist --- */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: .4rem 0 .4rem 1.6rem;
+    position: relative;
+    font-size: .88rem;
+    border-bottom: 1px dashed var(--gray-border);
+  }
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    color: var(--blue-main);
+    font-size: 1rem;
+  }
+
+  /* --- phase timeline --- */
+  .phase {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    margin-bottom: .75rem;
+  }
+  .phase-num {
+    min-width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--blue-main);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: .85rem;
+    flex-shrink: 0;
+  }
+  .phase-content { font-size: .88rem; }
+  .phase-content strong { color: var(--blue-dark); }
+
+  .note { font-size: .8rem; color: #777; margin-top: .5rem; font-style: italic; }
+
+  /* --- API detail cards --- */
+  .api-card {
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .api-card-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .6rem .9rem;
+    background: #f8f9fb;
+    cursor: pointer;
+    user-select: none;
+    font-size: .88rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--gray-border);
+  }
+  .api-card-header:hover { background: var(--blue-light); }
+  .api-card-header .chevron { margin-left: auto; font-size: .65rem; color: #999; transition: transform .2s; }
+  .api-card.collapsed .api-card-body { display: none; }
+  .api-card.collapsed .api-card-header .chevron { transform: rotate(-90deg); }
+  .api-card-body { padding: 0; }
+
+  .api-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .api-side {
+    padding: .75rem .9rem;
+    font-size: .82rem;
+  }
+  .api-side:first-child { border-right: 2px solid var(--gray-border); }
+  .api-side h5 {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .4rem;
+    opacity: .6;
+  }
+  .api-side.hm { background: #fafbfd; }
+  .api-side.tb { background: #f0faf4; }
+
+  .method-badge {
+    display: inline-block;
+    padding: .1em .45em;
+    border-radius: 3px;
+    font-size: .72rem;
+    font-weight: 700;
+    color: #fff;
+    margin-right: .3rem;
+  }
+  .method-get { background: #27ae60; }
+  .method-post { background: #2E75B6; }
+  .method-put { background: #e67e22; }
+
+  .api-url { font-family: 'Consolas','Courier New',monospace; font-size: .8rem; word-break: break-all; margin: .3rem 0; }
+
+  .api-section-label {
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-top: .5rem;
+    margin-bottom: .2rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .param-list { list-style: none; padding: 0; margin: 0; }
+  .param-list li {
+    padding: .15rem 0;
+    font-size: .78rem;
+    font-family: 'Consolas','Courier New',monospace;
+  }
+  .param-list li span.desc { font-family: 'Segoe UI',sans-serif; color: #777; font-size: .72rem; }
+
+  pre.json-block {
+    background: #1e2a3a;
+    color: #a8d8a8;
+    padding: .6rem .7rem;
+    border-radius: 5px;
+    font-size: .72rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin: .3rem 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .diff-note {
+    background: #fff3cd;
+    border-left: 3px solid var(--yellow);
+    padding: .4rem .6rem;
+    font-size: .78rem;
+    margin-top: .5rem;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .api-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .3rem; }
+  .api-tag {
+    font-size: .65rem;
+    padding: .1em .4em;
+    border-radius: 3px;
+    background: #e8e8e8;
+    color: #555;
+  }
+  .api-tag.ext { background: #fde; color: #a33; }
+  .api-tag.dev { background: #ffeeba; color: #856404; }
+
+  .no-equiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    color: #c0392b;
+    font-weight: 600;
+    font-size: .85rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  @media (max-width: 700px) {
+    .api-compare { grid-template-columns: 1fr; }
+    .api-side:first-child { border-right: none; border-bottom: 2px solid var(--gray-border); }
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 1.2rem 1rem; }
+    header h1 { font-size: 1.2rem; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    td, th { padding: .4rem .45rem; font-size: .78rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Análise Comparativa: Healthmap x Tabia (CareOS)</h1>
+  <p>Cruzamento: mapeamento CBV x Healthmap (19 endpoints) + OpenAPI CareOS &mdash; 13 abr 2026</p>
+</header>
+
+<main>
+
+<!-- ===== 1. Resumo Executivo ===== -->
+<div class="card">
+  <div class="card-header" onclick="toggle(this)">
+    1. Resumo Executivo
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="summary-grid">
+      <div class="summary-box bg-blue"><span class="num">19</span><span class="label">Endpoints Healthmap</span></div>
+      <div class="summary-box bg-green"><span class="num">8</span><span class="label">Equivalente direto</span></div>
+      <div class="summary-box bg-orange"><span class="num">8</span><span class="label">Equivalente parcial</span></div>
+      <div class="summary-box bg-red"><span class="num">2</span><span class="label">Sem equivalente / dev</span></div>
+      <div class="summary-box bg-yellow"><span class="num">1</span><span class="label">Redesign necessário</span></div>
+    </div>
+    <p>A Tabia cobre a maioria das necessidades, porém com <strong>abordagem arquitetural diferente</strong> — especialmente nos domínios de Plano de Ação (Pathway/ICP/Task/Event) e Questionários (Survey/SurveyData). A migração exigira <strong>camada de adaptação</strong> e <strong>mapeamento de campos</strong> significativo.</p>
+  </div>
+</div>
+
+<!-- ===== 2. Mudancas Estruturais ===== -->
+<div class="card">
+  <div class="card-header" onclick="toggle(this)">
+    2. Mudancas Estruturais Importantes
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <h4 style="margin-bottom:.5rem">2.1 Autenticação</h4>
+    <table>
+      <tr><th>Healthmap</th><th>Tabia</th></tr>
+      <tr><td>OAuth2 Bearer Token (<code>POST /oauth/token</code>)</td><td><strong>API Key</strong> para integrações</td></tr>
+      <tr><td>Header <code>KeyDS</code> para PRD/HMG</td><td>Configuração de ambiente via API Key</td></tr>
+    </table>
+    <p class="note">Impacto: Simplificacao — toda logica de obtencao/renovacao de token pode ser removida.</p>
+
+    <h4 style="margin:.75rem 0 .5rem">2.2 Nomenclatura de Entidades</h4>
+    <table>
+      <tr><th>Healthmap</th><th>Tabia (CareOS)</th></tr>
+      <tr><td>Beneficiário</td><td><strong>Patient</strong></td></tr>
+      <tr><td>Usuário</td><td><strong>User</strong></td></tr>
+      <tr><td>PlanoDeAcao</td><td><strong>Pathway + ICP + Task + Event</strong> (modular)</td></tr>
+      <tr><td>Questionário</td><td><strong>Survey</strong></td></tr>
+      <tr><td>QuestaoResposta</td><td><strong>SurveyData + Answer</strong></td></tr>
+      <tr><td>MedicaoRisco</td><td><strong>appointment-no-show-risk</strong> (conceito diferente)</td></tr>
+    </table>
+
+    <h4 style="margin:.75rem 0 .5rem">2.3 Paginação</h4>
+    <table>
+      <tr><th>Healthmap</th><th>Tabia</th></tr>
+      <tr><td><code>pageSize</code>, <code>offset</code>, <code>pageNumber</code></td><td><code>page</code> + <code>size</code> + <code>sort</code>/<code>sortBy</code>/<code>sortDir</code></td></tr>
+    </table>
+    <p class="note">Impacto: Baixo — adapter simples.</p>
+  </div>
+</div>
+
+<!-- ===== 3. Mapeamento Detalhado ===== -->
+<div class="card">
+  <div class="card-header" onclick="toggle(this)">
+    3. Mapeamento Detalhado — Endpoint por Endpoint
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+
+    <!-- 3.1 Auth -->
+    <h4 style="margin-bottom:.4rem">3.1 Autenticação</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>1</td><td><code>POST /oauth/token</code></td><td>API Key (header)</td><td><span class="badge badge-diff">Diferente</span></td></tr>
+    </table>
+
+    <!-- 3.2 Beneficiário -->
+    <h4 style="margin:.75rem 0 .4rem">3.2 Beneficiário &rarr; Patient</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>2</td><td><code>GET .../beneficiário</code></td><td><code>GET /apiv1/patient</code></td><td><span class="badge badge-equiv">Equivalente</span></td></tr>
+      <tr><td>3</td><td><code>GET .../beneficiário/{id}</code></td><td><code>GET /apiv1/patient/{id}</code></td><td><span class="badge badge-equiv">Equivalente</span></td></tr>
+      <tr><td>4</td><td><code>GET .../dadosBeneficiarioResumido/{id}</code></td><td><code>GET /apiv1/patient?minimalInfo=true</code></td><td><span class="badge badge-equiv">Equivalente</span></td></tr>
+    </table>
+
+    <!-- 3.3 Segurança -->
+    <h4 style="margin:.75rem 0 .4rem">3.3 Segurança / Usuário</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>5</td><td><code>GET .../segurança/v1/usuário</code></td><td><code>GET /apiv1/user</code> + <code>/user/search</code></td><td><span class="badge badge-equiv">Equivalente</span></td></tr>
+    </table>
+
+    <!-- 3.4 Termos -->
+    <h4 style="margin:.75rem 0 .4rem">3.4 Termos de Aceite</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>6</td><td><code>GET .../aceiteTermo</code></td><td>&mdash;</td><td><span class="badge badge-dev">Em dev</span></td></tr>
+      <tr><td>7</td><td><code>GET .../buscaTermoPublicadoPorEmpresa</code></td><td>&mdash;</td><td><span class="badge badge-dev">Em dev</span></td></tr>
+      <tr><td>8</td><td><code>GET .../buscarAceiteTermo</code></td><td>&mdash;</td><td><span class="badge badge-dev">Em dev</span></td></tr>
+      <tr><td>9</td><td><code>POST .../revogaTermo/{...}</code></td><td>&mdash;</td><td><span class="badge badge-dev">Em dev</span></td></tr>
+    </table>
+    <div class="alert"><strong>ALERTA:</strong> Todo o domínio de Termos de Aceite não existe na Tabia hoje. Blocker para migração do Viver Bem.</div>
+
+    <!-- 3.5 Risco -->
+    <h4 style="margin:.75rem 0 .4rem">3.5 Estratificação de Risco</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>10</td><td><code>GET .../medicaoRisco</code></td><td><code>GET .../appointment-no-show-risk/stats</code> + <code>event-metric</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+    </table>
+    <p class="note">Conceitos diferentes — Tabia tem risco de no-show, não estratificação de saúde populacional.</p>
+
+    <!-- 3.6 Plano de Ação -->
+    <h4 style="margin:.75rem 0 .4rem">3.6 Plano de Ação &rarr; Pathway / ICP / Task / Event</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>11</td><td><code>GET .../planoAcao</code></td><td><code>individual-care-plan</code> + <code>task</code> + <code>event</code> + <code>pathway</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>12</td><td><code>POST .../programarAcao/{id}</code></td><td><code>POST /apiv1/task</code> + <code>POST /apiv1/event</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>13</td><td><code>POST .../programarAcao/{id}</code> (lista)</td><td><code>POST .../batch</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>14</td><td><code>PUT .../realizarAcao</code></td><td><code>POST /apiv1/task/{id}/status</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+    </table>
+
+    <!-- 3.7 Questionários -->
+    <h4 style="margin:.75rem 0 .4rem">3.7 Questionários &rarr; Survey / SurveyData</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>15</td><td><code>GET .../questionário/{id}</code></td><td><code>GET /apiv1/survey/{id}</code></td><td><span class="badge badge-equiv">Equivalente</span></td></tr>
+      <tr><td>16</td><td><code>GET .../questaoRespostas</code></td><td><code>GET .../surveydata/{uid}/answer</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>17</td><td><code>POST .../responderQuestaoAvulsa</code></td><td><code>POST .../surveydata/{uid}/answer</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>18</td><td><code>POST .../questaoUltimaResposta</code></td><td>Composição: answer + applications</td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>ext1</td><td><code>POST .../responderAvaliacao</code></td><td><code>POST .../surveydata/{uid}/answer</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>ext2</td><td><code>GET .../dadosQuestionariosSintetico</code></td><td>Composição: stats + applications + surveydata</td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+      <tr><td>ext3</td><td><code>GET .../dadosQuestionariosCompletos</code></td><td>Composição: applications + surveydata</td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+    </table>
+
+    <!-- 3.8 Internação -->
+    <h4 style="margin:.75rem 0 .4rem">3.8 Internação</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>19</td><td><code>POST .../listarAlertasInternacao</code></td><td><code>GET /apiv1/event</code> (customizado)</td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+    </table>
+
+    <!-- 3.9 Mensageria -->
+    <h4 style="margin:.75rem 0 .4rem">3.9 Mensageria (CRM &rarr; WhatsApp)</h4>
+    <table>
+      <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
+      <tr><td>&mdash;</td><td>CRM Dynamics 365 &rarr; BLIP &rarr; WhatsApp</td><td><code>POST .../message/send</code> + <code>whatsapp-management</code></td><td><span class="badge badge-parcial">Parcial</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 3B. Detalhe das Chamadas (Postman Collection) ===== -->
+<div class="card">
+  <div class="card-header" onclick="toggle(this)">
+    3B. Detalhe das Chamadas — Healthmap (Collection) vs Tabia (CareOS)
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <p style="font-size:.83rem;margin-bottom:.75rem;color:#666">Dados extraidos da Postman Collection <strong>Jornada Assistencial — CBV x Healthmap</strong>. Cada card mostra a chamada real (metodo, URL, headers, query params, body) lado a lado com o equivalente Tabia.</p>
+
+    <!-- ── 1. Auth ── -->
+    <div class="api-card">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-post">POST</span> Obter Token OAuth2
+        <span class="badge badge-diff" style="margin-left:.5rem">Diferente</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> {{baseUrl}}/oauth/token</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list">
+              <li>Content-Type: application/x-www-form-urlencoded</li>
+              <li>KeyDS: {{keyDS}} <span class="desc">— PRD ou HMG</span></li>
+            </ul>
+            <div class="api-section-label">Body (form-urlencoded)</div>
+<pre class="json-block">grant_type=client_credentials
+client_id={{clientId}}
+client_secret={{clientSecret}}</pre>
+            <div class="api-section-label">Resposta</div>
+<pre class="json-block">{
+  "access_token": "...",
+  "token_type": "bearer",
+  "expires_in": 3600
+}</pre>
+            <div class="api-section-label">Auth heranca</div>
+            <p style="font-size:.78rem">noauth (este endpoint gera o token)</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">KEY</span> Header: X-API-Key</div>
+            <div class="api-section-label">Mecanismo</div>
+            <p style="font-size:.78rem">API Key fornecida pela Tabia, enviada em cada request como header. Não há fluxo OAuth2.</p>
+            <div class="api-section-label">Header esperado (todas as chamadas)</div>
+<pre class="json-block">api-key: {{apiKey}}</pre>
+            <div class="diff-note"><strong>Diferença:</strong> Elimina completamente o fluxo de obtencao/renovacao de token. A API Key é estática por ambiente — não expira como o Bearer Token.</div>
+            <div class="api-section-label">Migrar</div>
+            <p style="font-size:.78rem">Remover toda logica de <code>client_credentials</code>. Substituir <code>Authorization: Bearer</code> + <code>KeyDS</code> por header <code>api-key</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. Listar Beneficiários ── -->
+    <div class="api-card">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Listar Beneficiários (paginado)
+        <span class="badge badge-equiv" style="margin-left:.5rem">Equivalente</span>
+        <div class="api-tags"><span class="api-tag">Viver Bem</span><span class="api-tag">Redes de Valor</span><span class="api-tag">Cockpit Nav.</span><span class="api-tag">Auditoria</span><span class="api-tag">Trans. Cuidado</span><span class="api-tag">SRT</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/beneficiário/v1/beneficiário</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list">
+              <li>Authorization: Bearer {{bearerToken}}</li>
+              <li>KeyDS: {{keyDS}}</li>
+            </ul>
+            <div class="api-section-label">Query Params</div>
+            <ul class="param-list">
+              <li>pageSize=20 <span class="desc">— itens por página</span></li>
+              <li>cpf= <span class="desc">— filtro por CPF</span></li>
+              <li>email= <span class="desc">— filtro por e-mail</span></li>
+              <li>id= <span class="desc">— filtro por ID interno</span></li>
+              <li>nome= <span class="desc">— filtro por nome</span></li>
+              <li>numeroCarteirinha= <span class="desc">— filtro por carteirinha</span></li>
+            </ul>
+            <div class="api-section-label">Resposta</div>
+            <p style="font-size:.78rem"><code>Page&lt;BeneficiarioDTO&gt;</code> — paginação com pageSize/offset/pageNumber</p>
+            <div class="api-section-label">Transversalidade</div>
+            <p style="font-size:.78rem"><strong>Usado por todos os 6 subsistemas</strong> — alta criticidade</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/patient</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list">
+              <li>X-API-Key: {{apiKey}}</li>
+            </ul>
+            <div class="api-section-label">Query Params</div>
+            <ul class="param-list">
+              <li>page= <span class="desc">— numero da página</span></li>
+              <li>size= <span class="desc">— itens por página</span></li>
+              <li>sort= <span class="desc">— campo de ordenacao</span></li>
+              <li>email= <span class="desc">— filtro por email</span></li>
+              <li>cellphone= <span class="desc">— filtro por celular</span></li>
+            </ul>
+            <div class="api-section-label">Response — PatientDTO (campos principais)</div>
+<pre class="json-block">{
+  "id": "int64",
+  "fullName": "string",
+  "preferredName": "string",
+  "gender": "string",
+  "biologicalSex": "string",
+  "birthDate": "date",
+  "phoneNumber": "string",
+  "email": "string",
+  "medicalRecordId": "string",
+  "since": "date-time",
+  "patientAddresses": [{ "streetName","city","state","zipCode" }],
+  "healthInsurances": [{ "id","name","insuranceIdNumber" }],
+  "tags": [{ "id","content","color" }],
+  "pathways": [{ "id","name" }],
+  "contacts": [{ "alias","type","value" }],
+  "tabiaScore": {
+    "timeliness": "double",
+    "noShowRate": "double",
+    "responsiveness": "double",
+    "severity": "double"
+  },
+  "icds": [{ "code","name","startDate","endDate" }],
+  "teams": [{ "id","name" }],
+  "preferredLanguage": "string"
+}</pre>
+            <p class="note">Paginação: <code>Page&lt;PatientDTO&gt;</code> com totalPages, totalElements, size, number, first, last, empty</p>
+            <div class="diff-note"><strong>Diferenças:</strong><br>
+              1. Tabia busca por <strong>email/celular</strong>, não por CPF — <span class="badge badge-blocker" style="font-size:.65rem">BLOCKER</span> confirmar se CPF é suportado<br>
+              2. Campos <code>nome</code> &rarr; <code>fullName</code>, <code>numeroCarteirinha</code> &rarr; <code>medicalRecordId</code> (verificar)<br>
+              3. Paginação: <code>pageSize</code> &rarr; <code>size</code>, <code>pageNumber</code> &rarr; <code>number</code><br>
+              4. Tabia retorna muito mais dados (tabiaScore, ICDs, pathways, teams) — response mais rico<br>
+              5. Não há campo CPF no PatientDTO — confirmar onde fica
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. Beneficiário por ID ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Buscar Beneficiário por ID
+        <span class="badge badge-equiv" style="margin-left:.5rem">Equivalente</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/beneficiário/v1/beneficiário/{{idCliente}}</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <div class="api-section-label">Path Params</div>
+            <ul class="param-list"><li>idCliente <span class="desc">— ID interno do beneficiário</span></li></ul>
+            <div class="api-section-label">Resposta</div>
+            <p style="font-size:.78rem"><code>BeneficiarioDTO</code> — dados completos</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/patient/{id}</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>X-API-Key: {{apiKey}}</li></ul>
+            <div class="api-section-label">Path Params</div>
+            <ul class="param-list"><li>id <span class="desc">— ID do paciente na Tabia</span></li></ul>
+            <div class="api-section-label">Response — PatientDTO</div>
+<pre class="json-block">{
+  "id": "int64",
+  "fullName": "string",
+  "preferredName": "string",
+  "gender": "string",
+  "biologicalSex": "string",
+  "birthDate": "date",
+  "deathDate": "date",
+  "phoneNumber": "string",
+  "email": "string",
+  "medicalRecordId": "string",
+  "since": "date-time",
+  "patientAddresses": "PatientAddressDTO[]",
+  "associatedProfessionals": "AssociatedProfessionalDTO[]",
+  "healthInsurances": "PatientInsuranceReferenceDTO[]",
+  "pathways": "ReferenceDTO[]",
+  "events": "EventDTO[]",
+  "notes": "NoteDTO[]",
+  "contacts": "ContactDTO[]",
+  "individualCarePlans": "IndividualCarePlanDTO[]",
+  "tabiaScore": "TabiaScoreDTO",
+  "icds": "PatientICDDTO[]",
+  "teams": "TeamDTO[]",
+  "preferredLanguage": "string"
+}</pre>
+            <div class="diff-note"><strong>Diferença:</strong> O ID interno Healthmap <code>idCliente</code> provavelmente não é o mesmo ID da Tabia. Necessário mapeamento de IDs ou busca previa por CPF/email.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. Dados Resumidos ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Dados Resumidos do Beneficiário
+        <span class="badge badge-equiv" style="margin-left:.5rem">Equivalente</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/beneficiário/v1/beneficiário/dadosBeneficiarioResumido/{{idCliente}}</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <div class="api-section-label">Resposta</div>
+            <p style="font-size:.78rem"><code>BeneficiarioResumidoDTO</code> — versao compacta para listagens e cards</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/patient?minimalInfo=true</div>
+            <p style="font-size:.78rem;margin-top:.3rem">ou</p>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/patient/{id}/data-on-current-organization</div>
+            <div class="api-section-label">Response — PatientDataOnOrganizationDTO</div>
+<pre class="json-block">// GET /apiv1/patient/{id}/data-on-current-organization
+{
+  "medicalRecordId": "string",
+  "since": "date-time",
+  "insurances": [{
+    "personId": "int64",
+    "insuranceId": "int64",
+    "preferred": "boolean",
+    "insuranceIdNumber": "string"
+  }]
+}</pre>
+            <div class="diff-note"><strong>Diferença:</strong> <code>data-on-current-organization</code> retorna dados bem minimos (3 campos). <code>?minimalInfo=true</code> retorna PatientDTO completo. Verificar qual se aproxima mais do <code>BeneficiarioResumidoDTO</code>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. Usuário ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Consultar Usuário
+        <span class="badge badge-equiv" style="margin-left:.5rem">Equivalente</span>
+        <div class="api-tags"><span class="api-tag">Cockpit Nav.</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/segurança/v1/usuário</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <div class="api-section-label">Query Params</div>
+            <ul class="param-list">
+              <li>pageSize=20</li>
+              <li>cpf= <span class="desc">— filtro por CPF</span></li>
+              <li>email=</li>
+              <li>id=</li>
+              <li>nome=</li>
+            </ul>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/user</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/user/search</div>
+            <div class="api-section-label">Response — UserDTO</div>
+<pre class="json-block">{
+  "id": "int64",
+  "email": "string",
+  "phoneNumber": "string",
+  "blocked": "boolean",
+  "person": {
+    "id": "int64",
+    "fullName": "string",
+    "preferredName": "string",
+    "gender": "string",
+    "birthDate": "date",
+    "biologicalSex": "string",
+    "status": "string",
+    "fhirId": "string",
+    "roles": ["RoleDTO"],
+    "rolesInOrganizations": ["RoleInOrganizationDTO"],
+    "contacts": ["ContactDTO"],
+    "extensions": "map&lt;string,string&gt;",
+    "preferredLanguage": "string"
+  },
+  "preferences": "UserPreferencesDTO"
+}</pre>
+            <div class="diff-note"><strong>Diferença:</strong> Tabia separa listagem (<code>/user</code>) de busca (<code>/user/search</code>). Busca por CPF: <span class="badge badge-blocker" style="font-size:.65rem">BLOCKER</span> — não há campo CPF no UserDTO. Pode estar em <code>extensions</code> (map customizavel).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6-9. Termos de Aceite ── -->
+    <div class="api-card">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span><span class="method-badge method-post">POST</span> Termos de Aceite (4 endpoints)
+        <span class="badge badge-dev" style="margin-left:.5rem">Em dev na Tabia</span>
+        <div class="api-tags"><span class="api-tag">Viver Bem</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap — 4 endpoints</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> .../termo/aceiteTermo?idCliente&amp;idTermo&amp;idEmpresa</div>
+            <p style="font-size:.76rem;color:#666;margin:.2rem 0">Verifica se beneficiário aceitou um termo</p>
+            <div class="api-url"><span class="method-badge method-get">GET</span> .../termo/buscaTermoPublicadoPorEmpresa?idEmpresa</div>
+            <p style="font-size:.76rem;color:#666;margin:.2rem 0">Termos publicados por empresa</p>
+            <div class="api-url"><span class="method-badge method-get">GET</span> .../termo/buscarAceiteTermo?idCliente&amp;idTermo&amp;idEmpresa</div>
+            <p style="font-size:.76rem;color:#666;margin:.2rem 0">Busca registros de aceite com filtros</p>
+            <div class="api-url"><span class="method-badge method-post">POST</span> .../termo/revogaTermo/{{idPessoa}}/{{idTermo}}/{{idEmpresa}}</div>
+            <p style="font-size:.76rem;color:#666;margin:.2rem 0">Revoga aceitação de termo</p>
+            <div class="api-section-label">Headers (todos)</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="no-equiv">
+              Nenhum endpoint de Termos existe na Tabia hoje.<br>
+              <span class="badge badge-blocker" style="margin-top:.5rem">BLOCKER — Em desenvolvimento</span>
+            </div>
+            <div class="diff-note"><strong>Impacto:</strong> Bloqueia completamente a migração do modulo <strong>Viver Bem</strong>. Necessário alinhar timeline de entrega com a Tabia antes de prosseguir.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 10. Medição de Risco ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Consultar Medição de Risco
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <div class="api-tags"><span class="api-tag">Viver Bem</span><span class="api-tag">Redes de Valor</span><span class="api-tag">Cockpit Nav.</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/risco/v1/medicaoRisco</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <div class="api-section-label">Query Params</div>
+            <ul class="param-list">
+              <li>idCliente={{idCliente}} <span class="desc">— ID do beneficiário</span></li>
+              <li>status= <span class="desc">— filtro por status</span></li>
+              <li>pageSize=20</li>
+            </ul>
+            <div class="api-section-label">Resposta</div>
+            <p style="font-size:.78rem"><code>Page&lt;MedicaoRisco&gt;</code> — estratificação/classificação de risco de saúde populacional</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/appointment-no-show-risk/stats</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/event-metric</div>
+            <div class="api-section-label">Response — AppointmentInteractionStatisticsDTO</div>
+<pre class="json-block">// GET /apiv1/appointment-no-show-risk/stats
+{
+  "total": "int64",
+  "details": {
+    "&lt;key&gt;": { "status": "string", "count": "int64" }
+  }
+}</pre>
+            <div class="api-section-label">Response — EventMetricDTO</div>
+<pre class="json-block">// GET /apiv1/event-metric — Page&lt;EventMetricDTO&gt;
+{
+  "id": "int64",
+  "computedAt": "date-time",
+  "type": "enum(DAYS_OF_DEVIATION|RESCHEDULING_COUNT_*|EVENT_*_COUNT)",
+  "date": "date",
+  "value": "double",
+  "metadata": "map&lt;string,object&gt;",
+  "event": { "id": "int64", "name": "string" }
+}</pre>
+            <div class="diff-note"><strong>Diferença crítica:</strong><br>
+              Healthmap: <strong>estratificação de saúde populacional</strong> (risco clínico do beneficiário)<br>
+              Tabia: <strong>risco de no-show em agendamentos</strong> + metricas de desvio operacional<br><br>
+              <span class="badge badge-blocker" style="font-size:.65rem">BLOCKER</span> Conceitos fundamentalmente diferentes. Validar se Tabia pode criar endpoint de risco clínico.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 11. Consultar Planos de Ação ── -->
+    <div class="api-card">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Consultar Planos de Ação
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial — Redesign</span>
+        <div class="api-tags"><span class="api-tag">Viver Bem</span><span class="api-tag">Cockpit Nav.</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/planoacao/v1/planoAcao</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <div class="api-section-label">Query Params</div>
+            <ul class="param-list">
+              <li>id= <span class="desc">— ID do plano de ação</span></li>
+              <li>idCliente={{idCliente}} <span class="desc">— ID do beneficiário</span></li>
+              <li>status= <span class="desc">— status do plano</span></li>
+              <li>statusAcao= <span class="desc">— status da ação dentro do plano</span></li>
+            </ul>
+            <div class="api-section-label">Conceito</div>
+            <p style="font-size:.78rem">Entidade <strong>única</strong> "PlanoAcao" com ações embutidas</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS) — 4 endpoints</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/individual-care-plan</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/task</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/event</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/pathway</div>
+            <div class="diff-note"><strong>Redesign necessário:</strong><br>
+              Healthmap = 1 entidade (PlanoAcao com ações)<br>
+              Tabia = 4 entidades modulares:<br>
+              &bull; <strong>Pathway</strong> — jornada do cuidado<br>
+              &bull; <strong>ICP</strong> — plano individual de cuidado<br>
+              &bull; <strong>Task</strong> — tarefa específica<br>
+              &bull; <strong>Event</strong> — evento/marco<br><br>
+              O adapter precisa compor os 4 endpoints para reconstruir a visao "PlanoAcao".
+            </div>
+            <div class="api-section-label">Response — IndividualCarePlanDTO</div>
+<pre class="json-block">// GET /apiv1/individual-care-plan — Page&lt;IndividualCarePlanDTO&gt;
+{
+  "id": "int64",
+  "name": "string",
+  "patient": { "id": "int64", "name": "string" },
+  "pathway": "PathwayDTO",
+  "pathwayStartDate": "date",
+  "pathwayEndDate": "date",
+  "pathwayStartReason": { "id","name" },
+  "pathwayEndReason": { "id","name" },
+  "bodyPart": "BodyPartDTO",
+  "status": "enum(OPEN|CLOSED|CLOSING|CREATING|TRANSFERRING)",
+  "creationDate": "date-time",
+  "createdBy": "UserReferenceDTO",
+  "individualCarePlanEndType": "enum(CONCLUDED|TRANSFERRED)"
+}</pre>
+<pre class="json-block">// GET /apiv1/pathway — Page&lt;PathwayDTO&gt;
+{
+  "id": "int64",
+  "name": "string",
+  "program": { "id","name" },
+  "severityLevel": "int64",
+  "totalPatientsCount": "int64",
+  "activePatientsCount": "int64",
+  "objective": "enum(PUNCTUALITY|SPEED)",
+  "archived": "boolean",
+  "icds": [{ "code","name","versions" }],
+  "eventsCount": "int64",
+  "nodesCount": "int64",
+  "journeys": [{ "id","name","isDirect" }]
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 12. Programar Ação ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-post">POST</span> Programar Ação no Plano
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /api/planoacao/v1/planoAcao/programarAcao/{{idCliente}}</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li><li>Content-Type: application/json</li></ul>
+            <div class="api-section-label">Body (JSON) — aceita item único ou lista</div>
+<pre class="json-block">[
+  {
+    "idAcao": "",
+    "idPlanoAcao": "",
+    "dataAgendamento": "2024-01-01T10:00:00",
+    "observação": "",
+    "responsavel": ""
+  }
+]</pre>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/task</div>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/event</div>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/task/batch/*</div>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/individual-care-plan/batch</div>
+            <div class="diff-note"><strong>Diferença:</strong> Não há "programarAcao" direto. O adapter precisa:<br>
+              1. Criar Task para cada ação<br>
+              2. Vincular ao ICP/Pathway correto<br>
+              3. Para listas: usar endpoints batch
+            </div>
+            <div class="api-section-label">Response — TaskDTO (ao criar)</div>
+<pre class="json-block">// POST /apiv1/task
+{
+  "id": "int64",
+  "title": "string",
+  "instructions": "string",
+  "closed": "boolean",
+  "accomplished": "boolean",
+  "managed": "boolean",
+  "assignee": "ProfessionalDTO",
+  "dueDate": "date",
+  "dateCreated": "date-time",
+  "dateClosed": "date-time",
+  "patient": "PatientDTO",
+  "event": "EventDTO",
+  "team": "TeamDTO",
+  "createdBy": "UserReferenceDTO",
+  "notes": "NoteDTO[]",
+  "categories": "TaskCategoryDTO[]"
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 13. Realizar Ação ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-put">PUT</span> Realizar Ação do Plano
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-put">PUT</span> /api/planoacao/v1/planoAcao/realizarAcao</div>
+            <div class="api-section-label">Body (JSON)</div>
+<pre class="json-block">{
+  "idAcaoPlanoAcao": "",
+  "dataRealizacao": "2024-01-01T10:00:00",
+  "observação": "",
+  "resultado": "",
+  "responsavel": ""
+}</pre>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/task/{id}/status</div>
+            <div class="diff-note"><strong>Diferenças:</strong><br>
+              1. Metodo: <code>PUT</code> &rarr; <code>POST</code><br>
+              2. Healthmap envia <code>RealizarAcaoDTO</code> (5 campos) &rarr; Tabia espera <code>TaskStatusDTO</code><br>
+              3. Campo <code>resultado</code> e <code>observação</code> podem não ter equivalente direto<br>
+              4. Mapeamento: <code>idAcaoPlanoAcao</code> &rarr; <code>{id}</code> da Task
+            </div>
+            <div class="api-section-label">Request — TaskStatusDTO</div>
+<pre class="json-block">// POST /apiv1/task/{id}/status
+{
+  "id": "int64",
+  "closed": "boolean",
+  "accomplished": "boolean",
+  "assigneeId": "int64",
+  "taskNonAccomplishmentReasonId": "int64",
+  "taskNonAccomplishmentReasonDescription": "string"
+}</pre>
+            <p class="note">Response: retorna TaskDTO completo (mesmo schema do POST /apiv1/task)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 14. Questionário por ID ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Buscar Questionário por ID
+        <span class="badge badge-equiv" style="margin-left:.5rem">Equivalente</span>
+        <div class="api-tags"><span class="api-tag">Viver Bem</span><span class="api-tag">Auditoria</span><span class="api-tag">Trans. Cuidado</span><span class="api-tag">SRT</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/questionário/v1/questionário/{{idQuestionario}}</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <div class="api-section-label">Resposta</div>
+            <p style="font-size:.78rem">Estrutura completa do questionário (questões, opções, regras)</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/survey/{id}</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/survey/{id}/details</div>
+            <div class="api-section-label">Response — SurveyDTO</div>
+<pre class="json-block">// GET /apiv1/survey/{id}
+{
+  "id": "int64",
+  "name": "string",
+  "createdAt": "date-time",
+  "publishedAt": "date-time",
+  "expirationAt": "date",
+  "dirty": "boolean",
+  "applicationCount": "int64",
+  "doneApplicationsCount": "int64",
+  "fields": [{
+    "id": "int64",
+    "name": "string",
+    "type": "string",
+    "title": "string",
+    "description": "string",
+    "condition": "string",
+    "weight": "double",
+    "required": "boolean",
+    "config": "map&lt;string,object&gt;",
+    "choices": [{ "id","label","score","value" }]
+  }]
+}</pre>
+            <div class="api-section-label">Response — SurveyQuestionDetailDTO[]</div>
+<pre class="json-block">// GET /apiv1/survey/{id}/details
+[{
+  "id": "int64",
+  "title": "string",
+  "type": "string",
+  "choiceId": "int64",
+  "choiceLabel": "string",
+  "count": "int64"
+}]</pre>
+            <div class="diff-note"><strong>Diferença:</strong> Tabia separa metadados + campos (<code>/survey/{id}</code>) de estatisticas por questão (<code>/details</code>). O <code>/survey/{id}</code> com <code>fields</code> corresponde ao retorno completo do Healthmap.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 15. Respostas de Questão ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Buscar Respostas de Questão (por periodo)
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <div class="api-tags"><span class="api-tag">Viver Bem</span><span class="api-tag">Auditoria</span><span class="api-tag">Trans. Cuidado</span><span class="api-tag">SRT</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /api/questionário/v1/questionário/questaoRespostas</div>
+            <div class="api-section-label">Query Params</div>
+            <ul class="param-list">
+              <li>idQuestao= <span class="desc">— ID da questão</span></li>
+              <li>dataInicioResposta= <span class="desc">— inicio do periodo (ISO 8601)</span></li>
+              <li>dataFimResposta= <span class="desc">— fim do periodo (ISO 8601)</span></li>
+              <li>pageSize=20</li>
+            </ul>
+            <div class="api-section-label">Resposta</div>
+            <p style="font-size:.78rem"><code>Page&lt;QuestaoRespostaDTO&gt;</code></p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/surveydata/{uid}/answer</div>
+            <div class="api-section-label">Response — SurveyApplicationDTO (via /surveydata/{uid})</div>
+<pre class="json-block">{
+  "id": "int64",
+  "lang": "string",
+  "uid": "string",
+  "deliveredAt": "date-time",
+  "createdAt": "date-time",
+  "startedAt": "date-time",
+  "finishedAt": "date-time",
+  "expirationAt": "date",
+  "survey": "SurveyDTO",
+  "person": { "id","name","medicalRecordId" },
+  "status": "string",
+  "answers": "map&lt;string, array&gt;",
+  "error": "string"
+}</pre>
+            <p class="note">Nota: endpoint <code>/surveydata/{uid}/answer</code> não consta no OpenAPI — pode estar em outro modulo ou em dev.</p>
+            <div class="diff-note"><strong>Diferenças:</strong><br>
+              1. Healthmap filtra por <code>idQuestao</code> + periodo — Tabia filtra por <code>uid</code> do surveydata<br>
+              2. <strong>Não há filtro nativo por periodo</strong> na Tabia — pode exigir composição<br>
+              3. A logica muda: Healthmap busca "respostas de uma questão"; Tabia busca "respostas de uma aplicação de survey"
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 16. Responder Questão Avulsa ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-post">POST</span> Responder Questão Avulsa
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /api/questionário/v1/questionário/responderQuestaoAvulsa</div>
+            <div class="api-section-label">Body (JSON)</div>
+<pre class="json-block">{
+  "idCliente": "{{idCliente}}",
+  "idQuestao": "",
+  "resposta": "",
+  "dataResposta": "2024-01-01T10:00:00",
+  "observação": ""
+}</pre>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/surveydata/{uid}/answer</div>
+            <div class="api-section-label">Fluxo na Tabia (2 passos)</div>
+<pre class="json-block">// Passo 1: criar aplicação do survey
+POST /apiv1/survey/{id}/applications
+Request: {
+  "patientIds": [123],
+  "expirationAt": "date"
+}
+
+// Passo 2: registrar resposta
+POST /apiv1/surveydata/{uid}/answer
+// uid vem da aplicação criada no passo 1</pre>
+            <div class="diff-note"><strong>Diferença:</strong> Healthmap responde por <code>idCliente</code> + <code>idQuestao</code> em chamada única. Tabia exige 2 passos: criar aplicação + registrar resposta via <code>uid</code>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 17. Última Resposta ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-post">POST</span> Última Resposta da Questão
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <div class="api-tags"><span class="api-tag dev">Em dev (Healthmap)</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /api/questionário/v1/questionário/questaoUltimaResposta</div>
+            <div class="api-section-label">Body (JSON)</div>
+<pre class="json-block">{
+  "idCliente": "{{idCliente}}",
+  "idQuestionario": "{{idQuestionario}}"
+}</pre>
+            <p style="font-size:.76rem;color:#c0392b;margin-top:.3rem">Em desenvolvimento no Healthmap — não disponivel em produção</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/surveydata/{uid}/answer</div>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/survey/{id}/applications</div>
+            <div class="api-section-label">Response — SurveyApplicationDTO (via applications)</div>
+<pre class="json-block">// GET /apiv1/survey/{id}/applications — Page&lt;SurveyApplicationDTO&gt;
+{
+  "id": "int64",
+  "uid": "string",
+  "lang": "string",
+  "deliveredAt": "date-time",
+  "startedAt": "date-time",
+  "finishedAt": "date-time",
+  "survey": "SurveyDTO",
+  "person": { "id","name","medicalRecordId" },
+  "status": "string",
+  "answers": "map&lt;string, array&gt;"
+}
+// Buscar última por finishedAt DESC, depois GET /surveydata/{uid}</pre>
+            <div class="diff-note"><strong>Diferença:</strong> Composição necessária: buscar applications ordenadas por data + pegar última resposta via <code>uid</code>. Healthmap pretende ter chamada única.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 18. Internação ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-post">POST</span> Listar Alertas de Internação
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <div class="api-tags"><span class="api-tag">Cockpit Nav.</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /api/internação/v1/listarAlertasInternacao</div>
+            <div class="api-section-label">Body (JSON)</div>
+<pre class="json-block">{
+  "dataInternacao": "2024-01-01",
+  "dataSaida": "2024-01-31",
+  "idGestor": "",
+  "página": 1,
+  "itensPorPagina": 20
+}</pre>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/event (customizado)</div>
+            <div class="api-section-label">Query Params disponiveis no GET /apiv1/event</div>
+<pre class="json-block">size=int, page=int, search=string,
+statuses=[string], progress=[string],
+minTargetDate=date, maxTargetDate=date,
+minEffectiveDate=date, maxEffectiveDate=date,
+patients=[int64], tags=[int64],
+insurances=[int64]</pre>
+            <div class="api-section-label">Response — EventListItemDTO</div>
+<pre class="json-block">// GET /apiv1/event — Page&lt;EventListItemDTO&gt;
+{
+  "id": "int64",
+  "name": "string",
+  "categories": [{ "id","name" }],
+  "targetDate": "date",
+  "effectiveDate": "date",
+  "scheduledAt": "date",
+  "closed": "boolean",
+  "progress": "enum(PLANNED|STARTED|ACCOMPLISHED|NOT_ACCOMPLISHED)",
+  "source": "enum(ORCHESTRATION|INTEGRATION|MANUAL)",
+  "dateCreated": "timestamp",
+  "patient": { "id","name","medicalRecordId" },
+  "pathway": { "id","name","objective" },
+  "individualCarePlan": { "id","bodyPart","pathwayStartDate" },
+  "formData": "map&lt;string,object&gt;",
+  "createdBy": "UserReferenceDTO"
+}</pre>
+            <div class="diff-note"><strong>Diferença:</strong><br>
+              1. Metodo: <code>POST</code> com body &rarr; <code>GET</code> com query params<br>
+              2. Não há endpoint de alertas de internação na Tabia<br>
+              3. Sugestao Tabia: usar eventos customizados via <code>formData</code> (map flexivel)<br>
+              4. Mapear: <code>dataInternacao</code> &rarr; <code>minTargetDate</code>, <code>dataSaida</code> &rarr; <code>maxTargetDate</code>, <code>idGestor</code> &rarr; via <code>formData</code> custom
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ext1. Responder Avaliação ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-post">POST</span> Responder Avaliação Completa
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <div class="api-tags"><span class="api-tag ext">Externo (sem Swagger)</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap (Externo)</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> {{externalBaseUrl}}/api/v1/questionário/responderAvaliacao</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li><li>Content-Type: application/json</li></ul>
+            <div class="api-section-label">Body (JSON) — contrato diferente de responderQuestaoAvulsa</div>
+<pre class="json-block">{
+  "idCliente": "{{idCliente}}",
+  "idQuestionario": "{{idQuestionario}}"
+}</pre>
+            <p style="font-size:.76rem;color:#c0392b;margin-top:.3rem">Sem Swagger — contrato não documentado formalmente</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/surveydata/{uid}/answer</div>
+            <div class="diff-note"><strong>Diferença:</strong> Pode ser mapeado para <code>surveydata/{uid}/answer</code>, mas o contrato real do Healthmap não é conhecido (sem Swagger). Solicitar documentação antes da migração.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ext2. Dados Sinteticos ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Dados Sinteticos de Questionários
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <div class="api-tags"><span class="api-tag ext">Externo (sem Swagger)</span><span class="api-tag">Viver Bem</span><span class="api-tag">Auditoria</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap (Externo)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> {{externalBaseUrl}}/api/v1/consultas/dadosQuestionariosSintetico</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <p style="font-size:.76rem;color:#c0392b;margin-top:.3rem">Sem Swagger — retorna dados resumidos/sinteticos de questionários</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS) — composição</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/survey/{id}/stats</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/survey/{id}/applications</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/surveydata/{uid}</div>
+            <div class="diff-note"><strong>Diferença:</strong> Tabia não tem endpoint único de dados sinteticos. Necessário compor 3 chamadas. Verificar se as agregações e filtros necessários estão disponiveis nos endpoints individuais.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ext3. Listar Ações Relatório ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-get">GET</span> Listar Ações — Relatório Externo
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <div class="api-tags"><span class="api-tag ext">Externo (sem Swagger)</span><span class="api-tag">Cockpit Nav.</span></div>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap (Externo)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> {{externalBaseUrl}}/api/v1/relatório/listar-ações</div>
+            <div class="api-section-label">Headers</div>
+            <ul class="param-list"><li>Authorization: Bearer {{bearerToken}}</li><li>KeyDS: {{keyDS}}</li></ul>
+            <p style="font-size:.76rem;color:#c0392b;margin-top:.3rem">Sem Swagger — visao gerencial de ações para Cockpit Navegação</p>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/task</div>
+            <div class="api-url"><span class="method-badge method-get">GET</span> /apiv1/event</div>
+            <div class="diff-note"><strong>Diferença:</strong> Sem equivalente direto de "relatório de ações". O adapter precisaria compor dados de <code>task</code> + <code>event</code> para gerar visao gerencial equivalente.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Mensageria ── -->
+    <div class="api-card collapsed">
+      <div class="api-card-header" onclick="toggleApi(this)">
+        <span class="method-badge method-post">POST</span> Mensageria — WhatsApp
+        <span class="badge badge-parcial" style="margin-left:.5rem">Parcial</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="api-card-body">
+        <div class="api-compare">
+          <div class="api-side hm">
+            <h5>Healthmap (CRM Dynamics 365)</h5>
+            <p style="font-size:.78rem">Fluxo: Healthmap &rarr; Viver Bem &rarr; <strong>CRM Dynamics 365</strong> &rarr; BLIP &rarr; WhatsApp</p>
+            <div class="api-section-label">Autenticação (Azure AD)</div>
+<pre class="json-block">POST https://login.windows.net/{tenantid}/oauth2/token
+// Autenticação separada do OAuth2 Healthmap
+// Dataverse Web API v9.2</pre>
+            <div class="api-section-label">Entidades CRM</div>
+            <ul class="param-list">
+              <li>contacts <span class="desc">— campo custom uni_cpf</span></li>
+              <li>uni_linhadecuidados</li>
+              <li>uni_whatsapps</li>
+            </ul>
+          </div>
+          <div class="api-side tb">
+            <h5>Tabia (CareOS)</h5>
+            <div class="api-url"><span class="method-badge method-post">POST</span> /apiv1/message/send</div>
+            <div class="api-section-label">Response — ChatMessageDTO</div>
+<pre class="json-block">{
+  "id": "int64",
+  "personId": "int64",
+  "personName": "string",
+  "phoneNumber": "string",
+  "timestamp": "int64",
+  "sendAt": "date-time",
+  "deliveredAt": "date-time",
+  "readAt": "date-time",
+  "body": "string",
+  "inbound": "boolean",
+  "type": "string",
+  "template": { "id","name" },
+  "file": "StorageFileDTO",
+  "reactions": [{ "reaction","reactedAt","personName" }],
+  "uid": "string",
+  "session": { "id","publicId" },
+  "buttons": "array",
+  "error": "string"
+}</pre>
+            <p class="note">Endpoints de WhatsApp (<code>/whatsapp-management</code>, <code>/whatsapp/logs</code>) mencionados no PDF mas ausentes no OpenAPI.</p>
+            <div class="diff-note"><strong>Diferença:</strong> Tabia unifica mensageria — sem necessidade de CRM Dynamics 365 + BLIP como intermediarios. Porém precisa customizar flows para cobrir os cenarios existentes (linhas de cuidado, disparo por CPF, etc).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== 4. Matriz de Risco ===== -->
+<div class="card">
+  <div class="card-header" onclick="toggle(this)">
+    4. Matriz de Risco da Migração
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+
+    <h4 style="margin-bottom:.4rem">4.1 Riscos Críticos (Blockers)</h4>
+    <table>
+      <tr><th>Risco</th><th>Domínio</th><th>Ação</th></tr>
+      <tr><td><span class="badge badge-blocker">BLOCKER</span> Termos de Aceite inexistentes</td><td>Termos</td><td>Alinhar timeline de entrega com Tabia</td></tr>
+      <tr><td><span class="badge badge-blocker">BLOCKER</span> Busca por CPF</td><td>Beneficiário, Usuário</td><td>Confirmar se CPF pode ser filtro em patient/user</td></tr>
+      <tr><td><span class="badge badge-blocker">BLOCKER</span> Conceito de MedicaoRisco</td><td>Risco</td><td>Validar se no-show atende ou precisa novo endpoint</td></tr>
+    </table>
+
+    <h4 style="margin:.75rem 0 .4rem">4.2 Riscos Altos (Requerem Redesign)</h4>
+    <table>
+      <tr><th>Risco</th><th>Domínio</th><th>Ação</th></tr>
+      <tr><td><span class="badge badge-alto">ALTO</span> Plano de Ação modular</td><td>Plano de Ação</td><td>Criar camada de adaptação PlanoAcao &rarr; Pathway/ICP/Task/Event</td></tr>
+      <tr><td><span class="badge badge-alto">ALTO</span> Questionários compostos</td><td>Questionários</td><td>Construir logica de composição no adapter</td></tr>
+      <tr><td><span class="badge badge-alto">ALTO</span> Internação via Eventos</td><td>Internação</td><td>Definir modelo de evento customizado com Tabia</td></tr>
+    </table>
+
+    <h4 style="margin:.75rem 0 .4rem">4.3 Riscos Medios (Mapeamento de Campos)</h4>
+    <table>
+      <tr><th>Risco</th><th>Domínio</th></tr>
+      <tr><td><span class="badge badge-medio">MEDIO</span> Field mapping Patient &rarr; Beneficiário</td><td>Beneficiário</td></tr>
+      <tr><td><span class="badge badge-medio">MEDIO</span> Field mapping TaskStatus &rarr; RealizarAcao</td><td>Plano de Ação</td></tr>
+      <tr><td><span class="badge badge-medio">MEDIO</span> Paginação</td><td>Todos</td></tr>
+      <tr><td><span class="badge badge-medio">MEDIO</span> Mensageria customizada</td><td>WhatsApp</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 5. Endpoints Tabia ===== -->
+<div class="card">
+  <div class="card-header" onclick="toggle(this)">
+    5. Endpoints Tabia (CareOS OpenAPI) — Referência Completa
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <table>
+      <tr><th>Metodo(s)</th><th>Endpoint</th><th>Domínio</th></tr>
+      <tr><td>GET</td><td><code>/apiv1/appointment-no-show-risk/stats</code></td><td>Risco</td></tr>
+      <tr><td>GET / POST</td><td><code>/apiv1/event</code></td><td>Eventos</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/event-metric</code></td><td>Metricas</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/individual-care-plan</code></td><td>Plano Individual</td></tr>
+      <tr><td>POST</td><td><code>/apiv1/individual-care-plan/batch</code></td><td>Plano Individual (batch)</td></tr>
+      <tr><td>POST</td><td><code>/apiv1/message/send</code></td><td>Mensageria</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/pathway</code></td><td>Jornadas</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/patient</code></td><td>Paciente</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/patient/{id}</code></td><td>Paciente</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/patient/{id}/data-on-current-organization</code></td><td>Paciente</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/survey/{id}</code></td><td>Questionário</td></tr>
+      <tr><td>GET / POST</td><td><code>/apiv1/survey/{id}/applications</code></td><td>Aplicações</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/survey/{id}/details</code></td><td>Detalhes</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/survey/{id}/stats</code></td><td>Estatisticas</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/surveydata/{uid}</code></td><td>Dados de resposta</td></tr>
+      <tr><td>GET / POST</td><td><code>/apiv1/task</code></td><td>Tarefas</td></tr>
+      <tr><td>POST</td><td><code>/apiv1/task/{id}/status</code></td><td>Status tarefa</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/user</code></td><td>Usuário</td></tr>
+      <tr><td>GET</td><td><code>/apiv1/user/search</code></td><td>Busca usuário</td></tr>
+    </table>
+    <p class="note">Nota: Endpoints de WhatsApp (whatsapp-management, whatsapp/logs) e surveydata/{uid}/answer constam no PDF mas não no JSON — provavelmente em desenvolvimento.</p>
+  </div>
+</div>
+
+<!-- ===== 6. Recomendações ===== -->
+<div class="card">
+  <div class="card-header" onclick="toggle(this)">
+    6. Recomendações para o Projeto de Migração
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+
+    <h4 style="margin-bottom:.5rem">Fase 1 — Validação (antes de codar)</h4>
+    <div class="phase"><div class="phase-num">1</div><div class="phase-content"><strong>Confirmar busca por CPF</strong> nos endpoints patient e user da Tabia</div></div>
+    <div class="phase"><div class="phase-num">2</div><div class="phase-content"><strong>Alinhar timeline</strong> do endpoint de Termos de Aceite com a Tabia</div></div>
+    <div class="phase"><div class="phase-num">3</div><div class="phase-content"><strong>Validar conceito de MedicaoRisco</strong> — se no-show atende ou precisa novo recurso</div></div>
+    <div class="phase"><div class="phase-num">4</div><div class="phase-content"><strong>Obter field mapping</strong> detalhado: Patient &harr; Beneficiário, TaskStatus &harr; RealizarAcao</div></div>
+
+    <h4 style="margin:.75rem 0 .5rem">Fase 2 — Adapter Layer (Anti-Corruption Layer)</h4>
+    <div class="phase"><div class="phase-num">5</div><div class="phase-content"><strong>Criar camada de abstração</strong> entre CBV e APIs (interface única Healthmap &rarr; Tabia)</div></div>
+    <div class="phase"><div class="phase-num">6</div><div class="phase-content"><strong>Composição de chamadas</strong> para Questionários (multiplas Tabia &rarr; resposta única)</div></div>
+    <div class="phase"><div class="phase-num">7</div><div class="phase-content"><strong>Tradução Plano de Ação</strong> &rarr; Pathway/ICP/Task/Event</div></div>
+
+    <h4 style="margin:.75rem 0 .5rem">Fase 3 — Migração Gradual (Strangler Fig)</h4>
+    <div class="phase"><div class="phase-num">O1</div><div class="phase-content"><strong>Onda 1:</strong> Autenticação (API Key) + Beneficiário (patient)</div></div>
+    <div class="phase"><div class="phase-num">O2</div><div class="phase-content"><strong>Onda 2:</strong> Questionários (survey/surveydata) — maior volume</div></div>
+    <div class="phase"><div class="phase-num">O3</div><div class="phase-content"><strong>Onda 3:</strong> Plano de Ação (pathway/task/event) — maior complexidade</div></div>
+    <div class="phase"><div class="phase-num">O4</div><div class="phase-content"><strong>Onda 4:</strong> Risco + Internação + Termos (dependem de validação Tabia)</div></div>
+    <div class="phase"><div class="phase-num">O5</div><div class="phase-content"><strong>Onda 5:</strong> Mensageria (WhatsApp via flows Tabia)</div></div>
+
+    <h4 style="margin:.75rem 0 .5rem">Itens Pendentes com a Tabia</h4>
+    <ul class="checklist">
+      <li>Confirmar suporte a busca por CPF em <code>/apiv1/patient</code> e <code>/apiv1/user</code></li>
+      <li>Timeline de entrega dos endpoints de Termos de Aceite</li>
+      <li>Definição do modelo de evento para Alertas de Internação</li>
+      <li>Documentação dos endpoints de WhatsApp</li>
+      <li>Validação do conceito MedicaoRisco vs appointment-no-show-risk</li>
+      <li>Field mapping completo Patient &harr; Beneficiário</li>
+      <li>Confirmar se <code>surveydata/{uid}/answer</code> suporta filtro por periodo</li>
+    </ul>
+  </div>
+</div>
+
+</main>
+
+<script>
+function toggle(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+function toggleApi(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+</script>
+</body>
+</html>

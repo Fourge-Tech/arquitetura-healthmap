@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testes de Conectividade — API Tabia Staging</title>
+<style>
+  :root{
+    --blue-dark:#1a3a5c;--blue-main:#2E75B6;--blue-light:#D5E8F0;
+    --green:#27ae60;--orange:#e67e22;--red:#e74c3c;--yellow:#f39c12;
+    --purple:#8e44ad;--bg:#f5f7fa;--text:#2c3e50;--border:#dce1e8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.55}
+  header{background:linear-gradient(135deg,var(--blue-dark),var(--blue-main));color:#fff;padding:1.5rem 2rem;text-align:center}
+  header h1{font-size:1.4rem;font-weight:700}
+  header p{opacity:.9;font-size:.85rem;margin-top:.3rem}
+  header .date{display:inline-block;margin-top:.4rem;background:rgba(255,255,255,.15);padding:.2em .6em;border-radius:10px;font-size:.75rem}
+  main{max-width:1100px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+  .tldr{background:linear-gradient(135deg,#e8f5e9,#fff);border:2px solid var(--green);border-radius:12px;padding:1rem 1.3rem;margin-bottom:1.3rem}
+  .tldr h2{color:var(--green);font-size:1.05rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+  .tldr ul{list-style:none;font-size:.88rem}
+  .tldr ul li{padding:.25rem 0;padding-left:1.3rem;position:relative}
+  .tldr ul li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
+  .tldr ul li.warn::before{content:'⚠';color:var(--orange)}
+  .tldr ul li.info::before{content:'ℹ';color:var(--blue-main)}
+
+  .block{background:#fff;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.06);margin-bottom:1.2rem;overflow:hidden}
+  .block h2{background:#fafbfd;padding:.8rem 1.1rem;border-left:4px solid var(--blue-main);font-size:1.05rem;color:var(--blue-dark);display:flex;align-items:center;gap:.5rem}
+  .block .body{padding:1rem 1.1rem}
+
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th,td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:var(--blue-light);color:var(--blue-dark);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em}
+  td code{background:#eef3f8;padding:.08em .4em;border-radius:3px;font-size:.8rem;color:var(--blue-dark);font-family:'Consolas',monospace}
+
+  .http{display:inline-block;padding:.1em .5em;border-radius:3px;font-size:.72rem;font-weight:700;color:#fff;font-family:'Consolas',monospace}
+  .h-200{background:var(--green)}
+  .h-302{background:#16a085}
+  .h-401{background:var(--orange)}
+  .h-403{background:#d35400}
+  .h-404{background:var(--red)}
+  .h-500{background:#c0392b}
+
+  pre{background:#1e2a3a;color:#a8d8a8;padding:.7rem .85rem;border-radius:5px;font-size:.72rem;line-height:1.5;overflow-x:auto;font-family:'Consolas',monospace;margin:.3rem 0;white-space:pre-wrap;word-break:break-word}
+  pre .cmd{color:#70c0ff}
+  pre .out{color:#b8b8b8}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.7rem;margin:.7rem 0}
+  .stat{background:#fafbfd;border-radius:8px;padding:.7rem .8rem;border-left:3px solid var(--blue-main)}
+  .stat .label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.2rem}
+  .stat .value{font-size:.95rem;font-weight:600;color:var(--blue-dark);font-family:'Consolas',monospace;word-break:break-all}
+  .stat.ok{border-left-color:var(--green)}
+  .stat.warn{border-left-color:var(--orange)}
+  .stat.err{border-left-color:var(--red)}
+
+  .alert{padding:.6rem .9rem;border-radius:5px;font-size:.82rem;margin:.5rem 0}
+  .alert-green{background:#e8f5e9;border-left:3px solid var(--green)}
+  .alert-orange{background:#fff3e0;border-left:3px solid var(--orange)}
+  .alert-blue{background:#e3f2fd;border-left:3px solid var(--blue-main)}
+  .alert-red{background:#fdecea;border-left:3px solid var(--red)}
+  .alert strong{color:var(--blue-dark)}
+
+  .btn{display:inline-block;padding:.3rem .7rem;background:#eef3f8;color:var(--blue-dark);border:1px solid var(--border);border-radius:4px;font-size:.75rem;cursor:pointer;font-family:'Consolas',monospace;margin:.15rem}
+  .btn:hover{background:var(--blue-light)}
+
+  .note{font-size:.78rem;color:#777;font-style:italic;margin-top:.4rem}
+
+  @media print{
+    pre{break-inside:avoid}
+    .block{break-inside:avoid;box-shadow:none;border:1px solid var(--border)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔌 Testes de Conectividade — API Tabia Staging</h1>
+  <p>Diagnóstico da API <code>https://staging.tabia.health</code> sem credenciais reais</p>
+  <span class="date">Executado em 17/abr/2026</span>
+</header>
+
+<main>
+
+<!-- TLDR -->
+<div class="tldr">
+  <h2>🎯 TL;DR — Resposta direta</h2>
+  <ul>
+    <li><strong>Sim, dá para testar agora</strong> — mas só validações de infraestrutura. Chamadas reais de negócio (listar pacientes, etc) precisam da <strong>API Key</strong>.</li>
+    <li>A API <strong>existe, está no ar e responde corretamente</strong> — retorna 401 sem auth, 403 com key inválida.</li>
+    <li>Latência típica <strong>~460ms do Brasil</strong> (servidor na AWS Miami).</li>
+    <li class="info">Infra: <strong>AWS CloudFront</strong> + <strong>TLS 1.3</strong> + certificado Amazon. Backend Spring Boot (Java).</li>
+    <li class="warn">Os 2 endpoints de WhatsApp que <strong>faltavam no OpenAPI</strong> (<code>/apiv1/whatsapp-management</code> e <code>/apiv1/whatsapp/logs</code>) <strong>existem</strong> — só não foram documentados.</li>
+    <li class="warn">CORS <strong>não aceita origins arbitrárias</strong> (retorna 403). Em ODC, precisaremos chamar <strong>server-side</strong> via Consume REST API, não do browser.</li>
+    <li class="info">Swagger UI não é público — precisa autenticação para acessar.</li>
+  </ul>
+</div>
+
+<!-- Ambiente -->
+<div class="block">
+  <h2>🌍 Ambiente e infraestrutura</h2>
+  <div class="body">
+    <div class="grid">
+      <div class="stat ok">
+        <div class="label">Base URL (staging)</div>
+        <div class="value">staging.tabia.health</div>
+      </div>
+      <div class="stat ok">
+        <div class="label">Base URL (produção)</div>
+        <div class="value">app.tabia.health</div>
+      </div>
+      <div class="stat ok">
+        <div class="label">IP resolvido (staging)</div>
+        <div class="value">108.157.173.52</div>
+      </div>
+      <div class="stat ok">
+        <div class="label">CDN/Proxy</div>
+        <div class="value">AWS CloudFront</div>
+      </div>
+      <div class="stat ok">
+        <div class="label">Região CDN</div>
+        <div class="value">MIA3 (Miami)</div>
+      </div>
+      <div class="stat ok">
+        <div class="label">TLS</div>
+        <div class="value">TLSv1.3 / AES-128-GCM</div>
+      </div>
+      <div class="stat ok">
+        <div class="label">Certificado</div>
+        <div class="value">Amazon RSA 2048 M04</div>
+      </div>
+      <div class="stat ok">
+        <div class="label">Latência média (5 amostras)</div>
+        <div class="value">~460 ms</div>
+      </div>
+    </div>
+    <p class="note">Infra sem surpresas: CloudFront + Spring Boot padrão. Sem VPN ou peering — chamadas saem pela internet pública.</p>
+  </div>
+</div>
+
+<!-- Teste 1: Conectividade base -->
+<div class="block">
+  <h2>🟢 Teste 1 — Servidores no ar</h2>
+  <div class="body">
+    <table>
+      <tr><th>URL</th><th>Resposta</th><th>Tempo</th><th>Observação</th></tr>
+      <tr><td><code>GET https://staging.tabia.health/</code></td><td><span class="http h-302">302</span></td><td>737 ms</td><td>Redirect (provável para login)</td></tr>
+      <tr><td><code>GET https://app.tabia.health/</code></td><td><span class="http h-302">302</span></td><td>262 ms</td><td>Produção também no ar</td></tr>
+    </table>
+    <div class="alert alert-green"><strong>Resultado:</strong> Ambos os ambientes respondem. DNS e certificados OK.</div>
+  </div>
+</div>
+
+<!-- Teste 2: Autenticacao -->
+<div class="block">
+  <h2>🔐 Teste 2 — Comportamento da autenticação</h2>
+  <div class="body">
+    <table>
+      <tr><th>Cenário</th><th>HTTP</th><th>Interpretação</th></tr>
+      <tr>
+        <td><code>GET /apiv1/patient?size=1</code><br>sem header <code>api-key</code></td>
+        <td><span class="http h-401">401</span></td>
+        <td><strong>Unauthorized</strong> — servidor exige autenticação. Confirma endpoint existe.</td>
+      </tr>
+      <tr>
+        <td><code>GET /apiv1/patient?size=1</code><br>com <code>api-key: invalid-test-key-123</code></td>
+        <td><span class="http h-403">403</span></td>
+        <td><strong>Forbidden</strong> — servidor recebeu a key mas não reconheceu. Diferenciação 401 vs 403 ajuda no tratamento de erro do adapter.</td>
+      </tr>
+    </table>
+
+    <div class="alert alert-blue"><strong>Para o Dev Lead:</strong> O tratamento de erro do <code>Tabia_ACL_Lib</code> deve diferenciar:
+      <ul style="margin-top:.3rem;margin-left:1.2rem">
+        <li><strong>401</strong> = API Key ausente → alertar DevOps, secret pode ter sumido</li>
+        <li><strong>403</strong> = API Key errada/expirada → trocar chave</li>
+        <li><strong>429</strong> = rate limit (não testado) → backoff</li>
+        <li><strong>5xx</strong> = erro Tabia → retry + circuit breaker</li>
+      </ul>
+    </div>
+
+    <h3 style="margin:.8rem 0 .3rem;font-size:.9rem;color:var(--blue-dark)">Response headers observados (401)</h3>
+<pre><span class="out">HTTP/2 401
+content-length: 0
+set-cookie: XSRF-TOKEN=...; Path=/; Secure; SameSite=Strict
+set-cookie: SESSION=...; Path=/; Secure; HttpOnly; SameSite=Lax
+content-security-policy: default-src * 'self' data: ...
+x-frame-options: DENY
+x-content-type-options: nosniff
+strict-transport-security: max-age=31536000; includeSubDomains
+cache-control: no-cache, no-store, max-age=0, must-revalidate
+via: 1.1 b2d81f0349dd7259d5dfb1b35b379c6c.cloudfront.net</span></pre>
+    <p class="note">Headers típicos de Spring Security. Sessão + XSRF mostram que o backend é stateful para UI, mas as chamadas API usam só <code>api-key</code>.</p>
+  </div>
+</div>
+
+<!-- Teste 3: Endpoints ausentes no OpenAPI -->
+<div class="block">
+  <h2>🕵️ Teste 3 — Endpoints ausentes no OpenAPI existem?</h2>
+  <div class="body">
+    <p style="font-size:.85rem;margin-bottom:.5rem">Mencionados no PDF da Tabia mas faltando no <code>openapi-careos-simple.json</code>:</p>
+    <table>
+      <tr><th>Endpoint</th><th>HTTP sem auth</th><th>Conclusão</th></tr>
+      <tr><td><code>GET /apiv1/whatsapp-management</code></td><td><span class="http h-401">401</span></td><td>✅ <strong>Existe</strong> — só falta no OpenAPI</td></tr>
+      <tr><td><code>GET /apiv1/whatsapp/logs</code></td><td><span class="http h-401">401</span></td><td>✅ <strong>Existe</strong> — só falta no OpenAPI</td></tr>
+      <tr><td><code>GET /apiv1/surveydata/abc123/answer</code></td><td><span class="http h-404">404</span></td><td>⚠️ Não existe para esse <code>uid</code>, mas rota pode existir com UID válido</td></tr>
+    </table>
+
+    <div class="alert alert-orange"><strong>Ação com Tabia:</strong> Solicitar OpenAPI atualizado incluindo os endpoints de WhatsApp. Eles já estão no ar, só faltando na documentação. Para <code>/surveydata/{uid}/answer</code>: solicitar schema e exemplo de chamada com UID real.</div>
+  </div>
+</div>
+
+<!-- Teste 4: CORS -->
+<div class="block">
+  <h2>🌐 Teste 4 — CORS (importante para ODC)</h2>
+  <div class="body">
+    <table>
+      <tr><th>Cenário</th><th>HTTP</th><th>Mensagem</th></tr>
+      <tr>
+        <td><code>OPTIONS /apiv1/patient</code><br>Origin: <code>https://meu-odc.outsystemscloud.com</code></td>
+        <td><span class="http h-403">403</span></td>
+        <td><code>Invalid CORS request</code></td>
+      </tr>
+    </table>
+
+    <div class="alert alert-orange">
+      <strong>Implicação crítica para ODC:</strong> Chamadas diretas do <strong>browser</strong> (Reactive Web App) para a API Tabia <strong>serão bloqueadas pelo CORS</strong>.
+      <br><br>
+      <strong>Obrigatório:</strong> A Library <code>Tabia_ACL_Lib</code> deve rodar <strong>server-side</strong> (Server Actions no ODC chamam via Consume REST API). O browser só fala com o backend ODC, que por sua vez fala com Tabia. Padrão já recomendado.
+    </div>
+
+    <p class="note">Origens liberadas provavelmente incluem só <code>*.tabia.health</code>. Em staging pode ser possível pedir adição temporária do domínio ODC, mas <strong>não é boa prática</strong> expor API Key no browser de qualquer forma.</p>
+  </div>
+</div>
+
+<!-- Teste 5: Docs -->
+<div class="block">
+  <h2>📖 Teste 5 — Documentação pública disponível?</h2>
+  <div class="body">
+    <table>
+      <tr><th>URL</th><th>HTTP</th><th>Observação</th></tr>
+      <tr><td><code>/swagger-ui.html</code></td><td><span class="http h-302">302</span></td><td>Redireciona para login</td></tr>
+      <tr><td><code>/swagger/index.html</code></td><td><span class="http h-302">302</span></td><td>Mesmo comportamento</td></tr>
+      <tr><td><code>/v3/api-docs</code></td><td><span class="http h-302">302</span></td><td>Mesmo comportamento</td></tr>
+      <tr><td><code>/actuator/health</code></td><td><span class="http h-302">302</span></td><td>Spring Actuator também protegido</td></tr>
+    </table>
+    <div class="alert alert-blue">Nenhum endpoint de documentação/health é público. Tudo está atrás de auth. O OpenAPI enviado por arquivo (<code>openapi-careos-simple.json</code>) é a única fonte que temos.</div>
+  </div>
+</div>
+
+<!-- Como reproduzir -->
+<div class="block">
+  <h2>🛠️ Como reproduzir os testes (para o Dev Lead)</h2>
+  <div class="body">
+    <p style="font-size:.85rem;margin-bottom:.5rem">Todos os comandos abaixo rodam em qualquer terminal com <code>curl</code>:</p>
+    <pre><span class="cmd"># 1. Conectividade básica
+curl -s -o /dev/null -w "HTTP %{http_code} | %{time_total}s\n" https://staging.tabia.health/
+
+# 2. Chamar API sem key (deve dar 401)
+curl -s -i https://staging.tabia.health/apiv1/patient?size=1 | head -5
+
+# 3. Chamar com key inválida (deve dar 403)
+curl -s -i -H "api-key: test-fake-key" https://staging.tabia.health/apiv1/patient?size=1 | head -5
+
+# 4. Teste de latência (5 amostras)
+for i in 1 2 3 4 5; do
+  curl -s -o /dev/null -w "  $i: %{time_total}s\n" https://staging.tabia.health/apiv1/patient?size=1
+done
+
+# 5. CORS preflight
+curl -s -i -X OPTIONS \
+  -H "Origin: https://meu-dominio.com" \
+  -H "Access-Control-Request-Method: GET" \
+  -H "Access-Control-Request-Headers: api-key" \
+  https://staging.tabia.health/apiv1/patient
+
+# 6. Depois que tiver API Key real:
+curl -s -H "api-key: CHAVE_REAL_AQUI" https://staging.tabia.health/apiv1/patient?size=1 | jq</span></pre>
+  </div>
+</div>
+
+<!-- O que precisa API Key -->
+<div class="block">
+  <h2>🔑 O que só dá para validar depois da API Key</h2>
+  <div class="body">
+    <table>
+      <tr><th>#</th><th>Teste</th><th>Por quê</th></tr>
+      <tr><td>1</td><td>Paginação real (<code>page=0&size=20</code>)</td><td>Ver totalPages, totalElements, comportamento com size grande</td></tr>
+      <tr><td>2</td><td>Filtro por <code>email</code> e <code>cellphone</code></td><td>Confirmar quais campos são aceitos</td></tr>
+      <tr><td>3</td><td>Busca por CPF (<strong>blocker principal</strong>)</td><td>Testar <code>?cpf=...</code>, <code>?search=123.456.789-00</code>, <code>?extensions.cpf=...</code></td></tr>
+      <tr><td>4</td><td>Schema real vs OpenAPI</td><td>Validar que <code>PatientDTO</code> recebido bate com schema declarado</td></tr>
+      <tr><td>5</td><td>Rate limit efetivo</td><td>Fazer 100+ requests em loop — descobrir limites reais</td></tr>
+      <tr><td>6</td><td>Chamadas paralelas</td><td>Tabia aceita concorrência? Quantos requests simultâneos?</td></tr>
+      <tr><td>7</td><td>POST <code>/apiv1/task</code></td><td>Validar schema de request com <code>taskSpecificationId</code></td></tr>
+      <tr><td>8</td><td><code>/apiv1/survey/{id}/applications</code></td><td>Ver se <code>uid</code> é retornado no response do POST</td></tr>
+      <tr><td>9</td><td>Error responses</td><td>Qual é o formato JSON de erro? Ver Problem Details (RFC 7807)?</td></tr>
+      <tr><td>10</td><td>Headers de rate limit</td><td>Procurar <code>X-RateLimit-Remaining</code>, <code>Retry-After</code></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Proxima acao -->
+<div class="block">
+  <h2>➡️ Próxima ação</h2>
+  <div class="body">
+    <div class="alert alert-green">
+      <strong>Solicitar formalmente à Tabia:</strong>
+      <ol style="margin-top:.3rem;margin-left:1.2rem;font-size:.85rem">
+        <li><strong>API Key para staging</strong> (ambiente <code>https://staging.tabia.health</code>) com permissão para todos os endpoints documentados</li>
+        <li><strong>OpenAPI atualizado</strong> incluindo <code>/apiv1/whatsapp-management</code>, <code>/apiv1/whatsapp/logs</code> e <code>POST /apiv1/surveydata/{uid}/answer</code></li>
+        <li>Confirmação da <strong>política de rate limit</strong> (requests/min por API Key)</li>
+        <li><strong>Formato de erro</strong> oficial (estrutura do JSON quando da 4xx/5xx)</li>
+        <li>Confirmação se <strong>CPF</strong> pode ser adicionado como campo nativo ou fica em extensions (blocker principal)</li>
+      </ol>
+    </div>
+    <p style="text-align:center;margin-top:1rem">
+      <a href="kickoff_migracao.html" style="color:var(--blue-main);text-decoration:none;font-weight:600;font-size:.85rem">← Ver checklist completo de kickoff</a>
+    </p>
+  </div>
+</div>
+
+</main>
+
+</body>
+</html>
