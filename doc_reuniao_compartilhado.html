@@ -243,7 +243,6 @@
       <div class="stat" onclick="showGapDetail('all')" style="cursor:pointer"><div class="n">19</div><div class="l">Endpoints mapeados</div></div>
       <div class="stat green" onclick="showGapDetail('direto')" style="cursor:pointer"><div class="n">8</div><div class="l">Equivalente direto</div></div>
       <div class="stat orange" onclick="showGapDetail('parcial')" style="cursor:pointer"><div class="n">8</div><div class="l">Parcial / ajuste</div></div>
-      <div class="stat red" onclick="showGapDetail('dev')" style="cursor:pointer"><div class="n">2</div><div class="l">Em desenvolvimento</div></div>
       <div class="stat red" onclick="showGapDetail('redesign')" style="cursor:pointer"><div class="n">1</div><div class="l">Redesign necessário</div></div>
     </div>
 
@@ -251,8 +250,9 @@
 
     <div id="gapDetail" style="display:none;background:#fafbfd;border:1px solid var(--border);border-radius:6px;padding:.7rem .9rem;margin:.5rem 0;font-size:.82rem"></div>
 
-    <p style="font-size:.85rem;margin-top:.5rem"><strong>Boa notícia:</strong> Core de Beneficiário/Paciente, Usuário, Questionário e Plano de Ação (estrutura) <strong>mapeiam diretamente</strong>. 62% já bate automático.</p>
-    <p style="font-size:.85rem"><strong>Atenção:</strong> Existem <a href="analise_healthmap_tabia.html#blockers" target="_blank">3 blockers críticos</a> que precisam decisão antes de codar (ver seção 4).</p>
+    <p style="font-size:.85rem;margin-top:.5rem"><strong>Boa notícia:</strong> Core de Beneficiário/Paciente, Usuário, Questionário e Plano de Ação (estrutura) <strong>mapeiam diretamente</strong>.</p>
+    <p style="font-size:.85rem"><strong>Atenção:</strong> Existe <a href="analise_healthmap_tabia.html#blockers" target="_blank">1 blocker crítico</a> que precisa decisão antes de codar (ver seção 4).</p>
+    <p style="font-size:.85rem"><strong>Nota:</strong> Os 4 endpoints de <strong>Termos de Aceite</strong> estão em roadmap da Tabia. Permanecem mapeados mas não bloqueiam a migração — podem ser consumidos via Healthmap até a Tabia entregar.</p>
     <p style="font-size:.85rem"><strong>Bônus:</strong> Tabia entrega ~15 campos novos por entidade (tabiaScore, ICDs, pathways, teams, addresses estruturados, insurances multiplas) — dados que hoje não temos.</p>
   </div>
 </div>
