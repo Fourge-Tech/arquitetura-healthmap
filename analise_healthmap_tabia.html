@@ -316,7 +316,7 @@
 <main>
 
 <!-- ===== 1. Resumo Executivo ===== -->
-<div class="card">
+<div class="card" id="resumo">
   <div class="card-header" onclick="toggle(this)">
     1. Resumo Executivo
     <span class="chevron">&#9660;</span>
@@ -369,7 +369,7 @@
 </div>
 
 <!-- ===== 3. Mapeamento Detalhado ===== -->
-<div class="card">
+<div class="card" id="mapeamento">
   <div class="card-header" onclick="toggle(this)">
     3. Mapeamento Detalhado — Endpoint por Endpoint
     <span class="chevron">&#9660;</span>
@@ -377,7 +377,7 @@
   <div class="card-body">
 
     <!-- 3.1 Auth -->
-    <h4 style="margin-bottom:.4rem">3.1 Autenticação</h4>
+    <h4 id="autenticacao" style="margin-bottom:.4rem">3.1 Autenticação</h4>
     <table>
       <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
       <tr><td>1</td><td><code>POST /oauth/token</code></td><td>API Key (header)</td><td><span class="badge badge-diff">Diferente</span></td></tr>
@@ -400,7 +400,7 @@
     </table>
 
     <!-- 3.4 Termos -->
-    <h4 style="margin:.75rem 0 .4rem">3.4 Termos de Aceite</h4>
+    <h4 id="termos" style="margin:.75rem 0 .4rem">3.4 Termos de Aceite</h4>
     <table>
       <tr><th>#</th><th>Healthmap</th><th>Tabia</th><th>Status</th></tr>
       <tr><td>6</td><td><code>GET .../aceiteTermo</code></td><td>&mdash;</td><td><span class="badge badge-dev">Em dev</span></td></tr>
@@ -1436,7 +1436,7 @@ insurances=[int64]</pre>
 </div>
 
 <!-- ===== 4. Matriz de Risco ===== -->
-<div class="card">
+<div class="card" id="blockers">
   <div class="card-header" onclick="toggle(this)">
     4. Matriz de Risco da Migração
     <span class="chevron">&#9660;</span>
