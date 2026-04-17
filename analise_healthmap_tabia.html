@@ -1548,6 +1548,16 @@ insurances=[int64]</pre>
 function toggle(el) {
   el.parentElement.classList.toggle('collapsed');
 }
+function openFromHash() {
+  if (!location.hash) return;
+  const target = document.querySelector(location.hash);
+  if (!target) return;
+  const card = target.closest('.card');
+  if (card) card.classList.remove('collapsed');
+  setTimeout(() => target.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+}
+window.addEventListener('DOMContentLoaded', openFromHash);
+window.addEventListener('hashchange', openFromHash);
 function toggleApi(el) {
   el.parentElement.classList.toggle('collapsed');
 }
