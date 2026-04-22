@@ -7063,8 +7063,10 @@ function cancelAuth() {
 }
 
 // ── MODO VISITANTE (link direto sem senha) ──────────────────────────────────
-// Acesso via: ?acesso=visitante              → abre CBV (padrão)
-// Acesso via: ?acesso=visitante&projeto=ma   → abre Modelo Assistencial
+// Acesso via: ?acesso=visitante                         → abre CBV (padrão)
+// Acesso via: ?acesso=visitante&projeto=ma              → abre Modelo Assistencial
+// Acesso via: ?acesso=visitante&projeto=ja              → abre Jornada Assistencial
+// Acesso via: ?acesso=visitante&projeto=automacoes      → abre Automações — Alta
 // Qualquer pessoa com o link entra direto sem home nem senha.
 let _guestMode = false;
 
@@ -7139,10 +7141,8 @@ function loadProject(id) {
 function _applyGuestUI(proj) {
   proj = proj || 'cbv';
   if (proj === 'ma') {
-    // Esconde botão Dashboard do MA
     const dashMa = document.getElementById('btn-dashboard-ma');
     if (dashMa) dashMa.style.display = 'none';
-    // Insere chip "Visitante" na linha de meta do header MA
     const meta = document.querySelector('#page-header-ma .meta');
     if (meta) {
       const chip = document.createElement('span');
@@ -7151,13 +7151,35 @@ function _applyGuestUI(proj) {
       const exportBtn = document.getElementById('btn-export-ma');
       meta.insertBefore(chip, exportBtn);
     }
+  } else if (proj === 'ja') {
+    const dashJa = document.getElementById('btn-dashboard-ja');
+    if (dashJa) dashJa.style.display = 'none';
+    const meta = document.querySelector('#page-header-ja .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export-ja');
+      meta.insertBefore(chip, exportBtn);
+    }
+  } else if (proj === 'automacoes') {
+    const dashAuto = document.getElementById('btn-dashboard-automacoes');
+    if (dashAuto) dashAuto.style.display = 'none';
+    // Simulador WhatsApp continua disponível no modo visitante
+    const meta = document.querySelector('#page-header-automacoes .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export-automacoes');
+      meta.insertBefore(chip, exportBtn);
+    }
   } else {
-    // Esconde elementos de versão/data/status/histórico no modo visitante (CBV)
+    // CBV (default)
     ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
-    // Insere chip "Visitante" na linha de meta do header CBV
     const meta = document.querySelector('#page-header .meta');
     if (meta) {
       const chip = document.createElement('span');
