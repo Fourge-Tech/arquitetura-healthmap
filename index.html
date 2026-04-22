@@ -6162,6 +6162,17 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
             beneficiário captado pelo fluxo de Alta Complexidade no CRM Viver Bem.
           </p>
 
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0 16px;padding:12px 16px;background:#f1f5f9;border:1px dashed #94a3b8;border-radius:8px;">
+            <span style="font-size:22px;">📥</span>
+            <div style="flex:1;min-width:200px;">
+              <div style="font-weight:700;color:#1a3a5c;font-size:13px;">Collection Postman pronta</div>
+              <div style="font-size:12px;color:#475569;margin-top:2px;">Baixe uma collection v2.1 com os 3 requests deste exemplo + variáveis prontas para uso.</div>
+            </div>
+            <button onclick="downloadPostmanAlta()" style="background:#1a3a5c;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s;" onmouseover="this.style.background='#2a5a8c'" onmouseout="this.style.background='#1a3a5c'">
+              <span>⬇</span> Baixar collection
+            </button>
+          </div>
+
           <div class="mermaid-wrap" style="margin:12px 0 18px;">
             <div class="mermaid">
 sequenceDiagram
@@ -8943,6 +8954,159 @@ function closeSimulator() {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeSimulator();
 });
+
+/* ──────────────────────────────────────────────
+   Download da Collection Postman — Exemplo Alta
+────────────────────────────────────────────── */
+function downloadPostmanAlta() {
+  const collection = {
+    info: {
+      _postman_id: "viver-bem-alta-exemplo-" + Date.now(),
+      name: "Viver Bem CRM — Exemplo Alta (Encadeado)",
+      description: "Collection gerada a partir da seção 6.6 da documentação Automações — Alta Complexidade.\n\nEncadeamento:\n1. Obter Token (Azure AD)\n2. Consultar beneficiário por CPF\n3. Criar Linha de Cuidado (fluxo Alta)\n\nOrigem do fluxo: Plataforma Viver Bem → CRM → BLIP → WhatsApp.",
+      schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    item: [
+      {
+        name: "1. Obter Token (Azure AD)",
+        event: [{
+          listen: "test",
+          script: {
+            type: "text/javascript",
+            exec: [
+              "var jsonData = JSON.parse(responseBody);",
+              "pm.collectionVariables.set(\"token\", jsonData.access_token);"
+            ]
+          }
+        }],
+        request: {
+          method: "POST",
+          header: [],
+          body: {
+            mode: "formdata",
+            formdata: [
+              { key: "grant_type",    value: "client_credentials", type: "text" },
+              { key: "client_id",     value: "{{clientid}}",       type: "text" },
+              { key: "client_secret", value: "{{client_secret}}",  type: "text" },
+              { key: "resource",      value: "{{resource}}",       type: "text" }
+            ]
+          },
+          url: {
+            raw: "https://login.windows.net/{{tenantid}}/oauth2/token",
+            protocol: "https",
+            host: ["login", "windows", "net"],
+            path: ["{{tenantid}}", "oauth2", "token"]
+          }
+        },
+        response: []
+      },
+      {
+        name: "2. Consultar Beneficiário por CPF",
+        event: [{
+          listen: "test",
+          script: {
+            type: "text/javascript",
+            exec: [
+              "var jsonData = JSON.parse(responseBody);",
+              "if (jsonData.value && jsonData.value.length > 0) {",
+              "    pm.collectionVariables.set(\"contactid\", jsonData.value[0].contactid);",
+              "    console.log('contactid salvo:', jsonData.value[0].contactid);",
+              "} else {",
+              "    console.warn('Nenhum contato encontrado para o CPF informado');",
+              "}"
+            ]
+          }
+        }],
+        request: {
+          auth: {
+            type: "bearer",
+            bearer: [{ key: "token", value: "{{token}}", type: "string" }]
+          },
+          method: "GET",
+          header: [],
+          url: {
+            raw: "{{resource}}/api/data/v9.2/contacts?$select=contactid,fullname,telephone1,emailaddress1&$filter=uni_cpf eq '{{cpf}}'&$orderby=createdon desc&$top=1",
+            host: ["{{resource}}"],
+            path: ["api", "data", "v9.2", "contacts"],
+            query: [
+              { key: "$select",  value: "contactid,fullname,telephone1,emailaddress1" },
+              { key: "$filter",  value: "uni_cpf eq '{{cpf}}'" },
+              { key: "$orderby", value: "createdon desc" },
+              { key: "$top",     value: "1" }
+            ]
+          }
+        },
+        response: []
+      },
+      {
+        name: "3. Criar Linha de Cuidado (Alta)",
+        event: [{
+          listen: "test",
+          script: {
+            type: "text/javascript",
+            exec: [
+              "var jsonData = JSON.parse(responseBody);",
+              "if (jsonData.uni_linhadecuidadoid) {",
+              "    pm.collectionVariables.set(\"linhadecuidadoid\", jsonData.uni_linhadecuidadoid);",
+              "    console.log('uni_linhadecuidadoid:', jsonData.uni_linhadecuidadoid);",
+              "}"
+            ]
+          }
+        }],
+        request: {
+          auth: {
+            type: "bearer",
+            bearer: [{ key: "token", value: "{{token}}", type: "string" }]
+          },
+          method: "POST",
+          header: [
+            { key: "Content-Type", value: "application/json",    type: "text" },
+            { key: "Prefer",       value: "return=representation", type: "text" }
+          ],
+          body: {
+            mode: "raw",
+            raw: JSON.stringify({
+              "uni_name": "{{uni_name}}",
+              "uni_Contact@odata.bind": "/contacts({{contactid}})",
+              "uni_elegivel_programa_cuidado": true,
+              "uni_estagiodajornada": 122880000,
+              "uni_elegivelaoprogramacronico": true
+            }, null, 4),
+            options: { raw: { language: "json" } }
+          },
+          url: {
+            raw: "{{resource}}/api/data/v9.2/uni_linhadecuidados?$select=uni_linhadecuidadoid",
+            host: ["{{resource}}"],
+            path: ["api", "data", "v9.2", "uni_linhadecuidados"],
+            query: [{ key: "$select", value: "uni_linhadecuidadoid" }]
+          }
+        },
+        response: []
+      }
+    ],
+    variable: [
+      { key: "tenantid",      value: "062096f2-76c0-4ed8-b8bf-6644178496b2", type: "string" },
+      { key: "clientid",      value: "", type: "string" },
+      { key: "client_secret", value: "", type: "string" },
+      { key: "resource",      value: "https://unimedpoa-hml.crm2.dynamics.com", type: "string" },
+      { key: "token",         value: "", type: "string" },
+      { key: "cpf",           value: "02792238038", type: "string" },
+      { key: "contactid",     value: "", type: "string" },
+      { key: "uni_name",      value: "NAIANE", type: "string" },
+      { key: "linhadecuidadoid", value: "", type: "string" }
+    ]
+  };
+
+  const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'Viver-Bem-CRM-Exemplo-Alta.postman_collection.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 300);
+}
 </script>
 
 <!-- SIMULATOR MODAL -->
