@@ -5523,7 +5523,7 @@
     <a href="#auto-sec3-1" class="sub">3.1 Opt-out (PARAR)</a>
     <a href="#auto-sec3-2" class="sub">3.2 Com interesse</a>
     <div class="nav-section">Referência</div>
-    <a href="#auto-sec4">4. Pendências em Aberto</a>
+    <a href="#auto-sec4">4. Decisões e Esclarecimentos</a>
     <a href="#auto-sec5">5. Integrações</a>
     <a href="#auto-sec6">6. API CRM Dynamics 365</a>
     <a href="#auto-sec6-1" class="sub">6.1 Autenticação Azure AD</a>
@@ -5794,49 +5794,63 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
       </div>
     </div>
 
-    <!-- SEC 4: PENDÊNCIAS -->
+    <!-- SEC 4: DECISÕES E ESCLARECIMENTOS -->
     <div class="section-card" id="auto-sec4">
       <div class="section-header">
         <div class="section-number">4</div>
-        <h2>Pendências e Decisões em Aberto</h2>
+        <h2>Decisões e Esclarecimentos</h2>
       </div>
       <div class="section-body">
-        <div class="callout warn">
-          <strong>⚠️ Itens que precisam de definição antes do go-live</strong>
+        <div class="callout info">
+          <strong>ℹ️ Itens antes tratados como pendências — já resolvidos</strong>
+          Os itens abaixo foram originalmente levantados no board do Miro como pendências de
+          go-live, mas já possuem solução implementada ou decisão definida.
         </div>
         <table class="ep-table" style="margin-top:16px;">
           <thead>
             <tr>
               <th style="width:40px">#</th>
-              <th>Pendência</th>
+              <th>Item</th>
               <th style="width:130px">Tipo</th>
-              <th style="width:130px">Responsável</th>
+              <th style="width:110px">Status</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>1</td>
-              <td>Desenhar fluxo do cliente que <strong>não interagiu</strong> com a mensagem inicial (sem resposta)</td>
+              <td>
+                <strong>Cliente que não interagiu com a mensagem inicial</strong><br>
+                <span style="color:#475569;font-size:12.5px;">→ Solução: beneficiário entra no fluxo de recebimento dos <strong>4 templates de reengajamento</strong> implementados no BLIP (ver item 4).</span>
+              </td>
               <td><span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Fluxo</span></td>
-              <td>—</td>
+              <td><span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">✅ Resolvido</span></td>
             </tr>
             <tr>
               <td>2</td>
-              <td>Como identificar <strong>validador único por CPF no Blip</strong> (evitar duplicidade de captação)</td>
+              <td>
+                <strong>Validador único por CPF no Blip</strong><br>
+                <span style="color:#475569;font-size:12.5px;">→ Não se aplica: o controle de unicidade é feito pelo CRM (entidade <code>contacts</code> com <code>uni_cpf</code>) e pela própria Plataforma Viver Bem, que já trata a idempotência antes de chamar o CRM.</span>
+              </td>
               <td><span style="background:#fce7f3;color:#9f1239;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Técnica</span></td>
-              <td>—</td>
+              <td><span style="background:#f1f5f9;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Não se aplica</span></td>
             </tr>
             <tr>
               <td>3</td>
-              <td>Verificar <strong>idade mínima de rastreamento</strong> (quem entra na régua crônico)</td>
+              <td>
+                <strong>Idade mínima de rastreamento (régua crônico)</strong><br>
+                <span style="color:#475569;font-size:12.5px;">→ Controle é feito pela rotina da <strong>Plataforma Viver Bem</strong>, que consome a <strong>API de Base Vidas</strong>, aplica os critérios de elegibilidade (incluindo idade mínima) e dispara os gatilhos para o CRM.</span>
+              </td>
               <td><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Regra</span></td>
-              <td>—</td>
+              <td><span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">✅ Resolvido</span></td>
             </tr>
             <tr>
               <td>4</td>
-              <td>Proposta de <strong>4 templates</strong> para cliente sem interação (reengajamento)</td>
+              <td>
+                <strong>4 templates para cliente sem interação (reengajamento)</strong><br>
+                <span style="color:#475569;font-size:12.5px;">→ Já implementados pelo BLIP. O fluxo de captação Alta atende clientes sem interação via recebimento sequencial desses templates.</span>
+              </td>
               <td><span style="background:#e0e7ff;color:#4338ca;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Copy</span></td>
-              <td>—</td>
+              <td><span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">✅ Resolvido</span></td>
             </tr>
           </tbody>
         </table>
