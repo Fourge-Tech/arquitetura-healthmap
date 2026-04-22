@@ -5462,6 +5462,7 @@
     <a href="#auto-sec6-3" class="sub">6.3 Contato</a>
     <a href="#auto-sec6-4" class="sub">6.4 Linha de Cuidado</a>
     <a href="#auto-sec6-5" class="sub">6.5 WhatsApp / BLIP</a>
+    <a href="#auto-sec6-6" class="sub">6.6 Exemplo prático (Alta)</a>
     <a href="#auto-sec7">7. Próximas Seções</a>
   </nav>
 </aside>
@@ -6071,6 +6072,101 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
                 <tr><td><code>uni_falha</code></td><td>Detalhe do erro em caso de falha no envio via BLIP</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- 6.6 EXEMPLO PRÁTICO ENCADEADO -->
+        <div class="subsection" id="auto-sec6-6">
+          <div class="subsection-title">6.6 Exemplo prático — Encadeamento completo (Alta)</div>
+          <p>
+            Exemplo ponta-a-ponta mostrando o encadeamento das 3 chamadas necessárias para persistir um
+            beneficiário captado pelo fluxo de Alta Complexidade no CRM Viver Bem.
+          </p>
+
+          <div class="mermaid-wrap" style="margin:12px 0 18px;">
+            <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant B as Blip
+    participant AAD as Azure AD
+    participant CRM as Dynamics 365
+
+    B->>AAD: POST /oauth2/token (client_credentials)
+    AAD-->>B: access_token (Bearer)
+
+    B->>CRM: GET /contacts?$filter=uni_cpf eq '{cpf}'
+    CRM-->>B: contactid + fullname + telephone1
+
+    B->>CRM: POST /uni_linhadecuidados (uni_Contact@odata.bind)
+    CRM-->>B: uni_linhadecuidadoid
+            </div>
+          </div>
+
+          <!-- Passo 1 -->
+          <div style="background:#f8fafc;border-left:4px solid #1a3a5c;padding:14px 18px;margin:14px 0;border-radius:6px;">
+            <div style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:6px;">
+              <span style="background:#1a3a5c;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:8px;">1</span>
+              Obter Token (Azure AD)
+            </div>
+            <div style="margin-bottom:8px;"><span class="method post">POST</span> <code>https://login.windows.net/{tenantid}/oauth2/token</code></div>
+            <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;margin:0;"><code>grant_type=client_credentials
+client_id={clientid}
+client_secret={client_secret}
+resource=https://unimedpoa-hml.crm2.dynamics.com</code></pre>
+            <div style="font-size:12px;color:#475569;margin-top:8px;">
+              → Retorna <code>access_token</code> (Bearer), salvo na variável <code>{{token}}</code> da collection.
+            </div>
+          </div>
+
+          <!-- Passo 2 -->
+          <div style="background:#f8fafc;border-left:4px solid #1a3a5c;padding:14px 18px;margin:14px 0;border-radius:6px;">
+            <div style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:6px;">
+              <span style="background:#1a3a5c;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:8px;">2</span>
+              Consultar beneficiário por CPF
+            </div>
+            <div style="margin-bottom:8px;"><span class="method get">GET</span> <code>{{resource}}/api/data/v9.2/contacts?$filter=uni_cpf eq '{cpf}'</code></div>
+            <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;margin:0;"><code>Authorization: Bearer {{token}}
+
+Query:
+  $select  = fullname,telephone1,emailaddress1
+  $filter  = uni_cpf eq '02792238038'
+  $orderby = createdon desc
+  $top     = 1</code></pre>
+            <div style="font-size:12px;color:#475569;margin-top:8px;">
+              → Retorna <code>contactid</code> do beneficiário (ex.: <code>9b65818f-31f5-f011-8407-6045bd3c09a3</code>),
+              que será usado no próximo passo.
+            </div>
+          </div>
+
+          <!-- Passo 3 -->
+          <div style="background:#f8fafc;border-left:4px solid #1a3a5c;padding:14px 18px;margin:14px 0;border-radius:6px;">
+            <div style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:6px;">
+              <span style="background:#1a3a5c;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:8px;">3</span>
+              Criar Linha de Cuidado vinculada ao contato
+            </div>
+            <div style="margin-bottom:8px;"><span class="method post">POST</span> <code>{{resource}}/api/data/v9.2/uni_linhadecuidados?$select=uni_linhadecuidadoid</code></div>
+            <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;margin:0;"><code>Authorization: Bearer {{token}}
+Content-Type: application/json
+Prefer: return=representation
+
+{
+  "uni_name": "NAIANE",
+  "uni_Contact@odata.bind": "/contacts(9b65818f-31f5-f011-8407-6045bd3c09a3)",
+  "uni_elegivel_programa_cuidado": true,
+  "uni_estagiodajornada": 122880000,
+  "uni_elegivelaoprogramacronico": true
+}</code></pre>
+            <div style="font-size:12px;color:#475569;margin-top:8px;">
+              → Retorna o <code>uni_linhadecuidadoid</code> recém-criado. A criação dispara a automação
+              interna do Dynamics que cria o registro em <code>uni_whatsapps</code> e aciona o BLIP.
+            </div>
+          </div>
+
+          <div class="callout warn" style="margin-top:14px;">
+            <strong>⚠️ Atenção ao <code>uni_Contact@odata.bind</code></strong>
+            O valor deve ser a <em>URL relativa</em> do contato no formato <code>/contacts({contactid})</code> —
+            não é um lookup pelo CPF nem um objeto expandido. O <code>{contactid}</code> é o GUID obtido
+            no retorno do Passo 2.
           </div>
         </div>
 
