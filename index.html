@@ -5456,7 +5456,13 @@
     <div class="nav-section">Referência</div>
     <a href="#auto-sec4">4. Pendências em Aberto</a>
     <a href="#auto-sec5">5. Integrações</a>
-    <a href="#auto-sec6">6. Próximas Seções</a>
+    <a href="#auto-sec6">6. API CRM Dynamics 365</a>
+    <a href="#auto-sec6-1" class="sub">6.1 Autenticação Azure AD</a>
+    <a href="#auto-sec6-2" class="sub">6.2 Fluxo de Integração</a>
+    <a href="#auto-sec6-3" class="sub">6.3 Contato</a>
+    <a href="#auto-sec6-4" class="sub">6.4 Linha de Cuidado</a>
+    <a href="#auto-sec6-5" class="sub">6.5 WhatsApp / BLIP</a>
+    <a href="#auto-sec7">7. Próximas Seções</a>
   </nav>
 </aside>
 
@@ -5812,10 +5818,273 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
       </div>
     </div>
 
-    <!-- SEC 6: PRÓXIMAS SEÇÕES -->
+    <!-- SEC 6: API CRM DYNAMICS 365 -->
     <div class="section-card" id="auto-sec6">
       <div class="section-header">
         <div class="section-number">6</div>
+        <h2>API CRM Dynamics 365 — Viver Bem</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Integração do fluxo de captação com o <strong>CRM Dynamics 365</strong> da Unimed POA.
+          Após o aceite do termo e a resposta do questionário inicial no WhatsApp, o <strong>Blip</strong>
+          aciona a API do CRM para persistir o beneficiário, criar/atualizar sua Linha de Cuidado e
+          registrar o rastreamento da mensagem WhatsApp.
+        </p>
+
+        <div class="overview-grid" style="margin-top:12px;">
+          <div style="background:#e0f2fe;border:2px dashed #0284c7;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#0284c7;font-weight:700;">Chatbot</div>
+            <div style="font-size:20px;margin:8px 0;">🤖</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Blip</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Captação Viver Bem</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
+          <div style="background:#eef2ff;border:2px dashed #1a3a5c;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#1a3a5c;font-weight:700;">CRM</div>
+            <div style="font-size:20px;margin:8px 0;">⚙️</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Dynamics 365</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Unimed POA</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
+          <div style="background:#e3f4e3;border:2px dashed #276027;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#276027;font-weight:700;">Canal</div>
+            <div style="font-size:20px;margin:8px 0;">💬</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">WhatsApp</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Beneficiário</div>
+          </div>
+        </div>
+
+        <!-- 6.1 Autenticação -->
+        <div class="subsection" id="auto-sec6-1">
+          <div class="subsection-title">6.1 Autenticação — Azure AD (OAuth 2.0 Client Credentials)</div>
+          <p>
+            A autenticação com o CRM Dynamics 365 usa o fluxo <strong>client_credentials</strong> do
+            <strong>Azure Active Directory</strong>. O token obtido é enviado como Bearer em todas as
+            chamadas subsequentes à Dataverse Web API.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Token Azure AD</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>https://login.windows.net/{tenantid}/oauth2/token</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-token')">{ } JSON</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>ℹ️ Extração automática do token</strong>
+            O script de teste Postman (aba <em>Tests</em>) extrai automaticamente o <code>access_token</code>
+            do retorno e salva na variável <code>token</code> da collection via
+            <code>pm.collectionVariables.set("token", jsonData.access_token)</code>.
+          </div>
+        </div>
+
+        <!-- 6.2 Fluxo de Integração -->
+        <div class="subsection" id="auto-sec6-2">
+          <div class="subsection-title">6.2 Fluxo de Integração — Passo a Passo</div>
+          <p>
+            Após o beneficiário concluir o fluxo de captação no WhatsApp (aceite do termo + 8 perguntas),
+            o Blip dispara as seguintes chamadas sequenciais ao CRM:
+          </p>
+          <ol>
+            <li><strong>Obter Token</strong> — Autentica no Azure AD e obtém o Bearer Token do CRM.</li>
+            <li><strong>Verificar Contato por CPF</strong> — Consulta <code>contacts</code> filtrando pelo campo customizado <code>uni_cpf</code>.</li>
+            <li><strong>Criar / Atualizar Contato</strong> — Se não existir, cria via <code>POST /api/data/v9.2/contacts</code>. Se existir, atualiza telefone e e-mail via <code>PATCH</code>.</li>
+            <li><strong>Verificar Linha de Cuidado por CPF</strong> — Consulta <code>uni_linhadecuidados</code> expandindo o contato vinculado.</li>
+            <li><strong>Criar / Atualizar Linha de Cuidado</strong> — Persiste os flags de monitoramento derivados do questionário inicial.</li>
+            <li><strong>CRM → BLIP → WhatsApp</strong> — Automação interna do Dynamics 365 detecta a criação/atualização e aciona o BLIP para envios subsequentes ao beneficiário.</li>
+          </ol>
+          <div class="callout info">
+            <strong>ℹ️ Rastreamento de mensagens</strong>
+            Cada disparo via BLIP gera um registro na entidade <code>uni_whatsapps</code> com o status,
+            template utilizado, fila e eventual falha — permitindo auditoria do envio.
+          </div>
+        </div>
+
+        <!-- 6.3 Contato -->
+        <div class="subsection" id="auto-sec6-3">
+          <div class="subsection-title">6.3 Contato — Beneficiário no CRM <span class="tag">contacts</span></div>
+          <p>
+            Entidade padrão <code>contacts</code> do Dynamics 365 com campo customizado <code>uni_cpf</code>
+            para identificação do beneficiário Unimed. Campos relevantes:
+            <code>fullname</code>, <code>telephone1</code> e <code>emailaddress1</code>.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Por CPF</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/contacts?$filter=uni_cpf eq '{cpf}'</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-contato-cpf')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Atualizar Contato</td>
+                  <td><span class="method put">PATCH</span></td>
+                  <td><code>/api/data/v9.2/contacts({contactid})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-contato-update')">{ } JSON</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>ℹ️ Criação de Contato</strong>
+            A criação usa <code>POST /api/data/v9.2/contacts</code> (operação nativa do Dynamics 365, não
+            mapeada explicitamente na collection). O campo <code>uni_cpf</code> deve ser preenchido na
+            criação para viabilizar consultas subsequentes por CPF.
+          </div>
+        </div>
+
+        <!-- 6.4 Linha de Cuidado -->
+        <div class="subsection" id="auto-sec6-4">
+          <div class="subsection-title">6.4 Linha de Cuidado <span class="tag">uni_linhadecuidados</span></div>
+          <p>
+            Entidade customizada do CRM que representa o vínculo do beneficiário ao programa de cuidado
+            <strong>Viver Bem</strong>. Os flags de monitoramento alimentam as automações do Dynamics 365
+            que acionam o BLIP para disparo de mensagens WhatsApp.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Por CPF</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados?$expand=uni_Contact&amp;$filter=(uni_Contact/uni_cpf eq '{cpf}')</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-cpf')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Obter Por ID</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados({id})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-id')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Criar Linha de Cuidado</td>
+                  <td><span class="method post">POST</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-criar')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Atualizar Flags</td>
+                  <td><span class="method put">PATCH</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados({id})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-ldc-update')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Deletar</td>
+                  <td><span class="method del">DELETE</span></td>
+                  <td><code>/api/data/v9.2/uni_linhadecuidados({id})</code></td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">Campos da entidade uni_linhadecuidados</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><code>uni_linhadecuidadoid</code></td><td>GUID</td><td>Identificador único da linha de cuidado</td></tr>
+                <tr><td><code>uni_name</code></td><td>String</td><td>Nome/descrição da linha de cuidado</td></tr>
+                <tr><td><code>uni_Contact</code></td><td>Lookup</td><td>Vínculo com o contato — bind via <code>"uni_Contact@odata.bind": "/contacts({id})"</code></td></tr>
+                <tr><td><code>uni_elegivel_programa_cuidado</code></td><td>Boolean</td><td>Indica se o beneficiário é elegível ao programa de cuidado</td></tr>
+                <tr><td><code>uni_data_ativacao_contato</code></td><td>DateTime</td><td>Data de ativação no programa (ISO 8601)</td></tr>
+                <tr><td><code>uni_paciente_sem_acesso</code></td><td>String</td><td>Flag: beneficiário sem acesso ao sistema</td></tr>
+                <tr><td><code>uni_acoes_vencidas</code></td><td>String</td><td>Flag: possui ações vencidas no plano de ação</td></tr>
+                <tr><td><code>uni_monitoramento_previsto_para_o_dia</code></td><td>String</td><td>Flag: monitoramento previsto para o dia corrente</td></tr>
+                <tr><td><code>uni_alteracao_no_risco</code></td><td>String</td><td>Flag: houve alteração no risco do beneficiário (Healthmap)</td></tr>
+                <tr><td><code>uni_alteracao_no_pca</code></td><td>String</td><td>Flag: houve alteração no PCA (Plano de Cuidado Ativo)</td></tr>
+                <tr><td><code>uni_questionariospendentes</code></td><td>String</td><td>Flag: beneficiário possui questionários pendentes</td></tr>
+                <tr><td><code>uni_clientesemcontato</code></td><td>String</td><td>Flag: cliente sem contato recente registrado</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 6.5 WhatsApp / BLIP -->
+        <div class="subsection" id="auto-sec6-5">
+          <div class="subsection-title">6.5 WhatsApp / BLIP <span class="tag">uni_whatsapps</span></div>
+          <p>
+            Entidade customizada <code>uni_whatsapps</code> do CRM para rastreamento das mensagens WhatsApp
+            enviadas via BLIP. Os registros são criados automaticamente pelas automações do Dynamics 365
+            após criação ou atualização de uma Linha de Cuidado.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operação</th><th>Método</th><th>Endpoint</th><th>JSON</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Obter Por ID</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_whatsapps({id})</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-whatsapp-id')">{ } JSON</button></td>
+                </tr>
+                <tr>
+                  <td>Listar Mensagens</td>
+                  <td><span class="method get">GET</span></td>
+                  <td><code>/api/data/v9.2/uni_whatsapps</code></td>
+                  <td><button class="btn-payload" onclick="openPayload('crm-whatsapp-lista')">{ } JSON</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="margin-top:18px;">Campos da entidade uni_whatsapps</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campo</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><code>scheduledend</code></td><td>Data/hora agendada para envio da mensagem</td></tr>
+                <tr><td><code>uni_numero_contato_cliente</code></td><td>Número de telefone do beneficiário (formato E.164)</td></tr>
+                <tr><td><code>_uni_contato_value</code></td><td>GUID do contato vinculado</td></tr>
+                <tr><td><code>uni_template</code></td><td>Nome do template de mensagem configurado no BLIP</td></tr>
+                <tr><td><code>uni_fila</code></td><td>Fila de envio configurada no BLIP</td></tr>
+                <tr><td><code>uni_status_mensagem</code></td><td>Status atual da mensagem (Enviado, Pendente, Falha, etc.)</td></tr>
+                <tr><td><code>description</code></td><td>Conteúdo ou descrição da mensagem enviada</td></tr>
+                <tr><td><code>uni_falha</code></td><td>Detalhe do erro em caso de falha no envio via BLIP</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Ambientes CRM -->
+        <div class="subsection">
+          <div class="subsection-title">Ambientes CRM Dynamics 365</div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">Homologação (HMG)</div>
+              <div class="oc-value">unimedpoa-hml.crm2.dynamics.com</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Desenvolvimento (DEV)</div>
+              <div class="oc-value">unimedpoa-dev.crm2.dynamics.com</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Versão da Web API</div>
+              <div class="oc-value">Dataverse v9.2</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Auth Provider</div>
+              <div class="oc-value">Azure AD — login.windows.net</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEC 7: PRÓXIMAS SEÇÕES -->
+    <div class="section-card" id="auto-sec7">
+      <div class="section-header">
+        <div class="section-number">7</div>
         <h2>Próximas Seções a Documentar</h2>
       </div>
       <div class="section-body">
