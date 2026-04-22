@@ -37,7 +37,7 @@
     }
 
     /* ── SIDEBAR (CBV + MA + JA + AUTOMACOES) ── */
-    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes {
+    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes, #sidebar-automonitoramento {
       width: var(--sidebar-w);
       background: var(--blue-dark);
       color: #cde;
@@ -145,6 +145,33 @@
       background: transparent;
     }
     #main-automacoes { display: none; }
+    #main-automonitoramento { display: none; }
+
+    /* Automonitoramento — cores específicas (teal/cyan) */
+    #sidebar-automonitoramento { display: none; background: #0f3b43; }
+    #sidebar-automonitoramento nav a:hover, #sidebar-automonitoramento nav a.active {
+      background: rgba(20, 184, 166, .18);
+      border-left-color: #14b8a6;
+      color: #fff;
+    }
+    #sidebar-automonitoramento .badge-automonitoramento {
+      display: inline-block; background: #14b8a6; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 10px;
+      border-radius: 10px; margin-top: 8px; letter-spacing: .5px;
+    }
+    #page-header-automonitoramento {
+      background: linear-gradient(135deg, #0f3b43 0%, #14b8a6 100%);
+    }
+    #btn-dashboard-automonitoramento, #btn-export-automonitoramento {
+      background: transparent; color: #fff;
+      border: 1.5px solid rgba(255,255,255,.5);
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .2s; margin-left: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    #btn-dashboard-automonitoramento { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-automonitoramento:hover, #btn-export-automonitoramento:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
     .mermaid-wrap {
       background: #f8fafc;
       border-radius: 8px;
@@ -260,8 +287,8 @@
       background: #2a7a5a; color: #fff;
       font-size: 10px; padding: 2px 8px; border-radius: 10px;
     }
-    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav { padding: 12px 0; flex: 1; }
-    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a {
+    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav, #sidebar-automonitoramento nav { padding: 12px 0; flex: 1; }
+    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a, #sidebar-automonitoramento nav a {
       display: block; padding: 8px 20px;
       color: #a8c4dc; text-decoration: none;
       font-size: 12.5px; line-height: 1.4;
@@ -277,11 +304,11 @@
     #sidebar-ma nav a:hover, #sidebar-ma nav a.active {
       border-left-color: #3ab882;
     }
-    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section {
+    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section, #sidebar-automonitoramento nav .nav-section {
       font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
       color: #5a7a96; padding: 16px 20px 4px; font-weight: 600;
     }
-    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub { padding-left: 32px; font-size: 12px; }
+    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub, #sidebar-automonitoramento nav a.sub { padding-left: 32px; font-size: 12px; }
 
     /* ── HAMBURGER ── */
     #menu-toggle {
@@ -292,7 +319,7 @@
     }
 
     /* ── MAIN (CBV + MA) ── */
-    #main, #main-ma, #main-ja, #main-automacoes {
+    #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento {
       margin-left: var(--sidebar-w);
       flex: 1;
       min-width: 0;
@@ -300,7 +327,7 @@
     #main-ma { display: none; }
 
     /* ── HEADER ── */
-    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes {
+    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes, #page-header-automonitoramento {
       color: #fff;
       padding: 48px 48px 36px;
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
@@ -813,10 +840,11 @@
       #btn-export-ja, #btn-dashboard-ja,
       #btn-export-ma, #btn-dashboard-ma,
       #btn-export-automacoes, #btn-dashboard-automacoes, #btn-sim-automacoes { display: none !important; }
+      #btn-export-automonitoramento, #btn-dashboard-automonitoramento { display: none !important; }
 
       /* Layout sem sidebar */
       body { background: #fff !important; }
-      #main, #main-ma, #main-ja, #main-automacoes { margin-left: 0 !important; }
+      #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento { margin-left: 0 !important; }
       #content { padding: 16px 0 !important; width: 100% !important; }
 
       /* Header impresso — mantém gradiente */
@@ -1372,6 +1400,24 @@
           <span>⚙️ Blip + HMAP</span>
           <span>📅 2026</span>
           <span>🤖 Alta Complexidade</span>
+        </div>
+        <div class="pc-open">Abrir documentação →</div>
+      </div>
+
+      <!-- Projeto 5: Automações — Automonitoramento -->
+      <div class="project-card" onclick="openProject('automonitoramento')">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#0f3b43,#14b8a6);">🩺</div>
+          <span class="pc-badge">Em elaboração</span>
+        </div>
+        <div class="pc-title">Automações — Automonitoramento</div>
+        <div class="pc-sub">Jornada de acompanhamento remoto</div>
+        <div class="pc-desc">Documentação dos fluxos de automonitoramento: envio periódico de questionários aos clientes, templates de pré-agendamento, confirmação, reforço e reprogramação automática de ações.</div>
+        <div class="pc-meta">
+          <span>📋 Versão 1.0</span>
+          <span>⚙️ Blip + Viver Bem</span>
+          <span>📅 2026</span>
+          <span>🩺 Jornada clínica</span>
         </div>
         <div class="pc-open">Abrir documentação →</div>
       </div>
@@ -6342,6 +6388,433 @@ sequenceDiagram
   </div><!-- /content-automacoes -->
 </div><!-- /main-automacoes -->
 
+<!-- ══════════════════════════════════════════════════════════════════
+     PROJETO: AUTOMAÇÕES — AUTOMONITORAMENTO
+══════════════════════════════════════════════════════════════════ -->
+<aside id="sidebar-automonitoramento">
+  <div id="sidebar-logo">
+    <div class="org">Unimed POA</div>
+    <div class="title">Automonitoramento</div>
+    <span class="badge-automonitoramento">Jornada Clínica</span>
+  </div>
+  <nav>
+    <div class="nav-section">Documento</div>
+    <a href="#mon-sec1">1. Objetivo e Contexto</a>
+    <a href="#mon-sec2">2. Visão Geral do Fluxo</a>
+    <a href="#mon-sec3">3. Templates WhatsApp</a>
+    <a href="#mon-sec3-1" class="sub">3.1 Pré-agendamento (D-5)</a>
+    <a href="#mon-sec3-2" class="sub">3.2 Véspera / Dia</a>
+    <a href="#mon-sec3-3" class="sub">3.3 Reforço (sem interação)</a>
+    <a href="#mon-sec3-4" class="sub">3.4 Confirmação (recebimento)</a>
+    <a href="#mon-sec4">4. Fluxo de Confirmação</a>
+    <a href="#mon-sec5">5. Tratamento V2 — Ação em Atraso</a>
+    <a href="#mon-sec5-1" class="sub">5.1 Atraso no dia</a>
+    <a href="#mon-sec5-2" class="sub">5.2 Reprogramação (+15d)</a>
+    <a href="#mon-sec5-3" class="sub">5.3 Registro sem sucesso</a>
+    <div class="nav-section">Referência</div>
+    <a href="#mon-sec6">6. Variáveis dos Templates</a>
+    <a href="#mon-sec7">7. APIs / Integrações</a>
+    <a href="#mon-sec8">8. Validações Pendentes</a>
+  </nav>
+</aside>
+
+<div id="main-automonitoramento">
+
+  <header id="page-header-automonitoramento">
+    <div class="label">Automações — Jornada Clínica · Automonitoramento</div>
+    <h1>Fluxo de Automonitoramento</h1>
+    <div class="subtitle">Acompanhamento remoto via questionários periódicos</div>
+    <div class="meta">
+      <span class="chip"><span class="chip-icon">⚙️</span> Blip + Viver Bem</span>
+      <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+      <button id="btn-dashboard-automonitoramento" onclick="goHome()" title="Voltar ao dashboard">← Dashboard</button>
+      <button id="btn-export-automonitoramento" onclick="window.print()" title="Exportar como PDF"><span>📄</span> Exportar PDF</button>
+    </div>
+  </header>
+
+  <div id="content-automonitoramento" style="padding:40px 48px;width:100%;">
+
+    <!-- SEC 1: OBJETIVO -->
+    <div class="section-card" id="mon-sec1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Objetivo e Contexto</h2>
+      </div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title">Objetivo da demanda</div>
+          <p>
+            Melhorar o fluxo da jornada de <strong>automonitoramento</strong> atualmente utilizada pela Unimed,
+            que consiste no envio periódico de questionários aos clientes para acompanhamento remoto de sua saúde.
+            A meta é tornar o processo mais eficiente a partir dos aprendizados do piloto — otimizando o tempo
+            das navegadoras (enfermeiras), aumentando a taxa de resposta dos clientes e permitindo maior
+            controle, personalização da comunicação e agilidade no retorno das informações essenciais.
+          </p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Situação atual</div>
+          <p>
+            A jornada atual consiste no envio de questionários para que os clientes informem periodicamente
+            seu estado de saúde. Essa automação apoia o trabalho das navegadoras permitindo acompanhamento
+            remoto dos pacientes. A proposta contempla revisar e aperfeiçoar esse fluxo a partir do piloto
+            já realizado.
+          </p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Solução desejada — mudanças previstas</div>
+          <ol>
+            <li><strong>Novo template de pré-agendamento</strong> — gatilho automático 5 dias antes do monitoramento com botão único <code>Realizar</code>.</li>
+            <li><strong>Alteração do template atual</strong> — remover a opção <code>Reagendar</code>, mantendo apenas <code>Realizar agora</code> e <code>Confirmar</code>.</li>
+            <li><strong>Novo template de reforço</strong> — gatilho após X dias sem resposta, até 2 tentativas.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 2: VISÃO GERAL -->
+    <div class="section-card" id="mon-sec2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Visão Geral do Fluxo</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Fluxo macro da jornada de automonitoramento, do disparo automático (D-5) até a confirmação,
+          tratamento de atraso e reprogramação da próxima ação.
+        </p>
+
+        <div class="subsection">
+          <div class="subsection-title">Diagrama do Fluxo</div>
+          <div class="mermaid-wrap">
+            <div class="mermaid">
+flowchart TD
+    D([Disparo automático]):::start --> T1[Envia template 5 dias antes<br/>pré-agendamento]
+    T1 --> T2[Envia template 1 dia antes<br/>Realizar / Confirmar]
+    T2 --> ESC{Paciente escolhe<br/>a opção}
+
+    ESC -- Confirmar --> CF1[[Registra confirmação<br/>no Cockpit]]:::action
+    CF1 --> CF2[Envia template<br/>de recebimento]
+    CF2 --> INP{Inputs<br/>inesperados?}
+    INP -- Sim --> GF[[Consulta Base Vidas por CPF<br/>e direciona para fila do gestor]]:::action
+    INP -- Não --> FIM1([Fim — confirmado]):::end_yes
+
+    ESC -- Realizar agora --> Q[Preenche<br/>questionário]
+    Q --> FIM2([Fim — respondido]):::end_yes
+
+    ESC -- Sem interação --> R1[Template de reforço<br/>1ª tentativa em X dias]
+    R1 --> R2{Interagiu?}
+    R2 -- Sim --> ESC
+    R2 -- Não --> R3[Template de reforço<br/>2ª tentativa em +X dias]
+    R3 --> R4{Interagiu?}
+    R4 -- Sim --> ESC
+    R4 -- Não --> ATR[[Atraso no dia do monitoramento]]:::action
+
+    ATR --> V2A[POST EnviaQuestionario<br/>Registro sem sucesso]
+    V2A --> V2B[PUT AtualizarAcao<br/>status Realizado sem sucesso]
+    V2B --> V2C[[Cria nova ação em +15 dias]]:::action
+    V2C --> D
+
+    classDef start fill:#14b8a6,stroke:#0f766e,color:#fff
+    classDef action fill:#fed7aa,stroke:#ea580c,color:#7c2d12
+    classDef end_yes fill:#a7f3d0,stroke:#059669,color:#064e3b
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 3: TEMPLATES -->
+    <div class="section-card" id="mon-sec3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Templates WhatsApp</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          A jornada usa 4 templates distintos, cada um com gatilho, conteúdo e botões específicos.
+          Todos aceitam as variáveis <code>{{nome}}</code> e <code>{{cpf}}</code>.
+        </p>
+
+        <!-- 3.1 -->
+        <div class="subsection" id="mon-sec3-1">
+          <div class="subsection-title">3.1 Pré-agendamento (D-5) — NOVO</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Envio automático <strong>5 dias antes</strong> da data de agendamento do atendimento na agenda.</td></tr>
+                <tr><th>Conteúdo</th><td>Texto informativo orientando o cliente a realizar o automonitoramento.</td></tr>
+                <tr><th>Botões</th><td><span class="method post">Realizar agora</span> — único botão, direciona para URL do questionário.</td></tr>
+                <tr><th>Variáveis</th><td><code>{{nome}}</code>, <code>{{cpf}}</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3.2 -->
+        <div class="subsection" id="mon-sec3-2">
+          <div class="subsection-title">3.2 Véspera / Dia do monitoramento — ALTERAÇÃO</div>
+          <div class="callout warn">
+            <strong>⚠️ Mudança em relação ao template atual</strong>
+            O template atual possui <em>3 botões</em>: <code>Realizar agora</code>, <code>Confirmar</code> e <code>Reagendar</code>.
+            O botão <strong>Reagendar será removido</strong>, mantendo apenas <code>Realizar agora</code> e <code>Confirmar</code>.
+          </div>
+          <div class="table-wrap" style="margin-top:12px;">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Envio automático <strong>1 dia antes</strong> (ou no dia) do monitoramento.</td></tr>
+                <tr><th>Botão 1</th><td><span class="method post">Realizar agora</span> → direciona para URL do questionário.</td></tr>
+                <tr><th>Botão 2</th><td><span class="method post">Confirmar</span> → registra confirmação no Cockpit Viver Bem + dispara template de recebimento.</td></tr>
+                <tr><th>Inputs inesperados</th><td>Cliente digita texto livre → BLIP consulta Base Vidas por CPF, identifica o gestor do paciente e direciona para a fila do gestor.</td></tr>
+                <tr><th>Sem interação</th><td>Entra no fluxo do template de reforço (3.3).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3.3 -->
+        <div class="subsection" id="mon-sec3-3">
+          <div class="subsection-title">3.3 Reforço — sem interação — NOVO</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Após <strong>X dias sem resposta</strong> ao template da véspera/dia (3.2).</td></tr>
+                <tr><th>Tentativas</th><td>Até <strong>2 disparos</strong>: 1ª em X dias, 2ª em +X dias caso ainda sem interação.</td></tr>
+                <tr><th>Conteúdo</th><td>Mensagem de reforço incentivando o cliente a realizar o automonitoramento.</td></tr>
+                <tr><th>Botões</th><td><span class="method post">Realizar</span> — redireciona ao questionário.</td></tr>
+                <tr><th>Persistência sem resposta</th><td>Segue para o tratamento de atraso V2 (ver seção 5).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3.4 -->
+        <div class="subsection" id="mon-sec3-4">
+          <div class="subsection-title">3.4 Confirmação — recebimento</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Disparado automaticamente após o cliente clicar em <code>Confirmar</code> no template 3.2.</td></tr>
+                <tr><th>Conteúdo</th><td>Texto informativo. Ex.: <em>"Olá, recebemos sua confirmação, o nosso time entrará em contato…"</em>.</td></tr>
+                <tr><th>Botões</th><td>Nenhum — apenas confirmação textual.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 4: FLUXO DE CONFIRMAÇÃO -->
+    <div class="section-card" id="mon-sec4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Fluxo de Confirmação</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Fluxo automático disparado ao clicar em <strong>Confirmar</strong> no template da véspera/dia (3.2).
+          Envolve registro no Cockpit Viver Bem e retorno ao cliente.
+        </p>
+        <ol>
+          <li><strong>Registra confirmação</strong> no Cockpit Viver Bem via API (payload com CPF + data monitoramento).</li>
+          <li><strong>Envia template de confirmação (3.4)</strong> ao cliente.</li>
+          <li>
+            <strong>Input inesperado</strong> (cliente respondeu texto livre em vez de usar os botões):
+            <ul style="margin-top:6px;">
+              <li>BLIP consulta API Base Vidas por CPF para identificar o gestor responsável.</li>
+              <li>BLIP direciona o atendimento para a <strong>fila do gestor</strong>.</li>
+            </ul>
+          </li>
+        </ol>
+        <div class="callout info">
+          <strong>ℹ️ Diferenciação no Cockpit</strong>
+          O registro da confirmação deve permitir diferenciação clara entre <em>cliente que confirmou
+          via botão</em> e <em>cliente que entrou na fila por input inesperado</em> — para priorização
+          da gestora.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 5: TRATAMENTO V2 -->
+    <div class="section-card" id="mon-sec5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>Tratamento V2 — Ação em Atraso</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Tratamento para quando a data do monitoramento é alcançada e o cliente não realizou nem
+          confirmou, apesar dos reforços.
+        </p>
+
+        <!-- 5.1 -->
+        <div class="subsection" id="mon-sec5-1">
+          <div class="subsection-title">5.1 Ação em atraso no dia do monitoramento</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:140px;">Etapa</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Condição</strong></td><td>Data do monitoramento atingida com a ação em atraso.</td></tr>
+                <tr><td><strong>D+1 — Envio</strong></td><td>No dia seguinte, envia o questionário de automação <em>"Registro de contato sem sucesso"</em>. <br><span class="method post">POST</span> <code>EnviaQuestionario</code></td></tr>
+                <tr><td><strong>Atualização</strong></td><td>Atualiza o status da ação para <strong>Realizado sem sucesso</strong>. <br><span class="method put">PUT</span> <code>AtualizarAcao</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">
+            <strong>⚠️ Validação pendente</strong>
+            Confirmar com a área de negócio se o status correto é <code>Realizado sem sucesso</code>
+            ou <code>Não realizado</code>, conforme regra vigente.
+          </div>
+        </div>
+
+        <!-- 5.2 -->
+        <div class="subsection" id="mon-sec5-2">
+          <div class="subsection-title">5.2 Reprogramação de ação de monitoramento</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:140px;">Etapa</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Condição</strong></td><td>Após o monitoramento anterior — independente de sucesso.</td></tr>
+                <tr><td><strong>Ação</strong></td><td>Criar nova ação de monitoramento com prazo de <strong>+15 dias</strong> a partir da data atual.</td></tr>
+                <tr><td><strong>Fluxo</strong></td><td>A nova ação segue o fluxo padrão: D-5 (pré-agendamento) e D-1 (véspera/dia).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 5.3 -->
+        <div class="subsection" id="mon-sec5-3">
+          <div class="subsection-title">5.3 Registro sem sucesso com interação no meio do tempo</div>
+          <div class="callout info">
+            <strong>ℹ️ Cenário de validação</strong>
+            Se no disparo do registro sem sucesso o cliente <em>interagir</em> (tiver resposta no meio
+            do tempo), o sistema deve validar essa interação. Caso a nova tentativa também não seja
+            concluída com sucesso, <strong>não haverá nova reprogramação</strong> de monitoramento.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 6: VARIÁVEIS -->
+    <div class="section-card" id="mon-sec6">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>Variáveis dos Templates</h2>
+      </div>
+      <div class="section-body">
+        <p>Todos os templates da jornada utilizam o mesmo conjunto base de variáveis:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Variável</th><th>Descrição</th><th>Origem</th></tr></thead>
+            <tbody>
+              <tr><td><code>{{nome}}</code></td><td>Primeiro nome do cliente para personalização da mensagem</td><td>Base Vidas / CRM</td></tr>
+              <tr><td><code>{{cpf}}</code></td><td>CPF do beneficiário — usado para consultas downstream (gestor, Cockpit)</td><td>Base Vidas / CRM</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 7: APIs -->
+    <div class="section-card" id="mon-sec7">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2>APIs / Integrações</h2>
+      </div>
+      <div class="section-body">
+        <p>Integrações envolvidas na jornada de automonitoramento:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Sistema</th><th>Método</th><th>Endpoint</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Plataforma Viver Bem</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>EnviaQuestionario</code></td>
+                <td>Envio de questionário (ex.: "Registro de contato sem sucesso" no D+1 de atraso)</td>
+              </tr>
+              <tr>
+                <td>Plataforma Viver Bem</td>
+                <td><span class="method put">PUT</span></td>
+                <td><code>AtualizarAcao</code></td>
+                <td>Atualização de status da ação (ex.: <code>Realizado sem sucesso</code>)</td>
+              </tr>
+              <tr>
+                <td>Base Vidas</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/analyticsBackoffice/v1/vidas?cpf={cpf}</code></td>
+                <td>Identificação do gestor responsável pelo beneficiário (inputs inesperados)</td>
+              </tr>
+              <tr>
+                <td>Cockpit Viver Bem</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/cockpit/confirmacao</code></td>
+                <td>Registro de confirmação de recebimento do monitoramento</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout info">
+          <strong>ℹ️ Contratos detalhados</strong>
+          Os payloads exatos de <code>EnviaQuestionario</code> e <code>AtualizarAcao</code> serão
+          adicionados nesta seção conforme forem recebidos da equipe da Plataforma Viver Bem.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 8: VALIDAÇÕES PENDENTES -->
+    <div class="section-card" id="mon-sec8">
+      <div class="section-header">
+        <div class="section-number">8</div>
+        <h2>Validações Pendentes</h2>
+      </div>
+      <div class="section-body">
+        <div class="callout warn">
+          <strong>⚠️ Itens que precisam de definição antes do go-live</strong>
+        </div>
+        <table class="ep-table" style="margin-top:16px;">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Pendência</th>
+              <th style="width:130px">Tipo</th>
+              <th style="width:110px">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Definir o valor de <strong>X dias</strong> entre os disparos do template de reforço (1ª e 2ª tentativa).</td>
+              <td><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Regra</span></td>
+              <td><span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">⚠ Aberto</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Confirmar status correto na atualização da ação em atraso: <code>Realizado sem sucesso</code> ou <code>Não realizado</code>.</td>
+              <td><span style="background:#fce7f3;color:#9f1239;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Técnica</span></td>
+              <td><span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">⚠ Aberto</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Definir contratos (request/response) de <code>EnviaQuestionario</code> e <code>AtualizarAcao</code>.</td>
+              <td><span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">API</span></td>
+              <td><span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">⚠ Aberto</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Comportamento quando o cliente interage no disparo de registro sem sucesso — validar e confirmar se evita nova reprogramação.</td>
+              <td><span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Fluxo</span></td>
+              <td><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Em análise</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content-automonitoramento -->
+</div><!-- /main-automonitoramento -->
+
 <script>
 /* ── PAYLOADS ── */
 const H = { Authorization: "Bearer {token}", KeyDS: "production" };
@@ -7049,10 +7522,11 @@ function toggleEye() {
 // Clique no card → mostra auth
 let _pendingProject = null;
 const _projectNames = {
-  cbv:        'CBV × Healthmap',
-  ma:         'Modelo Assistencial',
-  ja:         'Jornada Assistencial',
-  automacoes: 'Automações — Alta Complexidade'
+  cbv:                'CBV × Healthmap',
+  ma:                 'Modelo Assistencial',
+  ja:                 'Jornada Assistencial',
+  automacoes:         'Automações — Alta Complexidade',
+  automonitoramento:  'Automações — Automonitoramento'
 };
 function openProject(id) {
   _pendingProject = id;
@@ -7079,6 +7553,7 @@ function cancelAuth() {
 // Acesso via: ?acesso=visitante&projeto=ma              → abre Modelo Assistencial
 // Acesso via: ?acesso=visitante&projeto=ja              → abre Jornada Assistencial
 // Acesso via: ?acesso=visitante&projeto=automacoes      → abre Automações — Alta
+// Acesso via: ?acesso=visitante&projeto=automonitoramento → abre Automonitoramento
 // Qualquer pessoa com o link entra direto sem home nem senha.
 let _guestMode = false;
 
@@ -7089,7 +7564,7 @@ let _guestMode = false;
   if (isGuest) {
     _guestMode = true;
     const _gp = params.get('projeto');
-    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : 'cbv';
+    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : _gp === 'automonitoramento' ? 'automonitoramento' : 'cbv';
     // Oculta overlays instantaneamente
     const ov = document.getElementById('auth-overlay');
     if (ov) { ov.classList.remove('show'); }
@@ -7129,25 +7604,30 @@ function loadProject(id) {
   const isMa   = id === 'ma';
   const isJa   = id === 'ja';
   const isAuto = id === 'automacoes';
+  const isMon  = id === 'automonitoramento';
   // sidebar
   const sbCbv  = document.getElementById('sidebar');
   const sbMa   = document.getElementById('sidebar-ma');
   const sbJa   = document.getElementById('sidebar-ja');
   const sbAuto = document.getElementById('sidebar-automacoes');
+  const sbMon  = document.getElementById('sidebar-automonitoramento');
   if (sbCbv)  sbCbv.style.display  = isCbv  ? '' : 'none';
   if (sbMa)   sbMa.style.display   = isMa   ? 'flex' : 'none';
   if (sbJa)   sbJa.style.display   = isJa   ? 'flex' : 'none';
   if (sbAuto) sbAuto.style.display = isAuto ? 'flex' : 'none';
+  if (sbMon)  sbMon.style.display  = isMon  ? 'flex' : 'none';
   // main
   const mCbv  = document.getElementById('main');
   const mMa   = document.getElementById('main-ma');
   const mJa   = document.getElementById('main-ja');
   const mAuto = document.getElementById('main-automacoes');
+  const mMon  = document.getElementById('main-automonitoramento');
   if (mCbv)  mCbv.style.display  = isCbv  ? 'block' : 'none';
   if (mMa)   mMa.style.display   = isMa   ? 'block' : 'none';
   if (mJa)   mJa.style.display   = isJa   ? 'block' : 'none';
   if (mAuto) mAuto.style.display = isAuto ? 'block' : 'none';
-  if (isAuto) mermaid.run();
+  if (mMon)  mMon.style.display  = isMon  ? 'block' : 'none';
+  if (isAuto || isMon) mermaid.run();
 }
 
 function _applyGuestUI(proj) {
@@ -7186,6 +7666,17 @@ function _applyGuestUI(proj) {
       const exportBtn = document.getElementById('btn-export-automacoes');
       meta.insertBefore(chip, exportBtn);
     }
+  } else if (proj === 'automonitoramento') {
+    const dashMon = document.getElementById('btn-dashboard-automonitoramento');
+    if (dashMon) dashMon.style.display = 'none';
+    const meta = document.querySelector('#page-header-automonitoramento .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export-automonitoramento');
+      meta.insertBefore(chip, exportBtn);
+    }
   } else {
     // CBV (default)
     ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
@@ -7207,10 +7698,10 @@ function _applyGuestUI(proj) {
 function goHome() {
   if (_guestMode) return;
   sessionStorage.removeItem('_p');
-  ['main','main-ma','main-ja','main-automacoes'].forEach(id => {
+  ['main','main-ma','main-ja','main-automacoes','main-automonitoramento'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
-  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes'].forEach(id => {
+  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes','sidebar-automonitoramento'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   const ho = document.getElementById('home-overlay');
