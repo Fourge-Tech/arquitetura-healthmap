@@ -611,6 +611,75 @@
       padding: 1px 6px; border-radius: 4px;
       color: #1a3a5c; word-break: break-all;
     }
+
+    /* Step cards (exemplo encadeado) */
+    .step-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0;
+      margin: 14px 0;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+    .step-card-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
+      background: linear-gradient(to right, #f8fafc, #fff);
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .step-num {
+      background: #1a3a5c; color: #fff;
+      width: 26px; height: 26px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-title {
+      color: #1a3a5c; font-size: 14px; font-weight: 700;
+      flex: 1;
+    }
+    .step-body { padding: 14px 16px; }
+    .step-endpoint {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .step-endpoint code {
+      font-size: 12px;
+    }
+    .step-code {
+      background: #0f172a;
+      border-radius: 6px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 12px;
+      line-height: 1.65;
+      color: #e2e8f0;
+      white-space: pre;
+      margin: 0;
+    }
+    .step-code .k { color: #7dd3fc; }          /* keyword / chave */
+    .step-code .s { color: #86efac; }          /* string */
+    .step-code .n { color: #fbbf24; }          /* number */
+    .step-code .c { color: #64748b; font-style: italic; } /* comment */
+    .step-code .p { color: #cbd5e1; }          /* punctuation */
+    .step-foot {
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: #475569;
+      padding: 8px 12px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      border-left: 3px solid #0284c7;
+    }
+    .step-foot strong, .step-foot .tag-out {
+      color: #1a3a5c; font-weight: 600;
+    }
+    .step-foot code {
+      font-size: 11.5px;
+      background: #fff;
+    }
     .ext-url code { color: #7a3000; background: #fff4e8; border-color: #e8c890; }
     .dev-url td { background: #fffbea; }
     .dev-url code { color: #6b4c00; background: #fff8dc; border-color: #f0d060; border-style: dashed; }
@@ -5828,17 +5897,17 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
       <div class="section-body">
         <p>
           Integração do fluxo de captação com o <strong>CRM Dynamics 365</strong> da Unimed POA.
-          Após o aceite do termo e a resposta do questionário inicial no WhatsApp, o <strong>Blip</strong>
-          aciona a API do CRM para persistir o beneficiário, criar/atualizar sua Linha de Cuidado e
-          registrar o rastreamento da mensagem WhatsApp.
+          A <strong>Plataforma Viver Bem</strong> chama as APIs do CRM para criar/iniciar o fluxo de automação
+          da Alta Complexidade. O próprio CRM, por automações internas, comunica o <strong>BLIP</strong>
+          para disparo dos templates WhatsApp ao beneficiário.
         </p>
 
         <div class="overview-grid" style="margin-top:12px;">
-          <div style="background:#e0f2fe;border:2px dashed #0284c7;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#0284c7;font-weight:700;">Chatbot</div>
-            <div style="font-size:20px;margin:8px 0;">🤖</div>
-            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Blip</div>
-            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Captação Viver Bem</div>
+          <div style="background:#e0f2fe;border:2px dashed #0284c7;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:180px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#0284c7;font-weight:700;">Plataforma</div>
+            <div style="font-size:20px;margin:8px 0;">🏥</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Viver Bem</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Origem do fluxo</div>
           </div>
           <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
           <div style="background:#eef2ff;border:2px dashed #1a3a5c;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
@@ -5846,6 +5915,13 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
             <div style="font-size:20px;margin:8px 0;">⚙️</div>
             <div style="font-size:13px;font-weight:700;color:#1a3a5c;">Dynamics 365</div>
             <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Unimed POA</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
+          <div style="background:#fef3c7;border:2px dashed #d97706;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#d97706;font-weight:700;">Mensageria</div>
+            <div style="font-size:20px;margin:8px 0;">📡</div>
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;">BLIP</div>
+            <div style="font-size:11px;color:#5a7a96;margin-top:4px;">Templates</div>
           </div>
           <div style="display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:22px;">→</div>
           <div style="background:#e3f4e3;border:2px dashed #276027;border-radius:8px;padding:16px 20px;text-align:center;min-width:110px;flex:1;max-width:160px;">
@@ -5889,21 +5965,24 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
         <div class="subsection" id="auto-sec6-2">
           <div class="subsection-title">6.2 Fluxo de Integração — Passo a Passo</div>
           <p>
-            Após o beneficiário concluir o fluxo de captação no WhatsApp (aceite do termo + 8 perguntas),
-            o Blip dispara as seguintes chamadas sequenciais ao CRM:
+            A <strong>Plataforma Viver Bem</strong> é a origem do fluxo de automação de Alta Complexidade.
+            Ela chama as APIs do CRM Dynamics 365 para criar/iniciar a Linha de Cuidado e, a partir dela,
+            o próprio CRM aciona o BLIP via automação interna para disparo dos templates WhatsApp.
           </p>
           <ol>
-            <li><strong>Obter Token</strong> — Autentica no Azure AD e obtém o Bearer Token do CRM.</li>
-            <li><strong>Verificar Contato por CPF</strong> — Consulta <code>contacts</code> filtrando pelo campo customizado <code>uni_cpf</code>.</li>
-            <li><strong>Criar / Atualizar Contato</strong> — Se não existir, cria via <code>POST /api/data/v9.2/contacts</code>. Se existir, atualiza telefone e e-mail via <code>PATCH</code>.</li>
-            <li><strong>Verificar Linha de Cuidado por CPF</strong> — Consulta <code>uni_linhadecuidados</code> expandindo o contato vinculado.</li>
-            <li><strong>Criar / Atualizar Linha de Cuidado</strong> — Persiste os flags de monitoramento derivados do questionário inicial.</li>
-            <li><strong>CRM → BLIP → WhatsApp</strong> — Automação interna do Dynamics 365 detecta a criação/atualização e aciona o BLIP para envios subsequentes ao beneficiário.</li>
+            <li><strong>Plataforma Viver Bem — Obter Token</strong> — Autentica no Azure AD (<code>client_credentials</code>) e obtém o Bearer Token do CRM.</li>
+            <li><strong>Plataforma Viver Bem — Verificar Contato por CPF</strong> — Consulta <code>contacts</code> filtrando pelo campo customizado <code>uni_cpf</code>.</li>
+            <li><strong>Plataforma Viver Bem — Criar / Atualizar Contato</strong> — Se não existir, cria via <code>POST /api/data/v9.2/contacts</code>. Se existir, atualiza telefone e e-mail via <code>PATCH</code>.</li>
+            <li><strong>Plataforma Viver Bem — Verificar Linha de Cuidado por CPF</strong> — Consulta <code>uni_linhadecuidados</code> expandindo o contato vinculado.</li>
+            <li><strong>Plataforma Viver Bem — Criar / Atualizar Linha de Cuidado</strong> — Persiste o vínculo do beneficiário no programa (estágio, elegibilidade) e inicia a automação de Alta.</li>
+            <li><strong>CRM → BLIP</strong> — A automação interna do Dynamics 365 detecta a criação/atualização da Linha de Cuidado e comunica o BLIP informando o template que deve ser disparado.</li>
+            <li><strong>BLIP → WhatsApp</strong> — BLIP envia o template ao beneficiário e registra o retorno em <code>uni_whatsapps</code> no CRM para auditoria.</li>
           </ol>
           <div class="callout info">
-            <strong>ℹ️ Rastreamento de mensagens</strong>
-            Cada disparo via BLIP gera um registro na entidade <code>uni_whatsapps</code> com o status,
-            template utilizado, fila e eventual falha — permitindo auditoria do envio.
+            <strong>ℹ️ Origem do fluxo</strong>
+            Quem inicia a comunicação com o CRM é a <strong>Plataforma Viver Bem</strong> — não o BLIP.
+            O BLIP atua como consumidor do CRM (via automação interna do Dynamics), responsável apenas
+            pela mensageria WhatsApp.
           </div>
         </div>
 
@@ -6087,78 +6166,101 @@ Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até br
             <div class="mermaid">
 sequenceDiagram
     autonumber
-    participant B as Blip
+    participant VB as Plataforma Viver Bem
     participant AAD as Azure AD
     participant CRM as Dynamics 365
+    participant BLIP as BLIP
+    participant WA as WhatsApp
 
-    B->>AAD: POST /oauth2/token (client_credentials)
-    AAD-->>B: access_token (Bearer)
+    VB->>AAD: POST /oauth2/token (client_credentials)
+    AAD-->>VB: access_token (Bearer)
 
-    B->>CRM: GET /contacts?$filter=uni_cpf eq '{cpf}'
-    CRM-->>B: contactid + fullname + telephone1
+    VB->>CRM: GET /contacts?$filter=uni_cpf eq '{cpf}'
+    CRM-->>VB: contactid + fullname + telephone1
 
-    B->>CRM: POST /uni_linhadecuidados (uni_Contact@odata.bind)
-    CRM-->>B: uni_linhadecuidadoid
+    VB->>CRM: POST /uni_linhadecuidados (uni_Contact@odata.bind)
+    CRM-->>VB: uni_linhadecuidadoid
+
+    CRM->>BLIP: Aciona template (automação interna)
+    BLIP->>WA: Envio do template ao beneficiário
+    BLIP-->>CRM: Registra status em uni_whatsapps
             </div>
           </div>
 
           <!-- Passo 1 -->
-          <div style="background:#f8fafc;border-left:4px solid #1a3a5c;padding:14px 18px;margin:14px 0;border-radius:6px;">
-            <div style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:6px;">
-              <span style="background:#1a3a5c;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:8px;">1</span>
-              Obter Token (Azure AD)
+          <div class="step-card">
+            <div class="step-card-head">
+              <span class="step-num">1</span>
+              <div class="step-title">Obter Token — Azure AD</div>
+              <span class="method post">POST</span>
             </div>
-            <div style="margin-bottom:8px;"><span class="method post">POST</span> <code>https://login.windows.net/{tenantid}/oauth2/token</code></div>
-            <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;margin:0;"><code>grant_type=client_credentials
-client_id={clientid}
-client_secret={client_secret}
-resource=https://unimedpoa-hml.crm2.dynamics.com</code></pre>
-            <div style="font-size:12px;color:#475569;margin-top:8px;">
-              → Retorna <code>access_token</code> (Bearer), salvo na variável <code>{{token}}</code> da collection.
+            <div class="step-body">
+              <div class="step-endpoint">
+                <code>https://login.windows.net/{tenantid}/oauth2/token</code>
+              </div>
+              <pre class="step-code"><span class="c"># x-www-form-urlencoded</span>
+<span class="k">grant_type</span><span class="p">=</span><span class="s">client_credentials</span>
+<span class="k">client_id</span><span class="p">=</span><span class="s">{clientid}</span>
+<span class="k">client_secret</span><span class="p">=</span><span class="s">{client_secret}</span>
+<span class="k">resource</span><span class="p">=</span><span class="s">https://unimedpoa-hml.crm2.dynamics.com</span></pre>
+              <div class="step-foot">
+                <strong>→ Retorna</strong> <code>access_token</code> (Bearer), salvo automaticamente na variável <code>{{token}}</code> da collection via script de Tests.
+              </div>
             </div>
           </div>
 
           <!-- Passo 2 -->
-          <div style="background:#f8fafc;border-left:4px solid #1a3a5c;padding:14px 18px;margin:14px 0;border-radius:6px;">
-            <div style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:6px;">
-              <span style="background:#1a3a5c;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:8px;">2</span>
-              Consultar beneficiário por CPF
+          <div class="step-card">
+            <div class="step-card-head">
+              <span class="step-num">2</span>
+              <div class="step-title">Consultar beneficiário por CPF</div>
+              <span class="method get">GET</span>
             </div>
-            <div style="margin-bottom:8px;"><span class="method get">GET</span> <code>{{resource}}/api/data/v9.2/contacts?$filter=uni_cpf eq '{cpf}'</code></div>
-            <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;margin:0;"><code>Authorization: Bearer {{token}}
+            <div class="step-body">
+              <div class="step-endpoint">
+                <code>{{resource}}/api/data/v9.2/contacts?$filter=uni_cpf eq '{cpf}'</code>
+              </div>
+              <pre class="step-code"><span class="c"># Headers</span>
+<span class="k">Authorization</span><span class="p">:</span> <span class="s">Bearer {{token}}</span>
 
-Query:
-  $select  = fullname,telephone1,emailaddress1
-  $filter  = uni_cpf eq '02792238038'
-  $orderby = createdon desc
-  $top     = 1</code></pre>
-            <div style="font-size:12px;color:#475569;margin-top:8px;">
-              → Retorna <code>contactid</code> do beneficiário (ex.: <code>9b65818f-31f5-f011-8407-6045bd3c09a3</code>),
-              que será usado no próximo passo.
+<span class="c"># Query params</span>
+<span class="k">$select</span>   <span class="p">=</span> <span class="s">fullname,telephone1,emailaddress1</span>
+<span class="k">$filter</span>   <span class="p">=</span> <span class="s">uni_cpf eq '02792238038'</span>
+<span class="k">$orderby</span>  <span class="p">=</span> <span class="s">createdon desc</span>
+<span class="k">$top</span>      <span class="p">=</span> <span class="n">1</span></pre>
+              <div class="step-foot">
+                <strong>→ Retorna</strong> <code>contactid</code> do beneficiário (ex.: <code>9b65818f-31f5-f011-8407-6045bd3c09a3</code>) — usado no próximo passo.
+              </div>
             </div>
           </div>
 
           <!-- Passo 3 -->
-          <div style="background:#f8fafc;border-left:4px solid #1a3a5c;padding:14px 18px;margin:14px 0;border-radius:6px;">
-            <div style="font-weight:700;color:#1a3a5c;font-size:14px;margin-bottom:6px;">
-              <span style="background:#1a3a5c;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:8px;">3</span>
-              Criar Linha de Cuidado vinculada ao contato
+          <div class="step-card">
+            <div class="step-card-head">
+              <span class="step-num">3</span>
+              <div class="step-title">Criar Linha de Cuidado vinculada ao contato</div>
+              <span class="method post">POST</span>
             </div>
-            <div style="margin-bottom:8px;"><span class="method post">POST</span> <code>{{resource}}/api/data/v9.2/uni_linhadecuidados?$select=uni_linhadecuidadoid</code></div>
-            <pre style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;margin:0;"><code>Authorization: Bearer {{token}}
-Content-Type: application/json
-Prefer: return=representation
+            <div class="step-body">
+              <div class="step-endpoint">
+                <code>{{resource}}/api/data/v9.2/uni_linhadecuidados?$select=uni_linhadecuidadoid</code>
+              </div>
+              <pre class="step-code"><span class="c"># Headers</span>
+<span class="k">Authorization</span><span class="p">:</span> <span class="s">Bearer {{token}}</span>
+<span class="k">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="k">Prefer</span><span class="p">:</span> <span class="s">return=representation</span>
 
-{
-  "uni_name": "NAIANE",
-  "uni_Contact@odata.bind": "/contacts(9b65818f-31f5-f011-8407-6045bd3c09a3)",
-  "uni_elegivel_programa_cuidado": true,
-  "uni_estagiodajornada": 122880000,
-  "uni_elegivelaoprogramacronico": true
-}</code></pre>
-            <div style="font-size:12px;color:#475569;margin-top:8px;">
-              → Retorna o <code>uni_linhadecuidadoid</code> recém-criado. A criação dispara a automação
-              interna do Dynamics que cria o registro em <code>uni_whatsapps</code> e aciona o BLIP.
+<span class="c"># Body</span>
+<span class="p">{</span>
+  <span class="k">"uni_name"</span><span class="p">:</span> <span class="s">"NAIANE"</span><span class="p">,</span>
+  <span class="k">"uni_Contact@odata.bind"</span><span class="p">:</span> <span class="s">"/contacts(9b65818f-31f5-f011-8407-6045bd3c09a3)"</span><span class="p">,</span>
+  <span class="k">"uni_elegivel_programa_cuidado"</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+  <span class="k">"uni_estagiodajornada"</span><span class="p">:</span> <span class="n">122880000</span><span class="p">,</span>
+  <span class="k">"uni_elegivelaoprogramacronico"</span><span class="p">:</span> <span class="n">true</span>
+<span class="p">}</span></pre>
+              <div class="step-foot">
+                <strong>→ Retorna</strong> <code>uni_linhadecuidadoid</code> recém-criado. A criação dispara a automação interna do Dynamics que cria o registro em <code>uni_whatsapps</code> e aciona o BLIP.
+              </div>
             </div>
           </div>
 
