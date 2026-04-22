@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: false, theme: 'default', flowchart: { curve: 'basis', padding: 20 } });</script>
   <style>
     :root {
       --blue-dark:   #1a3a5c;
@@ -34,8 +36,8 @@
       min-height: 100vh;
     }
 
-    /* ── SIDEBAR (CBV + MA + JA) ── */
-    #sidebar, #sidebar-ma, #sidebar-ja {
+    /* ── SIDEBAR (CBV + MA + JA + AUTOMACOES) ── */
+    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes {
       width: var(--sidebar-w);
       background: var(--blue-dark);
       color: #cde;
@@ -59,10 +61,171 @@
       background: #2E75B6; color: #fff;
       font-size: 10px; padding: 2px 8px; border-radius: 10px;
     }
-    #page-header-ja {
-      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
+    #sidebar-automacoes { display: none; background: #1b2f3f; }
+    #sidebar-automacoes nav a:hover, #sidebar-automacoes nav a.active {
       color: #fff;
-      padding: 48px 48px 36px;
+      background: rgba(255,255,255,.07);
+      border-left-color: var(--blue-mid);
+    }
+    #sidebar-automacoes .badge-automacoes {
+      display: inline-block; margin-top: 8px;
+      background: var(--blue-mid); color: #fff;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    }
+    #page-header-automacoes .label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #9dc4e8; margin-bottom: 8px; }
+    #page-header-automacoes h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    #page-header-automacoes .subtitle { font-size: 16px; color: #b8d8f0; margin-bottom: 20px; }
+    #page-header-automacoes .meta { display: flex; flex-wrap: wrap; gap: 12px; }
+    #btn-dashboard-automacoes, #btn-export-automacoes {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.35);
+      border-radius: 20px; color: #fff;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-dashboard-automacoes { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-automacoes:hover, #btn-export-automacoes:hover, #btn-sim-automacoes:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+    #btn-sim-automacoes {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.5);
+      border-radius: 20px; color: #fff;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* ── SIMULATOR MODAL ── */
+    #sim-overlay {
+      position: fixed; inset: 0; z-index: 900;
+      background: rgba(0,0,0,.75);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    #sim-overlay.open { opacity: 1; pointer-events: all; }
+    #sim-modal {
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      transform: scale(.93) translateY(20px);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    #sim-overlay.open #sim-modal { transform: scale(1) translateY(0); }
+    #sim-modal-header {
+      width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+      padding: 0 4px;
+    }
+    #sim-modal-header .sim-title {
+      font-size: 14px; font-weight: 700; color: #e9edef;
+      display: flex; align-items: center; gap: 8px;
+    }
+    #sim-close {
+      background: rgba(255,255,255,.15); border: none; border-radius: 50%;
+      width: 32px; height: 32px; cursor: pointer;
+      color: #fff; font-size: 16px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    #sim-close:hover { background: rgba(255,255,255,.3); }
+    #sim-iframe {
+      border: none;
+      border-radius: 0;
+      width: 380px;
+      height: 850px;
+      background: transparent;
+    }
+    #main-automacoes { display: none; }
+    .mermaid-wrap {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 24px;
+      overflow-x: auto;
+      text-align: center;
+      margin: 16px 0;
+    }
+    .msg-bubble {
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+    .ep-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .ep-table th, .ep-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .ep-table thead tr { background: #f1f5f9; }
+    .ep-table th { font-weight: 600; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+    .ep-table tbody tr:last-child td { border-bottom: none; }
+    .ep-table tbody tr:hover { background: #f8fafc; }
+    .btn-pill {
+      display: inline-block;
+      background: #0891b2;
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 4px 2px;
+    }
+    .btn-pill.danger { background: #dc2626; }
+    .btn-pill.success { background: #059669; }
+    .action-tag {
+      background: #fed7aa;
+      border-left: 4px solid #ea580c;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin: 8px 0;
+    }
+    .action-tag::before { content: "⚙️ "; }
+    .branch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 20px;
+    }
+    @media (max-width: 768px) { .branch-grid { grid-template-columns: 1fr; } }
+    .branch-col {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .branch-col.col-no  { background: #fef2f2; border-color: #fecaca; }
+    .branch-col.col-yes { background: #ecfdf5; border-color: #a7f3d0; }
+    .branch-col h4 { margin: 0 0 16px; font-size: 15px; text-transform: uppercase; letter-spacing: .5px; }
+    .branch-col.col-no  h4 { color: #dc2626; }
+    .branch-col.col-yes h4 { color: #059669; }
+    .flow-step {
+      display: flex; gap: 14px; align-items: flex-start;
+      margin: 14px 0; padding: 14px;
+      background: #f1f5f9; border-radius: 8px;
+      border-left: 4px solid #06b6d4;
+    }
+    .flow-step-num {
+      background: #06b6d4; color: #fff;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; flex-shrink: 0;
     }
     #page-header-ja .label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #9dc4e8; margin-bottom: 8px; }
     #page-header-ja h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
@@ -97,8 +260,8 @@
       background: #2a7a5a; color: #fff;
       font-size: 10px; padding: 2px 8px; border-radius: 10px;
     }
-    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav { padding: 12px 0; flex: 1; }
-    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a {
+    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav { padding: 12px 0; flex: 1; }
+    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a {
       display: block; padding: 8px 20px;
       color: #a8c4dc; text-decoration: none;
       font-size: 12.5px; line-height: 1.4;
@@ -114,11 +277,11 @@
     #sidebar-ma nav a:hover, #sidebar-ma nav a.active {
       border-left-color: #3ab882;
     }
-    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section {
+    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section {
       font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
       color: #5a7a96; padding: 16px 20px 4px; font-weight: 600;
     }
-    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub { padding-left: 32px; font-size: 12px; }
+    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub { padding-left: 32px; font-size: 12px; }
 
     /* ── HAMBURGER ── */
     #menu-toggle {
@@ -129,7 +292,7 @@
     }
 
     /* ── MAIN (CBV + MA) ── */
-    #main, #main-ma, #main-ja {
+    #main, #main-ma, #main-ja, #main-automacoes {
       margin-left: var(--sidebar-w);
       flex: 1;
       min-width: 0;
@@ -137,14 +300,9 @@
     #main-ma { display: none; }
 
     /* ── HEADER ── */
-    #page-header, #page-header-ma {
+    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes {
       color: #fff;
       padding: 48px 48px 36px;
-    }
-    #page-header {
-      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
-    }
-    #page-header-ma {
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
     }
     #page-header .label, #page-header-ma .label {
@@ -582,11 +740,14 @@
       #auth-overlay, #home-overlay, #sidebar, #menu-toggle, #sb-toggle,
       #scroll-top, .btn-payload, .diag-tabs, .diag-toolbar,
       .diag-wrapper, .diag-tooltip, .modal-overlay, #changelog-overlay,
-      #btn-export, #btn-dashboard, #btn-history { display: none !important; }
+      #btn-export, #btn-dashboard, #btn-history,
+      #btn-export-ja, #btn-dashboard-ja,
+      #btn-export-ma, #btn-dashboard-ma,
+      #btn-export-automacoes, #btn-dashboard-automacoes, #btn-sim-automacoes { display: none !important; }
 
       /* Layout sem sidebar */
       body { background: #fff !important; }
-      #main, #main-ma { margin-left: 0 !important; }
+      #main, #main-ma, #main-ja, #main-automacoes { margin-left: 0 !important; }
       #content { padding: 16px 0 !important; width: 100% !important; }
 
       /* Header impresso — mantém gradiente */
@@ -1124,6 +1285,24 @@
           <span>🗺️ Unimed POA</span>
           <span>📅 2026</span>
           <span>🔗 28 endpoints</span>
+        </div>
+        <div class="pc-open">Abrir documentação →</div>
+      </div>
+
+      <!-- Projeto 4: Automações — Alta Complexidade -->
+      <div class="project-card" onclick="openProject('automacoes')">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#1a3a5c,#2E75B6);">⚙️</div>
+          <span class="pc-badge">Em elaboração</span>
+        </div>
+        <div class="pc-title">Automações — Alta</div>
+        <div class="pc-sub">Fluxo de Captação — Viver Bem Juntos</div>
+        <div class="pc-desc">Documentação dos fluxos de automação de captação de beneficiários crônicos via chatbot Blip, modelo assistencial Alta Complexidade — Viver Bem Juntos.</div>
+        <div class="pc-meta">
+          <span>📋 Versão 1.0</span>
+          <span>⚙️ Blip + HMAP</span>
+          <span>📅 2026</span>
+          <span>🤖 Alta Complexidade</span>
         </div>
         <div class="pc-open">Abrir documentação →</div>
       </div>
@@ -5256,6 +5435,404 @@
   </div><!-- /content-ja -->
 </div><!-- /main-ja -->
 
+<!-- ══════════════════════════════════════════════════════
+     AUTOMAÇÕES — ALTA COMPLEXIDADE
+══════════════════════════════════════════════════════ -->
+
+<aside id="sidebar-automacoes">
+  <div id="sidebar-logo">
+    <div class="org">Unimed POA</div>
+    <div class="title">Automações — Alta</div>
+    <span class="badge-automacoes">Viver Bem Juntos</span>
+  </div>
+  <nav>
+    <div class="nav-section">Documento</div>
+    <a href="#auto-sec1">1. Visão Geral do Fluxo</a>
+    <a href="#auto-sec2">2. Mensagens ao Beneficiário</a>
+    <a href="#auto-sec2b" class="sub">2.1 Avaliação Inicial (8 perguntas)</a>
+    <a href="#auto-sec3">3. Ramificações</a>
+    <a href="#auto-sec3-1" class="sub">3.1 Opt-out (PARAR)</a>
+    <a href="#auto-sec3-2" class="sub">3.2 Com interesse</a>
+    <div class="nav-section">Referência</div>
+    <a href="#auto-sec4">4. Pendências em Aberto</a>
+    <a href="#auto-sec5">5. Integrações</a>
+    <a href="#auto-sec6">6. Próximas Seções</a>
+  </nav>
+</aside>
+
+<div id="main-automacoes">
+
+  <header id="page-header-automacoes">
+    <div class="label">Automações — Modelo Assistencial · Alta Complexidade</div>
+    <h1>Fluxo de Captação — Viver Bem Juntos</h1>
+    <div class="subtitle">Captação de beneficiários crônicos via chatbot Blip</div>
+    <div class="meta">
+      <span class="chip"><span class="chip-icon">📋</span> Versão 1.0</span>
+      <span class="chip"><span class="chip-icon">📅</span> 21/04/2026</span>
+      <span class="chip"><span class="chip-icon">⚙️</span> Blip + HMAP</span>
+      <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+      <button id="btn-dashboard-automacoes" onclick="goHome()" title="Voltar ao dashboard">← Dashboard</button>
+      <button id="btn-sim-automacoes" onclick="openSimulator()" title="Abrir simulador do fluxo">📱 Simulador</button>
+      <button id="btn-export-automacoes" onclick="window.print()" title="Exportar como PDF"><span>📄</span> Exportar PDF</button>
+    </div>
+  </header>
+
+  <div id="content-automacoes" style="padding:40px 48px;width:100%;">
+
+    <!-- SEC 1: VISÃO GERAL -->
+    <div class="section-card" id="auto-sec1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Visão Geral do Fluxo</h2>
+      </div>
+      <div class="section-body">
+        <p>Fluxo de captação de beneficiários com condições crônicas ativado via régua de captação no chatbot <strong>Blip</strong>, com o objetivo de engajá-los no modelo assistencial <strong>Viver Bem Juntos</strong>.</p>
+        <p><strong>Escopo:</strong> Alta Complexidade — da régua de captação crônico até a entrada na fila de atendimento da saúde populacional.</p>
+        <p><em>Fonte: Miro — "Aceleração Tecnológica Modelo Assistencial"</em></p>
+
+        <div class="subsection">
+          <div class="subsection-title">Diagrama do Fluxo</div>
+          <div class="mermaid-wrap">
+            <div class="mermaid">
+flowchart TD
+    A([Disparo via régua\ncaptação crônico]):::start --> M1[Mensagem 1\napresentação do modelo]
+    M1 --> B{Conhecer\nagora?}
+    B --> M2[Mensagem 2\nbeneficios]
+    M2 --> C{Interesse em\nparticipar?}
+
+    C -- Sem interesse --> SI1[Despedida cordial]
+    SI1 --> SI2[[Registra API HMAP\nquestão sem interesse]]:::action
+    SI2 --> FIM1([Fim — sem captação]):::end_no
+
+    C -- Com interesse --> CI1[Aceite do termo\nde consentimento]
+    CI1 --> CI2[[Registra termo HMAP]]:::action
+    CI2 --> CI3[Convite ao questionário]
+    CI3 --> Q[[Gera 8 perguntas]]:::action
+    Q --> CI4[Avaliação inicial +\nagradecimento]
+    CI4 --> FILA([Fila de atendimento\nsaúde populacional]):::end_yes
+
+    classDef start fill:#06b6d4,stroke:#0891b2,color:#fff
+    classDef action fill:#fed7aa,stroke:#ea580c,color:#7c2d12
+    classDef end_no fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+    classDef end_yes fill:#a7f3d0,stroke:#059669,color:#064e3b
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <strong>⏱️ Regra de inatividade (transversal a todo o fluxo)</strong>
+          10 min sem resposta → cliente é chamado novamente.<br>
+          +10 min sem resposta (20 min total) → vai para a fila de captação saúde populacional, <strong>com a etapa onde parou gravada</strong> para continuidade posterior.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 2: MENSAGENS -->
+    <div class="section-card" id="auto-sec2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Mensagens ao Beneficiário</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="callout info" style="margin-bottom:20px;">
+          <strong>📱 Fluxo real implementado no WhatsApp</strong>
+          As mensagens abaixo refletem o fluxo <strong>em produção</strong>, verificado via prints do WhatsApp Business (Blip). Diferem parcialmente do design original no Miro: a abertura é uma única mensagem template personalizada (não duas mensagens separadas), o botão de ação é <em>"Quero fazer parte"</em> e o termo é enviado como card de documento com versão e data.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">1. Template inicial — Régua de captação (WhatsApp Template)</div>
+          <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Mensagem personalizada com o nome do beneficiário. Enviada via disparo da régua crônico.</p>
+          <div class="msg-bubble">Olá, {{nome}}!
+
+Sua jornada de saúde merece cuidado contínuo e especializado. Por isso, a comunidade <strong>Viver Bem</strong> da Unimed Porto Alegre oferece, <strong>sem custo adicional</strong>, os seguintes benefícios:
+
+📋 Plano de cuidado personalizado
+
+👩‍💼 Acompanhamento individual com profissionais da saúde
+
+👥 Suporte nas etapas mais importantes da sua jornada
+
+Cuidar da saúde fica mais leve com o Viver Bem. <strong>Clique no botão</strong> e comece a receber o cuidado que você merece.
+
+<em>Se não deseja receber esse tipo de mensagem, envie PARAR.</em></div>
+          <span class="btn-pill success">↩️ Quero fazer parte</span>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">2. Confirmação de interesse + convite ao termo</div>
+          <div class="msg-bubble">Que bom te ter com a gente!</div>
+          <div class="msg-bubble">Para participar da comunidade Viver Bem, preciso que você aceite o termo de consentimento. 👇
+
+📱 Utilize seu celular para visualizar a mensagem abaixo.</div>
+          <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:16px 20px;background:#f8fafc;margin:10px 0;max-width:340px;">
+            <div style="font-weight:700;font-size:14px;color:#1a3a5c;margin-bottom:4px;">Termo de consentimento</div>
+            <div style="font-size:13px;color:#64748b;">Versão: Viver Bem 1 · Criado em 16/02/2024.</div>
+            <div style="margin-top:12px;border-top:1px solid #e2e8f0;padding-top:10px;color:#94a3b8;font-size:13px;text-align:center;">Ler e aceitar termo</div>
+          </div>
+          <span class="btn-pill">Ler e aceitar termo</span>
+          <div class="action-tag" style="margin-top:10px;">Registra aceite do termo no HMAP</div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">3. Convite à Avaliação Inicial</div>
+          <div class="msg-bubble">Agora, vou precisar entender um pouco mais sobre a sua saúde.
+
+📱 Utilize seu celular para visualizar a mensagem abaixo.</div>
+          <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:16px 20px;background:#f8fafc;margin:10px 0;max-width:340px;">
+            <div style="font-weight:700;font-size:14px;color:#1a3a5c;margin-bottom:4px;">Avaliação Inicial</div>
+            <div style="font-size:13px;color:#64748b;">Selecione o botão abaixo para responder. 👇</div>
+            <div style="margin-top:12px;border-top:1px solid #e2e8f0;padding-top:10px;color:#94a3b8;font-size:13px;text-align:center;">Informar</div>
+          </div>
+          <span class="btn-pill">Informar</span>
+          <div class="action-tag" style="margin-top:10px;">Dispara o fluxo das 8 perguntas da Avaliação Inicial</div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">4. Encerramento e resumo das respostas</div>
+          <div class="msg-bubble">Agradecemos por compartilhar mais detalhes sobre a sua saúde com a gente!</div>
+          <div style="border:1.5px solid #e2e8f0;border-radius:10px;padding:16px 20px;background:#f8fafc;margin:10px 0;">
+            <div style="font-size:13px;font-weight:700;color:#1a3a5c;margin-bottom:10px;">📋 Avaliação Inicial:</div>
+            <div style="font-size:13px;color:#374151;line-height:1.9;">
+              • <strong>1. Como está o seu estado de saúde hoje?</strong> {{resposta_1}}<br>
+              • <strong>2. Tem alguma dessas condições de saúde?</strong> {{resposta_2}}<br>
+              • <strong>3. No momento, apresenta algum sintoma de infecção?</strong> {{resposta_3}}<br>
+              • <strong>4. Precisou de atendimento de emergência nos últimos 3 meses?</strong> {{resposta_4}}<br>
+              • <strong>5. Qual sua altura e peso atual?</strong> {{resposta_5}}<br>
+              • <strong>6. Perdeu peso sem intenção nos últimos 6 meses?</strong> {{resposta_6}}<br>
+              • <strong>7. Possui limitação para suas atividades de rotina?</strong> {{resposta_7}}<br>
+              • <strong>8. Tem algo sobre saúde para compartilhar com a gente?</strong> {{resposta_8}}
+            </div>
+          </div>
+          <div class="msg-bubble">Agora é com a gente: vamos analisar suas respostas para elaborar o plano de cuidado.
+
+Quando estiver pronto, eu te chamo por aqui, tá bem?</div>
+          <div class="msg-bubble">Até mais! 👋</div>
+          <div class="action-tag" style="margin-top:10px;">Envia beneficiário para fila de atendimento — captação saúde populacional com resumo da Avaliação Inicial</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEC 2B: 8 PERGUNTAS -->
+    <div class="section-card" id="auto-sec2b">
+      <div class="section-header">
+        <div class="section-number">2.1</div>
+        <h2>Avaliação Inicial — 8 Perguntas</h2>
+      </div>
+      <div class="section-body">
+        <p>Perguntas exibidas ao beneficiário no fluxo de <strong>Avaliação Inicial</strong> via Blip. Verificadas via print do WhatsApp em produção.</p>
+        <table class="ep-table" style="margin-top:16px;">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Pergunta</th>
+              <th style="width:160px">Variável de resposta</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Como está o seu estado de saúde hoje?</td><td><code>{{resposta_1}}</code></td></tr>
+            <tr><td>2</td><td>Tem alguma dessas condições de saúde?</td><td><code>{{resposta_2}}</code></td></tr>
+            <tr><td>3</td><td>No momento, apresenta algum sintoma de infecção?</td><td><code>{{resposta_3}}</code></td></tr>
+            <tr><td>4</td><td>Precisou de atendimento de emergência nos últimos 3 meses?</td><td><code>{{resposta_4}}</code></td></tr>
+            <tr><td>5</td><td>Qual sua altura e peso atual?</td><td><code>{{resposta_5}}</code></td></tr>
+            <tr><td>6</td><td>Perdeu peso sem intenção nos últimos 6 meses?</td><td><code>{{resposta_6}}</code></td></tr>
+            <tr><td>7</td><td>Possui limitação para suas atividades de rotina?</td><td><code>{{resposta_7}}</code></td></tr>
+            <tr><td>8</td><td>Tem algo sobre saúde para compartilhar com a gente?</td><td><code>{{resposta_8}}</code></td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn" style="margin-top:20px;">
+          <strong>⚠️ Nomes reais das variáveis não confirmados</strong>
+          Os nomes <code>{{resposta_1}}</code>…<code>{{resposta_8}}</code> são placeholders desta documentação. Os nomes reais das variáveis no Blip precisam ser levantados com o time técnico.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 3: RAMIFICAÇÕES -->
+    <div class="section-card" id="auto-sec3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Ramificações</h2>
+      </div>
+      <div class="section-body">
+        <div class="branch-grid">
+
+          <!-- SEM INTERESSE -->
+          <div class="branch-col col-no" id="auto-sec3-1">
+            <h4>❌ Sem interesse</h4>
+            <div class="msg-bubble">Agradecemos por tua resposta!
+
+Sempre que precisar, é só falar com a gente por aqui.
+
+A Unimed Porto Alegre deseja {{um/uma}} {{periodoDia}}!
+Até mais! 👋</div>
+            <span class="btn-pill">ok</span>
+            <div class="action-tag" style="margin-top:12px;">Registra via API no HMAP: "questão sem interesse"</div>
+            <p style="margin-top:14px;font-size:13px;"><strong>Resultado:</strong> encerra fluxo. Cliente não captado.</p>
+          </div>
+
+          <!-- COM INTERESSE -->
+          <div class="branch-col col-yes" id="auto-sec3-2">
+            <h4>✅ Com interesse</h4>
+
+            <div class="flow-step">
+              <div class="flow-step-num">1</div>
+              <div>
+                <strong>Aceite do termo de consentimento</strong>
+                <div class="msg-bubble" style="margin-top:8px;">Ficamos felizes com teu interesse! Será um prazer cuidar de ti. 💙
+
+Para continuar, preciso do teu aceite no termo de consentimento.
+
+Ler termo e aceitar</div>
+                <span class="btn-pill">ok</span>
+                <div class="action-tag">Registra termo de consentimento no HMAP</div>
+              </div>
+            </div>
+
+            <div class="flow-step">
+              <div class="flow-step-num">2</div>
+              <div>
+                <strong>Convite ao questionário</strong>
+                <div class="msg-bubble" style="margin-top:8px;">Que bom te ter no Viver Bem Juntos!
+
+Agora queremos saber um pouco mais sobre tua saúde. São apenas <strong>8 perguntas simples</strong>.
+
+Selecione o botão abaixo para responder.</div>
+                <div class="action-tag">Dispara fluxo de 8 perguntas do questionário inicial</div>
+              </div>
+            </div>
+
+            <div class="flow-step">
+              <div class="flow-step-num">3</div>
+              <div>
+                <strong>Encerramento e avaliação inicial</strong>
+                <div class="msg-bubble" style="margin-top:8px;">Agradecemos por compartilhar mais detalhes sobre tua saúde! 🙌
+
+Avaliação Inicial: {{userResponse}}
+
+Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até breve!</div>
+                <div class="action-tag">Envia beneficiário para fila de atendimento — captação saúde populacional</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 4: PENDÊNCIAS -->
+    <div class="section-card" id="auto-sec4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Pendências e Decisões em Aberto</h2>
+      </div>
+      <div class="section-body">
+        <div class="callout warn">
+          <strong>⚠️ Itens que precisam de definição antes do go-live</strong>
+        </div>
+        <table class="ep-table" style="margin-top:16px;">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Pendência</th>
+              <th style="width:130px">Tipo</th>
+              <th style="width:130px">Responsável</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Desenhar fluxo do cliente que <strong>não interagiu</strong> com a mensagem inicial (sem resposta)</td>
+              <td><span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Fluxo</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Como identificar <strong>validador único por CPF no Blip</strong> (evitar duplicidade de captação)</td>
+              <td><span style="background:#fce7f3;color:#9f1239;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Técnica</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Verificar <strong>idade mínima de rastreamento</strong> (quem entra na régua crônico)</td>
+              <td><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Regra</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Proposta de <strong>4 templates</strong> para cliente sem interação (reengajamento)</td>
+              <td><span style="background:#e0e7ff;color:#4338ca;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Copy</span></td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEC 5: INTEGRAÇÕES -->
+    <div class="section-card" id="auto-sec5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>Integrações</h2>
+      </div>
+      <div class="section-body">
+        <div class="overview-grid">
+          <div class="overview-card">
+            <div class="oc-label">Chatbot / Orquestração</div>
+            <div class="oc-value">Blip</div>
+          </div>
+          <div class="overview-card">
+            <div class="oc-label">Registro de dados</div>
+            <div class="oc-value">HMAP (API REST)</div>
+          </div>
+          <div class="overview-card">
+            <div class="oc-label">Destino final</div>
+            <div class="oc-value">Fila Saúde Populacional</div>
+          </div>
+        </div>
+        <table class="ep-table" style="margin-top:16px;">
+          <thead>
+            <tr><th>Sistema</th><th>Uso neste fluxo</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Blip</strong></td>
+              <td>Orquestração do chatbot, régua de captação, identificação do contato</td>
+            </tr>
+            <tr>
+              <td><strong>HMAP</strong></td>
+              <td>Registro de consentimento (termo) e respostas (sem interesse, questionário) via API</td>
+            </tr>
+            <tr>
+              <td><strong>Fila saúde populacional</strong></td>
+              <td>Destino final para beneficiários captados ou com timeout de inatividade</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEC 6: PRÓXIMAS SEÇÕES -->
+    <div class="section-card" id="auto-sec6">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>Próximas Seções a Documentar</h2>
+      </div>
+      <div class="section-body">
+        <div class="callout info">
+          <strong>📋 Em andamento</strong>
+          Os fluxos abaixo ainda precisam ser mapeados e documentados neste módulo.
+        </div>
+        <ul style="margin-top:16px;line-height:2;">
+          <li>Alta Complexidade — continuação: triagem healthshop, TAG Captado, ativação PCA, cliente acessa APP</li>
+          <li>Baixa e Baixíssima Complexidade — régua autocuidado / promoção de saúde</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /content-automacoes -->
+</div><!-- /main-automacoes -->
+
 <script>
 /* ── PAYLOADS ── */
 const H = { Authorization: "Bearer {token}", KeyDS: "production" };
@@ -5944,9 +6521,10 @@ function toggleEye() {
 // Clique no card → mostra auth
 let _pendingProject = null;
 const _projectNames = {
-  cbv: 'CBV × Healthmap',
-  ma:  'Modelo Assistencial',
-  ja:  'Jornada Assistencial'
+  cbv:        'CBV × Healthmap',
+  ma:         'Modelo Assistencial',
+  ja:         'Jornada Assistencial',
+  automacoes: 'Automações — Alta Complexidade'
 };
 function openProject(id) {
   _pendingProject = id;
@@ -5981,7 +6559,7 @@ let _guestMode = false;
   if (isGuest) {
     _guestMode = true;
     const _gp = params.get('projeto');
-    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : 'cbv';
+    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : 'cbv';
     // Oculta overlays instantaneamente
     const ov = document.getElementById('auth-overlay');
     if (ov) { ov.classList.remove('show'); }
@@ -6017,23 +6595,29 @@ let _guestMode = false;
 
 // Carrega o projeto correto — mostra/oculta sidebar e main
 function loadProject(id) {
-  const isCbv = id === 'cbv';
-  const isMa  = id === 'ma';
-  const isJa  = id === 'ja';
+  const isCbv  = id === 'cbv';
+  const isMa   = id === 'ma';
+  const isJa   = id === 'ja';
+  const isAuto = id === 'automacoes';
   // sidebar
-  const sbCbv = document.getElementById('sidebar');
-  const sbMa  = document.getElementById('sidebar-ma');
-  const sbJa  = document.getElementById('sidebar-ja');
-  if (sbCbv) sbCbv.style.display = isCbv ? '' : 'none';
-  if (sbMa)  sbMa.style.display  = isMa  ? 'flex' : 'none';
-  if (sbJa)  sbJa.style.display  = isJa  ? 'flex' : 'none';
+  const sbCbv  = document.getElementById('sidebar');
+  const sbMa   = document.getElementById('sidebar-ma');
+  const sbJa   = document.getElementById('sidebar-ja');
+  const sbAuto = document.getElementById('sidebar-automacoes');
+  if (sbCbv)  sbCbv.style.display  = isCbv  ? '' : 'none';
+  if (sbMa)   sbMa.style.display   = isMa   ? 'flex' : 'none';
+  if (sbJa)   sbJa.style.display   = isJa   ? 'flex' : 'none';
+  if (sbAuto) sbAuto.style.display = isAuto ? 'flex' : 'none';
   // main
-  const mCbv = document.getElementById('main');
-  const mMa  = document.getElementById('main-ma');
-  const mJa  = document.getElementById('main-ja');
-  if (mCbv) mCbv.style.display = isCbv ? 'block' : 'none';
-  if (mMa)  mMa.style.display  = isMa  ? 'block' : 'none';
-  if (mJa)  mJa.style.display  = isJa  ? 'block' : 'none';
+  const mCbv  = document.getElementById('main');
+  const mMa   = document.getElementById('main-ma');
+  const mJa   = document.getElementById('main-ja');
+  const mAuto = document.getElementById('main-automacoes');
+  if (mCbv)  mCbv.style.display  = isCbv  ? 'block' : 'none';
+  if (mMa)   mMa.style.display   = isMa   ? 'block' : 'none';
+  if (mJa)   mJa.style.display   = isJa   ? 'block' : 'none';
+  if (mAuto) mAuto.style.display = isAuto ? 'block' : 'none';
+  if (isAuto) mermaid.run();
 }
 
 function _applyGuestUI(proj) {
@@ -6073,11 +6657,12 @@ function _applyGuestUI(proj) {
 function goHome() {
   if (_guestMode) return;
   sessionStorage.removeItem('_p');
-  // oculta ambos os projetos
-  const mCbv = document.getElementById('main'); if (mCbv) mCbv.style.display = 'none';
-  const mMa  = document.getElementById('main-ma'); if (mMa) mMa.style.display = 'none';
-  const sbCbv = document.getElementById('sidebar'); if (sbCbv) sbCbv.style.display = 'none';
-  const sbMa  = document.getElementById('sidebar-ma'); if (sbMa) sbMa.style.display = 'none';
+  ['main','main-ma','main-ja','main-automacoes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
   const ho = document.getElementById('home-overlay');
   if (ho) { ho.classList.remove('hide'); window.scrollTo(0, 0); }
 }
@@ -7832,6 +8417,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
+/* ── SIMULADOR ── */
+function openSimulator() {
+  const ov = document.getElementById('sim-overlay');
+  const iframe = document.getElementById('sim-iframe');
+  iframe.src = 'automações/simulacao-whatsapp.html';
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSimulator() {
+  const ov = document.getElementById('sim-overlay');
+  ov.classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(() => {
+    document.getElementById('sim-iframe').src = '';
+  }, 300);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSimulator();
+});
 </script>
+
+<!-- SIMULATOR MODAL -->
+<div id="sim-overlay" onclick="if(event.target===this)closeSimulator()">
+  <div id="sim-modal">
+    <div id="sim-modal-header">
+      <div class="sim-title">📱 Simulador — Fluxo Captação Viver Bem</div>
+      <button id="sim-close" onclick="closeSimulator()" title="Fechar">✕</button>
+    </div>
+    <iframe id="sim-iframe" src="" title="Simulador WhatsApp"></iframe>
+  </div>
+</div>
+
 </body>
 </html>

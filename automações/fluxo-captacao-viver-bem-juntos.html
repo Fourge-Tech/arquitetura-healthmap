@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxo de Captação — Viver Bem Juntos</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f8fafc;
+    color: #0f172a;
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    color: white;
+    padding: 48px 32px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 8px; font-size: 32px; font-weight: 700; }
+  header p { margin: 0; opacity: 0.95; font-size: 16px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px; }
+  section {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+  }
+  h2 {
+    font-size: 24px;
+    margin: 0 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #06b6d4;
+    color: #0891b2;
+  }
+  h3 { font-size: 18px; color: #0f172a; margin-top: 32px; }
+  .mermaid {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin: 16px 0;
+    padding: 16px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    border-left: 4px solid #06b6d4;
+  }
+  .step-num {
+    background: #06b6d4;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .message {
+    background: #d1fae5;
+    border-left: 4px solid #10b981;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 12px 0;
+    white-space: pre-wrap;
+    font-size: 15px;
+  }
+  .message.warn {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+  }
+  .button-pill {
+    display: inline-block;
+    background: #0891b2;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 4px 0;
+  }
+  .action {
+    background: #fed7aa;
+    border-left: 4px solid #ea580c;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin: 8px 0;
+  }
+  .action::before { content: "⚙️ "; }
+  .branch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  @media (max-width: 768px) { .branch { grid-template-columns: 1fr; } }
+  .branch-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .branch-card.no {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+  .branch-card.yes {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+  }
+  .branch-card h4 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .branch-card.no h4 { color: #dc2626; }
+  .branch-card.yes h4 { color: #059669; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 600;
+    color: #475569;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-fluxo { background: #dbeafe; color: #1e40af; }
+  .badge-tech { background: #fce7f3; color: #9f1239; }
+  .badge-regra { background: #fef3c7; color: #92400e; }
+  .badge-copy { background: #e0e7ff; color: #4338ca; }
+  .alert {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+  .alert strong { color: #92400e; }
+  footer {
+    text-align: center;
+    padding: 32px;
+    color: #64748b;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fluxo de Captação — Viver Bem Juntos</h1>
+  <p>Unimed Porto Alegre · Modelo Assistencial · Alta Complexidade (captação crônico)</p>
+</header>
+
+<div class="container">
+
+<section>
+  <h2>📊 Visão geral do fluxo</h2>
+  <div class="mermaid">
+flowchart TD
+    A([Disparo via régua<br/>captação crônico]):::start --> M1[Mensagem 1<br/>apresentação do modelo]
+    M1 --> B{Conhecer<br/>agora?}
+    B --> M2[Mensagem 2<br/>benefícios]
+    M2 --> C{Interesse em<br/>participar?}
+
+    C -- Sem interesse --> SI1[Despedida cordial]
+    SI1 --> SI2[[Registra API HMAP<br/>questão sem interesse]]:::action
+    SI2 --> FIM1([Fim — sem captação]):::end_no
+
+    C -- Com interesse --> CI1[Aceite do termo<br/>de consentimento]
+    CI1 --> CI2[[Registra termo HMAP]]:::action
+    CI2 --> CI3[Convite ao questionário]
+    CI3 --> Q[[Gera 8 perguntas]]:::action
+    Q --> CI4[Avaliação inicial +<br/>agradecimento]
+    CI4 --> FILA([Fila de atendimento<br/>saúde populacional]):::end_yes
+
+    classDef start fill:#06b6d4,stroke:#0891b2,color:#fff
+    classDef action fill:#fed7aa,stroke:#ea580c,color:#7c2d12
+    classDef end_no fill:#fecaca,stroke:#dc2626,color:#7f1d1d
+    classDef end_yes fill:#a7f3d0,stroke:#059669,color:#064e3b
+  </div>
+
+  <div class="alert">
+    <strong>⏱️ Regra de inatividade (transversal a todo fluxo):</strong><br>
+    10 min sem resposta → cliente é chamado novamente.<br>
+    +10 min sem resposta (20 min total) → vai para a fila de captação saúde populacional, <strong>com a etapa onde parou gravada</strong>.
+  </div>
+</section>
+
+<section>
+  <h2>💬 Mensagens enviadas ao beneficiário</h2>
+
+  <h3>1. Abertura (após disparo da régua)</h3>
+  <div class="message">Olá! Teu plano de saúde mudou. Agora, a Unimed Porto Alegre tem um novo jeito de cuidar de ti.
+
+Vamos te acompanhar em toda a tua jornada de saúde, com uma equipe pronta para te ajudar — e o melhor: sem custo adicional.
+
+Conheça o modelo de cuidado Viver Bem Juntos.</div>
+  <span class="button-pill">Conhecer agora</span>
+
+  <h3>2. Apresentação dos benefícios</h3>
+  <div class="message">Com o Viver Bem Juntos, cada pessoa recebe um plano de cuidado personalizado. Vou te contar os principais benefícios:
+
+✅ Ações de promoção da saúde e prevenção de doenças
+🧘 Autocuidado apoiado
+👩‍⚕️ Suporte direto da equipe de gestão em saúde
+
+Tudo isso é gratuito, sem cobrança adicional. 💙
+
+Gostaria de participar e aproveitar os benefícios?</div>
+  <p><strong>Decisão:</strong> <span class="button-pill" style="background:#dc2626">Sem interesse</span> &nbsp; <span class="button-pill" style="background:#059669">Com interesse</span></p>
+</section>
+
+<section>
+  <h2>🔀 Ramificações</h2>
+
+  <div class="branch">
+
+    <div class="branch-card no">
+      <h4>❌ Sem interesse</h4>
+      <div class="message">Agradecemos por tua resposta!
+
+Sempre que precisar, é só falar com a gente por aqui.
+
+A Unimed Porto Alegre deseja {{um/uma}} {{periodoDia}}!
+Até mais! 👋</div>
+      <span class="button-pill">ok</span>
+      <div class="action">Registra via API no HMAP: "questão sem interesse"</div>
+      <p style="margin-top:16px"><strong>Resultado:</strong> encerra fluxo. Cliente não captado.</p>
+    </div>
+
+    <div class="branch-card yes">
+      <h4>✅ Com interesse</h4>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <strong>Aceite do termo</strong>
+          <div class="message">Ficamos felizes com teu interesse! Será um prazer cuidar de ti. 💙
+
+Para continuar, preciso do teu aceite no termo de consentimento.
+
+Ler termo e aceitar</div>
+          <span class="button-pill">ok</span>
+          <div class="action">Registra termo de consentimento no HMAP</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <strong>Convite ao questionário</strong>
+          <div class="message">Que bom te ter no Viver Bem Juntos!
+
+Agora queremos saber um pouco mais sobre tua saúde. São apenas 8 perguntas simples.
+
+Selecione o botão abaixo para responder.</div>
+          <div class="action">Dispara fluxo de 8 perguntas do questionário inicial</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <strong>Encerramento e avaliação inicial</strong>
+          <div class="message">Agradecemos por compartilhar mais detalhes sobre tua saúde! 🙌
+
+Avaliação Inicial: {{userResponse}}
+
+Com base nas tuas respostas, vamos te oferecer um cuidado personalizado. Até breve!</div>
+          <div class="action">Envia beneficiário para fila de atendimento — captação saúde populacional</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>⚠️ Pendências e decisões em aberto</h2>
+  <table>
+    <thead>
+      <tr><th style="width:40px">#</th><th>Pendência</th><th style="width:140px">Tipo</th><th style="width:140px">Responsável</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Desenhar fluxo do cliente que <strong>não interagiu</strong> com a mensagem inicial</td>
+        <td><span class="badge badge-fluxo">Fluxo</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Como identificar <strong>validador único por CPF no Blip</strong> (evitar duplicidade)</td>
+        <td><span class="badge badge-tech">Técnica</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Verificar <strong>idade mínima de rastreamento</strong> (quem entra na régua crônico)</td>
+        <td><span class="badge badge-regra">Regra</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Proposta de <strong>4 templates</strong> para cliente sem interação (reengajamento)</td>
+        <td><span class="badge badge-copy">Copy</span></td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>🔌 Integrações</h2>
+  <table>
+    <thead>
+      <tr><th>Sistema</th><th>Uso neste fluxo</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Blip</strong></td><td>Orquestração do chatbot, régua de captação, identificação do contato</td></tr>
+      <tr><td><strong>HMAP</strong></td><td>Registro de consentimento (termo) e respostas (sem interesse, questionário) via API</td></tr>
+      <tr><td><strong>Fila saúde populacional</strong></td><td>Destino final para beneficiários captados ou com timeout de inatividade</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>📋 Próximas seções a documentar</h2>
+  <ul>
+    <li>Alta Complexidade — continuação (triagem healthshop, TAG Captado, ativação PCA, cliente acessa APP)</li>
+    <li>Baixa e Baixíssima Complexidade (régua autocuidado / promoção de saúde)</li>
+  </ul>
+</section>
+
+</div>
+
+<footer>
+  Documentação gerada a partir do Miro "Aceleração Tecnológica Modelo Assistencial"
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    flowchart: { curve: 'basis', padding: 20 }
+  });
+</script>
+
+</body>
+</html>

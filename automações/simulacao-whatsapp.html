@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulação — Fluxo Captação Viver Bem</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+    background:
+      radial-gradient(ellipse at 50% 60%, rgba(0,168,132,.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 60% 20%, #0d1f2d 0%, #060c10 70%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    gap: 14px;
+  }
+
+  /* ── RESTART BUTTON (outside phone) ── */
+  .restart-btn {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px;
+    color: rgba(255,255,255,.6);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 16px;
+    cursor: pointer;
+    letter-spacing: .5px;
+    transition: all .2s;
+    backdrop-filter: blur(4px);
+    flex-shrink: 0;
+  }
+  .restart-btn:hover { background: rgba(0,168,132,.3); border-color: #00a884; color: #00c99e; }
+
+  /* ── iPhone FRAME ── */
+  .iphone-wrap {
+    position: relative;
+    width: 320px;
+    height: 720px;
+    flex-shrink: 0;
+  }
+
+  /* corpo do iPhone — titânio escuro */
+  .iphone-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -11px;
+    background: linear-gradient(145deg,
+      #3a3a3c 0%,
+      #1c1c1e 30%,
+      #2c2c2e 60%,
+      #1a1a1c 100%);
+    border-radius: 50px;
+    box-shadow:
+      0 0 0 1px #48484a,
+      0 0 0 2px #000,
+      0 40px 80px rgba(0,0,0,.9),
+      0 10px 30px rgba(0,0,0,.6),
+      0 0 60px rgba(0,168,132,.08),
+      inset 0 1px 0 rgba(255,255,255,.12),
+      inset 0 -1px 0 rgba(0,0,0,.6);
+  }
+
+  /* reflexo na tela */
+  .iphone-wrap .screen-glare {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 45%;
+    background: linear-gradient(170deg,
+      rgba(255,255,255,.04) 0%,
+      rgba(255,255,255,0) 100%);
+    border-radius: 42px 42px 0 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  /* botão power (direita) */
+  .iphone-wrap::after {
+    content: '';
+    position: absolute;
+    right: -14px; top: 130px;
+    width: 3px; height: 65px;
+    background: linear-gradient(to right, #2c2c2e, #3a3a3c);
+    border-radius: 0 3px 3px 0;
+    box-shadow: 1px 0 0 #555;
+  }
+
+  /* botões volume (esquerda) */
+  .btn-vol {
+    position: absolute;
+    left: -14px; top: 110px;
+    width: 3px; height: 36px;
+    background: linear-gradient(to left, #2c2c2e, #3a3a3c);
+    border-radius: 3px 0 0 3px;
+    box-shadow:
+      -1px 0 0 #555,
+      0 50px 0 #2c2c2e,
+      -1px 50px 0 #555,
+      0 -55px 0 #2c2c2e,
+      -1px -55px 0 #555;
+  }
+
+  /* Dynamic Island */
+  .dynamic-island {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px; height: 24px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+    box-shadow:
+      0 0 0 1px #1c1c1e,
+      inset 0 1px 2px rgba(255,255,255,.05);
+  }
+
+  /* Home indicator */
+  .home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 4px;
+    background: rgba(255,255,255,.25);
+    border-radius: 4px;
+    z-index: 10;
+  }
+
+  .phone {
+    position: absolute;
+    inset: 0;
+    background: #111b21;
+    border-radius: 42px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    background: #1f2c34;
+    padding: 38px 18px 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    color: #fff;
+  }
+  .status-bar .time { font-weight: 700; font-size: 13px; letter-spacing: -.3px; }
+  .status-icons { display: flex; gap: 4px; align-items: center; font-size: 10px; }
+
+  /* ── CHAT HEADER ── */
+  .chat-header {
+    background: #202c33;
+    padding: 7px 10px 7px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #1a2530;
+  }
+  .back-btn { color: #aebac1; font-size: 18px; cursor: pointer; flex-shrink: 0; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, #1b5e3b, #2a9d6f);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+    box-shadow: 0 0 0 1.5px rgba(255,255,255,.1);
+  }
+  .chat-info { flex: 1; min-width: 0; }
+  .chat-name {
+    color: #e9edef; font-size: 13px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .chat-status { color: #8696a0; font-size: 11px; margin-top: 1px; }
+  .header-icons { color: #aebac1; display: flex; gap: 14px; font-size: 16px; flex-shrink: 0; }
+
+  /* ── INFO BAR ── */
+  .info-bar {
+    background: #182229;
+    padding: 4px 10px;
+    text-align: center;
+    font-size: 10px;
+    color: #8696a0;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── MESSAGES ── */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 6px 6px;
+    background: #0b141a;
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { display: none; }
+
+  .date-divider {
+    text-align: center;
+    margin: 8px 0;
+    font-size: 10.5px;
+    color: #8696a0;
+    background: rgba(11,20,26,.8);
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    width: 100%;
+  }
+
+  /* ── BUBBLES ── */
+  .bubble-row {
+    display: flex;
+    margin: 2px 6px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity .22s ease, transform .22s ease;
+  }
+  .bubble-row.visible { opacity: 1; transform: translateY(0); }
+  .bubble-row.bot  { justify-content: flex-start; }
+  .bubble-row.user { justify-content: flex-end; }
+
+  .bubble {
+    max-width: 80%;
+    padding: 6px 9px 5px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    position: relative;
+    word-wrap: break-word;
+  }
+  .bubble-row.bot  .bubble { background: #202c33; color: #e9edef; border-top-left-radius: 0; }
+  .bubble-row.user .bubble { background: #005c4b; color: #e9edef; border-top-right-radius: 0; }
+
+  .bubble .time-stamp {
+    font-size: 9.5px; color: #8696a0;
+    text-align: right; margin-top: 2px;
+    display: flex; justify-content: flex-end; align-items: center; gap: 2px;
+  }
+  .bubble-row.user .bubble .time-stamp { color: #8ac3b8; }
+  .tick { color: #53bdeb; font-size: 11px; }
+
+  .bubble-row.bot .bubble::before {
+    content: ''; position: absolute; top: 0; left: -7px;
+    border: 7px solid transparent;
+    border-top-color: #202c33; border-right: none;
+  }
+  .bubble-row.user .bubble::before {
+    content: ''; position: absolute; top: 0; right: -7px;
+    border: 7px solid transparent;
+    border-top-color: #005c4b; border-left: none;
+  }
+
+  /* ── TYPING ── */
+  .typing-row { display: flex; margin: 3px 6px; opacity: 0; transition: opacity .2s; }
+  .typing-row.visible { opacity: 1; }
+  .typing-bubble {
+    background: #202c33; border-radius: 7px; border-top-left-radius: 0;
+    padding: 10px 14px; display: flex; gap: 4px; align-items: center;
+  }
+  .typing-bubble span {
+    width: 6px; height: 6px; background: #8696a0; border-radius: 50%;
+    animation: bounce 1.2s ease infinite;
+  }
+  .typing-bubble span:nth-child(2) { animation-delay: .2s; }
+  .typing-bubble span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  /* ── DOC CARD ── */
+  .doc-card {
+    background: #1a2632; border-radius: 8px; overflow: hidden;
+    margin: 3px 0 2px; border: 1px solid #2a3942; min-width: 190px;
+  }
+  .doc-card-header {
+    background: #253341; padding: 10px 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .doc-icon {
+    width: 30px; height: 30px; background: #00a884; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .doc-title { color: #e9edef; font-size: 12.5px; font-weight: 600; }
+  .doc-sub   { color: #8696a0; font-size: 10.5px; margin-top: 1px; }
+  .doc-btn {
+    border-top: 1px solid #2a3942; padding: 9px 12px;
+    text-align: center; color: #00a884; font-size: 12.5px;
+    font-weight: 500; cursor: pointer; transition: background .15s;
+  }
+  .doc-btn:hover { background: #1e2f3c; }
+
+  /* ── QUICK REPLIES ── */
+  .quick-replies {
+    display: flex; flex-direction: column; gap: 5px;
+    padding: 6px 8px 4px; opacity: 0; transition: opacity .25s;
+  }
+  .quick-replies.visible { opacity: 1; }
+  .qr-btn {
+    background: #182229; border: 1.5px solid #00a884;
+    border-radius: 20px; color: #00a884;
+    padding: 9px 14px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; text-align: center; transition: background .15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .qr-btn:hover { background: #1a2f2b; }
+  .qr-btn:disabled { opacity: .35; cursor: default; }
+
+  /* ── INPUT BAR ── */
+  .input-bar {
+    background: #202c33; padding: 6px 10px 10px;
+    display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+    border-top: 1px solid #1a2530;
+  }
+  .input-field {
+    flex: 1; background: #2a3942; border: none; border-radius: 20px;
+    padding: 8px 14px; color: #e9edef; font-size: 13px; outline: none;
+  }
+  .input-field::placeholder { color: #8696a0; }
+  .send-btn {
+    width: 36px; height: 36px; background: #00a884; border: none;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 15px; flex-shrink: 0; transition: background .15s;
+  }
+  .send-btn:hover { background: #00c99e; }
+
+  /* ── QUESTION PANEL ── */
+  .q-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,.72);
+    display: flex; align-items: flex-end; z-index: 20;
+    opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .q-overlay.open { opacity: 1; pointer-events: all; }
+  .q-panel {
+    background: #1a2530; border-radius: 16px 16px 0 0;
+    padding: 16px 16px 22px; width: 100%;
+    transform: translateY(100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+  }
+  .q-overlay.open .q-panel { transform: translateY(0); }
+  .q-handle { width: 32px; height: 3px; background: #374045; border-radius: 2px; margin: 0 auto 14px; }
+  .q-title   { color: #e9edef; font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .q-sub     { color: #8696a0; font-size: 11px; margin-bottom: 12px; }
+  .q-progress { display: flex; gap: 3px; margin-bottom: 14px; }
+  .q-dot      { flex: 1; height: 3px; background: #2a3942; border-radius: 2px; transition: background .3s; }
+  .q-dot.done { background: #00a884; }
+  .q-dot.active { background: #00c99e; }
+  .q-question { color: #e9edef; font-size: 13px; font-weight: 600; margin-bottom: 12px; line-height: 1.5; }
+  .q-options  { display: flex; flex-direction: column; gap: 6px; }
+  .q-opt {
+    background: #253341; border: 1.5px solid #2e3d4a; border-radius: 10px;
+    padding: 10px 12px; color: #e9edef; font-size: 12.5px;
+    cursor: pointer; transition: border-color .15s, background .15s; text-align: left;
+  }
+  .q-opt:hover   { border-color: #00a884; background: #1a2f2b; }
+  .q-opt.selected{ border-color: #00a884; background: #1a2f2b; color: #00c99e; }
+  .q-input {
+    width: 100%; background: #253341; border: 1.5px solid #2e3d4a;
+    border-radius: 10px; padding: 10px 12px; color: #e9edef;
+    font-size: 12.5px; outline: none; transition: border-color .15s;
+    font-family: inherit; resize: none;
+  }
+  .q-input:focus { border-color: #00a884; }
+  .q-next {
+    width: 100%; background: #00a884; border: none; border-radius: 20px;
+    color: #fff; font-size: 13px; font-weight: 700; padding: 11px;
+    cursor: pointer; margin-top: 12px; transition: background .15s;
+  }
+  .q-next:hover { background: #00c99e; }
+  .q-next:disabled { background: #2e3d4a; color: #5a6a74; cursor: default; }
+</style>
+</head>
+<body>
+
+<button class="restart-btn" onclick="restartFlow()">↺ Reiniciar</button>
+
+<div class="iphone-wrap">
+  <div class="btn-vol"></div>
+  <div class="dynamic-island"></div>
+  <div class="phone" id="phone">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="time" id="clock">20:53</span>
+      <div class="status-icons">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="white" opacity=".9"><rect x="0" y="4" width="3" height="7" rx="1"/><rect x="4" y="2.5" width="3" height="8.5" rx="1"/><rect x="8" y="1" width="3" height="10" rx="1"/><rect x="12" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="white" stroke-width="1.2" opacity=".9"><path d="M1 7.5 C3 2.5 11 2.5 13 7.5" /><path d="M3 7.5 C4 4.5 10 4.5 11 7.5" /><circle cx="7" cy="8" r="1.2" fill="white" stroke="none"/></svg>
+        <svg width="24" height="12" viewBox="0 0 24 12" fill="none" opacity=".9"><rect x="0" y="1" width="21" height="10" rx="2" stroke="white" stroke-width="1.2"/><rect x="22" y="4" width="2" height="4" rx="1" fill="white"/><rect x="1.5" y="2.5" width="15" height="7" rx="1" fill="white"/></svg>
+      </div>
+    </div>
+
+    <!-- Chat header -->
+    <div class="chat-header">
+      <span class="back-btn">←</span>
+      <div class="avatar">💚</div>
+      <div class="chat-info">
+        <div class="chat-name">Viver Bem - Unimed Porto Alegre ✔️</div>
+        <div class="chat-status" id="chat-status">online</div>
+      </div>
+      <div class="header-icons">
+        <span>📞</span>
+        <span>⋮</span>
+      </div>
+    </div>
+
+    <!-- Info bar -->
+    <div class="info-bar">🔒 As mensagens e chamadas são protegidas com criptografia</div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages">
+      <div style="text-align:center;margin:8px 0;">
+        <span class="date-divider">Hoje</span>
+      </div>
+    </div>
+
+    <!-- Quick replies container -->
+    <div id="qr-container"></div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <span style="color:#8696a0;font-size:22px;">😊</span>
+      <input class="input-field" id="text-input" placeholder="Mensagem" disabled />
+      <button class="send-btn" id="send-btn" disabled>➤</button>
+    </div>
+
+    <!-- Question overlay -->
+    <div class="q-overlay" id="q-overlay">
+      <div class="q-panel">
+        <div class="q-handle"></div>
+        <div class="q-title">Avaliação Inicial</div>
+        <div class="q-sub" id="q-counter">Pergunta 1 de 8</div>
+        <div class="q-progress" id="q-progress"></div>
+        <div class="q-question" id="q-question"></div>
+        <div class="q-options" id="q-options"></div>
+        <button class="q-next" id="q-next" disabled onclick="nextQuestion()">Confirmar</button>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+  <div class="screen-glare"></div>
+  <div class="home-indicator"></div>
+</div><!-- /iphone-wrap -->
+
+<script>
+/* ══════════════════════════════════════════
+   DADOS DO FLUXO
+══════════════════════════════════════════ */
+const NOME = 'CLIENTE';
+
+const questions = [
+  {
+    text: '1. Como está o seu estado de saúde hoje?',
+    type: 'options',
+    options: ['Bom 😊', 'Regular 😐', 'Ruim 😞']
+  },
+  {
+    text: '2. Tem alguma dessas condições de saúde?',
+    type: 'options',
+    options: ['Hipertensão', 'Diabetes', 'Doença cardíaca', 'Não tenho nenhuma']
+  },
+  {
+    text: '3. No momento, apresenta algum sintoma de infecção?',
+    type: 'options',
+    options: ['Sim', 'Não']
+  },
+  {
+    text: '4. Precisou de atendimento de emergência nos últimos 3 meses?',
+    type: 'options',
+    options: ['Sim', 'Não']
+  },
+  {
+    text: '5. Qual sua altura e peso atual?',
+    type: 'text',
+    placeholder: 'Ex: Altura 165 Peso 70'
+  },
+  {
+    text: '6. Perdeu peso sem intenção nos últimos 6 meses?',
+    type: 'options',
+    options: ['Sim', 'Não']
+  },
+  {
+    text: '7. Possui limitação para suas atividades de rotina?',
+    type: 'text',
+    placeholder: 'Descreva ou escreva "Nenhuma"'
+  },
+  {
+    text: '8. Tem algo sobre saúde para compartilhar com a gente?',
+    type: 'text',
+    placeholder: 'Escreva ou "Não informado"'
+  }
+];
+
+let answers = [];
+let currentQ = 0;
+let selectedOpt = null;
+let flowStep = 0;
+let isTyping = false;
+
+/* ══════════════════════════════════════════
+   UTILITÁRIOS
+══════════════════════════════════════════ */
+function getTime() {
+  const now = new Date();
+  return now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+
+function scrollBottom() {
+  const m = document.getElementById('messages');
+  m.scrollTop = m.scrollHeight;
+}
+
+function showTyping() {
+  return new Promise(resolve => {
+    document.getElementById('chat-status').textContent = 'digitando...';
+    const row = document.createElement('div');
+    row.className = 'typing-row';
+    row.id = 'typing-indicator';
+    row.innerHTML = `<div class="typing-bubble"><span></span><span></span><span></span></div>`;
+    document.getElementById('messages').appendChild(row);
+    scrollBottom();
+    setTimeout(() => { row.classList.add('visible'); }, 30);
+    setTimeout(() => {
+      row.remove();
+      document.getElementById('chat-status').textContent = 'online';
+      resolve();
+    }, 1400);
+  });
+}
+
+function addBotBubble(html, delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(async () => {
+      await showTyping();
+      const row = document.createElement('div');
+      row.className = 'bubble-row bot';
+      row.innerHTML = `<div class="bubble">${html}<div class="time-stamp">${getTime()}</div></div>`;
+      document.getElementById('messages').appendChild(row);
+      scrollBottom();
+      setTimeout(() => { row.classList.add('visible'); scrollBottom(); }, 30);
+      setTimeout(resolve, 400);
+    }, delay);
+  });
+}
+
+function addUserBubble(text, delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const row = document.createElement('div');
+      row.className = 'bubble-row user';
+      row.innerHTML = `<div class="bubble">${text}<div class="time-stamp">${getTime()} <span class="tick">✔✔</span></div></div>`;
+      document.getElementById('messages').appendChild(row);
+      scrollBottom();
+      setTimeout(() => { row.classList.add('visible'); scrollBottom(); }, 30);
+      setTimeout(resolve, 300);
+    }, delay);
+  });
+}
+
+function showQuickReplies(buttons) {
+  return new Promise(resolve => {
+    const container = document.getElementById('qr-container');
+    container.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'quick-replies';
+    div.style.padding = '0 8px 4px';
+    buttons.forEach(btn => {
+      const b = document.createElement('button');
+      b.className = 'qr-btn';
+      b.innerHTML = btn.icon ? `${btn.icon} ${btn.label}` : btn.label;
+      b.onclick = () => {
+        div.querySelectorAll('.qr-btn').forEach(x => x.disabled = true);
+        resolve(btn.value || btn.label);
+      };
+      div.appendChild(b);
+    });
+    container.appendChild(div);
+    setTimeout(() => { div.classList.add('visible'); scrollBottom(); }, 50);
+  });
+}
+
+function clearQuickReplies() {
+  document.getElementById('qr-container').innerHTML = '';
+}
+
+function addDocCard(title, sub, btnLabel, delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(async () => {
+      await showTyping();
+      const row = document.createElement('div');
+      row.className = 'bubble-row bot';
+      row.innerHTML = `
+        <div class="bubble" style="padding:6px 6px 4px;min-width:240px;">
+          <div class="doc-card">
+            <div class="doc-card-header">
+              <div class="doc-icon">📄</div>
+              <div>
+                <div class="doc-title">${title}</div>
+                <div class="doc-sub">${sub}</div>
+              </div>
+            </div>
+            <div class="doc-btn" id="doc-btn-${Date.now()}">${btnLabel}</div>
+          </div>
+          <div class="time-stamp">${getTime()}</div>
+        </div>`;
+      document.getElementById('messages').appendChild(row);
+      scrollBottom();
+      setTimeout(() => { row.classList.add('visible'); scrollBottom(); }, 30);
+      // bind click
+      const btn = row.querySelector('.doc-btn');
+      btn.onclick = () => {
+        btn.style.color = '#00a884';
+        btn.style.fontWeight = '600';
+        resolve();
+      };
+    }, delay);
+  });
+}
+
+/* ══════════════════════════════════════════
+   QUESTIONÁRIO (8 perguntas)
+══════════════════════════════════════════ */
+function buildProgress() {
+  const p = document.getElementById('q-progress');
+  p.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'q-dot' + (i < currentQ ? ' done' : i === currentQ ? ' active' : '');
+    p.appendChild(d);
+  });
+}
+
+function openQuestion() {
+  selectedOpt = null;
+  const q = questions[currentQ];
+  document.getElementById('q-counter').textContent = `Pergunta ${currentQ + 1} de ${questions.length}`;
+  document.getElementById('q-question').textContent = q.text;
+  buildProgress();
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  document.getElementById('q-next').disabled = true;
+
+  if (q.type === 'options') {
+    q.options.forEach(opt => {
+      const b = document.createElement('button');
+      b.className = 'q-opt';
+      b.textContent = opt;
+      b.onclick = () => {
+        opts.querySelectorAll('.q-opt').forEach(x => x.classList.remove('selected'));
+        b.classList.add('selected');
+        selectedOpt = opt;
+        document.getElementById('q-next').disabled = false;
+      };
+      opts.appendChild(b);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.className = 'q-input';
+    ta.rows = 3;
+    ta.placeholder = q.placeholder;
+    ta.oninput = () => {
+      selectedOpt = ta.value.trim() || null;
+      document.getElementById('q-next').disabled = !selectedOpt;
+    };
+    opts.appendChild(ta);
+  }
+
+  document.getElementById('q-overlay').classList.add('open');
+}
+
+function nextQuestion() {
+  answers.push(selectedOpt || 'Não informado');
+  currentQ++;
+  if (currentQ < questions.length) {
+    openQuestion();
+  } else {
+    closeQuestionPanel();
+    finishQuestionnaire();
+  }
+}
+
+function closeQuestionPanel() {
+  document.getElementById('q-overlay').classList.remove('open');
+}
+
+async function finishQuestionnaire() {
+  await addUserBubble('Informar');
+
+  // Agradecimento
+  await addBotBubble('Agradecemos por compartilhar mais detalhes sobre a sua saúde com a gente!', 200);
+
+  // Card resumo
+  await new Promise(resolve => setTimeout(async () => {
+    await showTyping();
+    const rows = answers.map((a, i) =>
+      `<div style="margin-bottom:6px;"><strong>• ${questions[i].text.replace(/^\d+\.\s/,'')}</strong><br><span style="color:#8ac3b8;">${a}</span></div>`
+    ).join('');
+    const row = document.createElement('div');
+    row.className = 'bubble-row bot';
+    row.innerHTML = `
+      <div class="bubble" style="min-width:250px;">
+        <div style="font-size:13px;font-weight:700;color:#00a884;margin-bottom:10px;">📋 Avaliação Inicial</div>
+        <div style="font-size:13px;line-height:1.7;">${rows}</div>
+        <div class="time-stamp">${getTime()}</div>
+      </div>`;
+    document.getElementById('messages').appendChild(row);
+    scrollBottom();
+    setTimeout(() => { row.classList.add('visible'); scrollBottom(); }, 30);
+    setTimeout(resolve, 500);
+  }, 600));
+
+  await addBotBubble('Agora é com a gente: vamos analisar suas respostas para elaborar o plano de cuidado.<br><br>Quando estiver pronto, eu te chamo por aqui, tá bem? 😊', 800);
+  await addBotBubble('Até mais! 👋', 400);
+
+  document.getElementById('chat-status').textContent = 'online';
+}
+
+/* ══════════════════════════════════════════
+   FLUXO PRINCIPAL
+══════════════════════════════════════════ */
+async function runFlow() {
+  // 1. Template inicial
+  await addBotBubble(`
+    Olá, <strong>${NOME}!</strong><br><br>
+    Sua jornada de saúde merece cuidado contínuo e especializado. Por isso, a comunidade <strong>Viver Bem</strong> da Unimed Porto Alegre oferece, <strong>sem custo adicional</strong>, os seguintes benefícios:<br><br>
+    📋 Plano de cuidado personalizado<br>
+    👩‍💼 Acompanhamento individual com profissionais da saúde<br>
+    👥 Suporte nas etapas mais importantes da sua jornada<br><br>
+    Cuidar da saúde fica mais leve com o Viver Bem. <strong>Clique no botão</strong> e comece a receber o cuidado que você merece.<br><br>
+    <span style="color:#8696a0;font-size:12px;">Se não deseja receber esse tipo de mensagem, envie PARAR.</span>
+  `);
+
+  // Quick reply: Quero fazer parte
+  await showQuickReplies([
+    { label: '↩️ Quero fazer parte', value: 'quero' }
+  ]);
+  clearQuickReplies();
+  await addUserBubble('Quero fazer parte');
+
+  // 2. Confirmação + termo
+  await addBotBubble('Que bom te ter com a gente! 💚', 300);
+  await addBotBubble('Para participar da comunidade Viver Bem, preciso que você aceite o termo de consentimento. 👇<br><br>📱 Utilize seu celular para visualizar a mensagem abaixo.', 200);
+
+  // Card do termo
+  await addDocCard(
+    'Termo de consentimento',
+    'Versão: Viver Bem 1 · Criado em 16/02/2024',
+    'Ler e aceitar termo'
+  );
+
+  // Usuário aceita
+  await addUserBubble('Ler e aceitar termo ✔');
+
+  // 3. Convite ao questionário
+  await addBotBubble('Agora, vou precisar entender um pouco mais sobre a sua saúde.<br><br>📱 Utilize seu celular para visualizar a mensagem abaixo.', 300);
+
+  // Card da avaliação
+  await new Promise(resolve => {
+    showTyping().then(() => {
+      const row = document.createElement('div');
+      row.className = 'bubble-row bot';
+      row.innerHTML = `
+        <div class="bubble" style="padding:6px 6px 4px;min-width:240px;">
+          <div class="doc-card">
+            <div class="doc-card-header">
+              <div class="doc-icon">📋</div>
+              <div>
+                <div class="doc-title">Avaliação Inicial</div>
+                <div class="doc-sub">Selecione o botão abaixo para responder. 👇</div>
+              </div>
+            </div>
+            <div class="doc-btn" id="eval-btn">Informar</div>
+          </div>
+          <div class="time-stamp">${getTime()}</div>
+        </div>`;
+      document.getElementById('messages').appendChild(row);
+      scrollBottom();
+      setTimeout(() => { row.classList.add('visible'); scrollBottom(); }, 30);
+      document.getElementById('eval-btn').onclick = () => {
+        document.getElementById('eval-btn').style.color = '#00a884';
+        document.getElementById('eval-btn').style.fontWeight = '600';
+        resolve();
+      };
+    });
+  });
+
+  // Abre questionário
+  currentQ = 0;
+  answers = [];
+  openQuestion();
+}
+
+/* ══════════════════════════════════════════
+   REINICIAR
+══════════════════════════════════════════ */
+function restartFlow() {
+  document.getElementById('messages').innerHTML = '<div style="text-align:center;margin:8px 0;"><span class="date-divider">Hoje</span></div>';
+  document.getElementById('qr-container').innerHTML = '';
+  document.getElementById('q-overlay').classList.remove('open');
+  currentQ = 0;
+  answers = [];
+  flowStep = 0;
+  setTimeout(runFlow, 400);
+}
+
+/* ══════════════════════════════════════════
+   RELÓGIO
+══════════════════════════════════════════ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+setInterval(updateClock, 10000);
+updateClock();
+
+/* START */
+setTimeout(runFlow, 600);
+</script>
+</body>
+</html>
