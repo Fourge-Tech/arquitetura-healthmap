@@ -1,0 +1,530 @@
+{
+  "info": {
+    "name": "Tabia IS",
+    "description": "Collection gerada a partir do spec openapi-careos-simple.json — CareOS (Tabia Health) API.\n\nVariáveis:\n- `baseUrl`: https://app.tabia.health\n- `apiKey`: chave de acesso (api-key header)\n\nTodos os requests já incluem o header `api-key` via variável de coleção.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://app.tabia.health",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "ea5c633a-1722-4d09-8a7d-d5e7a3fe35c2",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "api-key", "type": "string" },
+      { "key": "value", "value": "{{apiKey}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Patient",
+      "item": [
+        {
+          "name": "List Patients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/patient?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "patient"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Página (0-based)" },
+                { "key": "size", "value": "10", "description": "Itens por página" },
+                { "key": "search", "value": "", "description": "Busca textual (nome, telefone, etc)", "disabled": true },
+                { "key": "sortBy", "value": "", "disabled": true },
+                { "key": "sortDir", "value": "asc", "disabled": true },
+                { "key": "inAnyPathway", "value": "true", "disabled": true },
+                { "key": "smartFilter", "value": "", "disabled": true },
+                { "key": "programs", "value": "", "disabled": true },
+                { "key": "pathways", "value": "", "disabled": true },
+                { "key": "ids", "value": "", "disabled": true },
+                { "key": "tags", "value": "", "disabled": true },
+                { "key": "insurances", "value": "", "disabled": true },
+                { "key": "segment", "value": "", "disabled": true },
+                { "key": "withPhoneNumber", "value": "true", "disabled": true },
+                { "key": "start", "value": "", "disabled": true },
+                { "key": "end", "value": "", "disabled": true },
+                { "key": "structuredSearch", "value": "", "description": "Busca estruturada (JSON)", "disabled": true },
+                { "key": "minimalInfo", "value": "false", "disabled": true }
+              ]
+            },
+            "description": "Lista paginada de pacientes com tabiaScore, tags, planos de cuidado e seguros de saúde."
+          }
+        },
+        {
+          "name": "Get Patient by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/patient/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "patient", ":id"],
+              "variable": [
+                { "key": "id", "value": "448266", "description": "ID interno Tabia do paciente" }
+              ]
+            },
+            "description": "Retorna detalhe completo do paciente incluindo endereços, profissionais associados, ICDs, times e histórico."
+          }
+        },
+        {
+          "name": "Get Patient Data on Current Organization",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/patient/:id/data-on-current-organization",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "patient", ":id", "data-on-current-organization"],
+              "variable": [
+                { "key": "id", "value": "448266", "description": "ID interno Tabia do paciente" }
+              ]
+            },
+            "description": "Dados do paciente específicos da organização atual (segmentação, flags etc)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Event",
+      "item": [
+        {
+          "name": "List Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/event?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "event"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "sort", "value": "", "disabled": true },
+                { "key": "statuses", "value": "", "disabled": true },
+                { "key": "progress", "value": "", "disabled": true },
+                { "key": "minTargetDate", "value": "", "disabled": true },
+                { "key": "maxTargetDate", "value": "", "disabled": true },
+                { "key": "minEffectiveDate", "value": "", "disabled": true },
+                { "key": "maxEffectiveDate", "value": "", "disabled": true },
+                { "key": "patients", "value": "", "disabled": true },
+                { "key": "tags", "value": "", "disabled": true },
+                { "key": "insurances", "value": "", "disabled": true },
+                { "key": "programs", "value": "", "disabled": true },
+                { "key": "pathways", "value": "", "disabled": true },
+                { "key": "individualCarePlans", "value": "", "disabled": true },
+                { "key": "smartFilter", "value": "", "disabled": true },
+                { "key": "useGlobalFilter", "value": "", "disabled": true },
+                { "key": "include", "value": "", "disabled": true },
+                { "key": "categories", "value": "", "disabled": true },
+                { "key": "specifications", "value": "", "disabled": true },
+                { "key": "structuredSearch", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": 448266,\n  \"description\": \"\",\n  \"targetDate\": \"2026-04-22\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/event",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "event"]
+            }
+          }
+        },
+        {
+          "name": "List Event Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/event-metric?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "event-metric"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sortBy", "value": "", "disabled": true },
+                { "key": "sortDir", "value": "", "disabled": true },
+                { "key": "events", "value": "", "disabled": true },
+                { "key": "types", "value": "", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Individual Care Plan",
+      "item": [
+        {
+          "name": "List Individual Care Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/individual-care-plan?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "individual-care-plan"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "pathwayId", "value": "", "disabled": true },
+                { "key": "sortBy", "value": "", "disabled": true },
+                { "key": "sortDir", "value": "", "disabled": true },
+                { "key": "patients", "value": "", "disabled": true },
+                { "key": "completed", "value": "", "disabled": true },
+                { "key": "active", "value": "true", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Individual Care Plans (batch)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"patientId\": 448266,\n    \"pathwayId\": 2145,\n    \"pathwayStartDate\": \"2026-04-22\"\n  }\n]",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/individual-care-plan/batch",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "individual-care-plan", "batch"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pathway",
+      "item": [
+        {
+          "name": "List Pathways",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/pathway?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "pathway"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "sortBy", "value": "", "disabled": true },
+                { "key": "sortDir", "value": "", "disabled": true },
+                { "key": "patients", "value": "", "disabled": true },
+                { "key": "programs", "value": "", "disabled": true },
+                { "key": "published", "value": "true", "disabled": true },
+                { "key": "archived", "value": "false", "disabled": true },
+                { "key": "archivedActive", "value": "", "disabled": true },
+                { "key": "minimalInfo", "value": "false", "disabled": true },
+                { "key": "useGlobalFilter", "value": "", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Task",
+      "item": [
+        {
+          "name": "List Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/task?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "task"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "sortBy", "value": "", "disabled": true },
+                { "key": "sortDir", "value": "", "disabled": true },
+                { "key": "categories", "value": "", "disabled": true },
+                { "key": "statuses", "value": "", "disabled": true },
+                { "key": "startDueDate", "value": "", "disabled": true },
+                { "key": "endDueDate", "value": "", "disabled": true },
+                { "key": "patients", "value": "", "disabled": true },
+                { "key": "accomplished", "value": "", "disabled": true },
+                { "key": "archived", "value": "false", "disabled": true },
+                { "key": "programs", "value": "", "disabled": true },
+                { "key": "pathways", "value": "", "disabled": true },
+                { "key": "teams", "value": "", "disabled": true },
+                { "key": "smartFilter", "value": "", "disabled": true },
+                { "key": "useGlobalFilter", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": 448266,\n  \"description\": \"\",\n  \"dueDate\": \"2026-04-30\",\n  \"assigneeId\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/task",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "task"]
+            }
+          }
+        },
+        {
+          "name": "Update Task Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DONE\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/task/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "task", ":id", "status"],
+              "variable": [
+                { "key": "id", "value": "", "description": "ID da task" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Message",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": 448266,\n  \"content\": \"\",\n  \"channel\": \"WHATSAPP\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/message/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "message", "send"],
+              "query": [
+                { "key": "includeSession", "value": "false", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Survey",
+      "item": [
+        {
+          "name": "Get Survey",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/survey/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "survey", ":id"],
+              "variable": [
+                { "key": "id", "value": "", "description": "ID do survey" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Survey Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/survey/:id/details",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "survey", ":id", "details"],
+              "variable": [
+                { "key": "id", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Survey Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/survey/:id/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "survey", ":id", "stats"],
+              "variable": [
+                { "key": "id", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Survey Applications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/survey/:id/applications?page=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "survey", ":id", "applications"],
+              "variable": [
+                { "key": "id", "value": "" }
+              ],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "sortDir", "value": "", "disabled": true },
+                { "key": "sortBy", "value": "", "disabled": true },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "statuses", "value": "", "disabled": true },
+                { "key": "startDate", "value": "", "disabled": true },
+                { "key": "endDate", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Survey Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": 448266\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/survey/:id/applications",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "survey", ":id", "applications"],
+              "variable": [
+                { "key": "id", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Survey Data by UID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/surveydata/:uid",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "surveydata", ":uid"],
+              "variable": [
+                { "key": "uid", "value": "" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointment",
+      "item": [
+        {
+          "name": "Get No-Show Risk Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/appointment-no-show-risk/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "appointment-no-show-risk", "stats"],
+              "query": [
+                { "key": "fromDate", "value": "", "disabled": true },
+                { "key": "toDate", "value": "", "disabled": true },
+                { "key": "structuredSearch", "value": "", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/user?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "user"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/apiv1/user/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["apiv1", "user", "search"],
+              "query": [
+                { "key": "email", "value": "", "disabled": true },
+                { "key": "phoneNumber", "value": "", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
