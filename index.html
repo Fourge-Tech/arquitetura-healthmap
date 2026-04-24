@@ -37,7 +37,7 @@
     }
 
     /* ── SIDEBAR (CBV + MA + JA + AUTOMACOES) ── */
-    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes, #sidebar-automonitoramento {
+    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes, #sidebar-automonitoramento, #sidebar-automacoes-gerais {
       width: var(--sidebar-w);
       background: var(--blue-dark);
       color: #cde;
@@ -172,6 +172,34 @@
     }
     #btn-dashboard-automonitoramento { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
     #btn-dashboard-automonitoramento:hover, #btn-export-automonitoramento:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+
+    /* Automações Gerais — sidebar accent âmbar */
+    #main-automacoes-gerais { display: none; }
+    #sidebar-automacoes-gerais { display: none; background: #1b2f3f; }
+    #sidebar-automacoes-gerais nav a:hover, #sidebar-automacoes-gerais nav a.active {
+      background: rgba(245, 158, 11, .18);
+      border-left-color: #f59e0b;
+      color: #fff;
+    }
+    #sidebar-automacoes-gerais .badge-automacoes-gerais {
+      display: inline-block; background: #f59e0b; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 10px;
+      border-radius: 10px; margin-top: 8px; letter-spacing: .5px;
+    }
+    #page-header-automacoes-gerais {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, #f59e0b 100%);
+    }
+    #btn-dashboard-automacoes-gerais, #btn-export-automacoes-gerais {
+      background: transparent; color: #fff;
+      border: 1.5px solid rgba(255,255,255,.5);
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .2s; margin-left: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    #btn-dashboard-automacoes-gerais { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-automacoes-gerais:hover, #btn-export-automacoes-gerais:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+
     .mermaid-wrap {
       background: #f8fafc;
       border-radius: 8px;
@@ -287,8 +315,8 @@
       background: #2a7a5a; color: #fff;
       font-size: 10px; padding: 2px 8px; border-radius: 10px;
     }
-    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav, #sidebar-automonitoramento nav { padding: 12px 0; flex: 1; }
-    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a, #sidebar-automonitoramento nav a {
+    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav, #sidebar-automonitoramento nav, #sidebar-automacoes-gerais nav { padding: 12px 0; flex: 1; }
+    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a, #sidebar-automonitoramento nav a, #sidebar-automacoes-gerais nav a {
       display: block; padding: 8px 20px;
       color: #a8c4dc; text-decoration: none;
       font-size: 12.5px; line-height: 1.4;
@@ -304,11 +332,11 @@
     #sidebar-ma nav a:hover, #sidebar-ma nav a.active {
       border-left-color: #3ab882;
     }
-    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section, #sidebar-automonitoramento nav .nav-section {
+    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section, #sidebar-automonitoramento nav .nav-section, #sidebar-automacoes-gerais nav .nav-section {
       font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
       color: #5a7a96; padding: 16px 20px 4px; font-weight: 600;
     }
-    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub, #sidebar-automonitoramento nav a.sub { padding-left: 32px; font-size: 12px; }
+    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub, #sidebar-automonitoramento nav a.sub, #sidebar-automacoes-gerais nav a.sub { padding-left: 32px; font-size: 12px; }
 
     /* ── HAMBURGER ── */
     #menu-toggle {
@@ -319,7 +347,7 @@
     }
 
     /* ── MAIN (CBV + MA) ── */
-    #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento {
+    #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento, #main-automacoes-gerais {
       margin-left: var(--sidebar-w);
       flex: 1;
       min-width: 0;
@@ -327,7 +355,7 @@
     #main-ma { display: none; }
 
     /* ── HEADER ── */
-    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes, #page-header-automonitoramento {
+    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes, #page-header-automonitoramento, #page-header-automacoes-gerais {
       color: #fff;
       padding: 48px 48px 36px;
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
@@ -841,10 +869,11 @@
       #btn-export-ma, #btn-dashboard-ma,
       #btn-export-automacoes, #btn-dashboard-automacoes, #btn-sim-automacoes { display: none !important; }
       #btn-export-automonitoramento, #btn-dashboard-automonitoramento { display: none !important; }
+      #btn-export-automacoes-gerais, #btn-dashboard-automacoes-gerais { display: none !important; }
 
       /* Layout sem sidebar */
       body { background: #fff !important; }
-      #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento { margin-left: 0 !important; }
+      #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento, #main-automacoes-gerais { margin-left: 0 !important; }
       #content { padding: 16px 0 !important; width: 100% !important; }
 
       /* Header impresso — mantém gradiente */
@@ -1400,6 +1429,23 @@
           <span>⚙️ Blip + HMAP</span>
           <span>📅 2026</span>
           <span>🤖 Alta Complexidade</span>
+        </div>
+        <div class="pc-open">Abrir documentação →</div>
+      </div>
+
+      <!-- Projeto 6: Automações Gerais -->
+      <div class="project-card" onclick="openProject('automacoes-gerais')">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#78350f,#f59e0b);">⚡</div>
+          <span class="pc-badge active">Ativo</span>
+        </div>
+        <div class="pc-title">Automações Gerais</div>
+        <div class="pc-sub">Disparos via CRM Dynamics + Blip</div>
+        <div class="pc-desc">Integração entre Unimed POA e beneficiários via WhatsApp: disparo de questionários pendentes e pesquisa de satisfação pós-cirúrgica orquestrados pelo CRM Dynamics.</div>
+        <div class="pc-meta">
+          <span>📱 Blip</span>
+          <span>🔗 Dynamics CRM</span>
+          <span>⚙️ Viver Bem</span>
         </div>
         <div class="pc-open">Abrir documentação →</div>
       </div>
@@ -6815,6 +6861,280 @@ flowchart TD
   </div><!-- /content-automonitoramento -->
 </div><!-- /main-automonitoramento -->
 
+<!-- ══════════════════════════════════════════════════════════════════
+     PROJETO: AUTOMAÇÕES GERAIS
+══════════════════════════════════════════════════════════════════ -->
+<aside id="sidebar-automacoes-gerais">
+  <div id="sidebar-logo">
+    <div class="org">Unimed POA</div>
+    <div class="title">Automações Gerais</div>
+    <span class="badge-automacoes-gerais">Dynamics + Blip</span>
+  </div>
+  <nav>
+    <div class="nav-section">Documento</div>
+    <a href="#ag-sec1">1. Visão Geral e Objetivo</a>
+    <a href="#ag-sec1-1" class="sub">1.1 Templates Disponíveis</a>
+    <a href="#ag-sec2">2. Arquitetura e Fluxo de Dados</a>
+    <a href="#ag-sec3">3. Especificações Técnicas (API)</a>
+    <a href="#ag-sec3-1" class="sub">3.1 Autenticação</a>
+    <a href="#ag-sec3-2" class="sub">3.2 Identificação do Beneficiário</a>
+    <a href="#ag-sec3-3" class="sub">3.3 Gatilho de Disparo</a>
+    <a href="#ag-sec3-3a" class="sub">3.3a Payload — Questionários</a>
+    <a href="#ag-sec3-3b" class="sub">3.3b Payload — Desfecho Cirúrgico</a>
+    <div class="nav-section">Referência</div>
+    <a href="#ag-sec4">4. Regras de Disparo</a>
+  </nav>
+</aside>
+
+<div id="main-automacoes-gerais">
+
+  <header id="page-header-automacoes-gerais">
+    <div class="label">Automações Gerais · Dynamics CRM + Blip + WhatsApp</div>
+    <h1>Disparo de Mensagens via WhatsApp</h1>
+    <div class="subtitle">Comunicação proativa com beneficiários — questionários e pesquisas pós-cirúrgicas</div>
+    <div class="meta">
+      <span class="chip"><span class="chip-icon">⚡</span> Dynamics + Blip</span>
+      <span class="chip"><span class="chip-icon">✅</span> Ativo</span>
+      <button id="btn-dashboard-automacoes-gerais" onclick="goHome()" title="Voltar ao dashboard">← Dashboard</button>
+      <button id="btn-export-automacoes-gerais" onclick="window.print()" title="Exportar como PDF"><span>📄</span> Exportar PDF</button>
+    </div>
+  </header>
+
+  <div id="content-automacoes-gerais" style="padding:40px 48px;width:100%;">
+
+    <!-- SEC 1: VISÃO GERAL -->
+    <div class="section-card" id="ag-sec1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Visão Geral e Objetivo de Negócio</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          O objetivo desta integração é <strong>automatizar a comunicação entre a Unimed POA e seus beneficiários
+          através do WhatsApp</strong>, utilizando a plataforma <strong>Blip</strong> como intermediária.
+          A solução visa agilizar a coleta de informações assistenciais e o monitoramento de pacientes
+          através do envio proativo de mensagens.
+        </p>
+
+        <div class="subsection" id="ag-sec1-1">
+          <div class="subsection-title">Templates Disponíveis</div>
+          <table>
+            <thead>
+              <tr><th>Template</th><th>Finalidade</th><th>Flag de ativação</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Desfecho Cirúrgico</strong></td>
+                <td>Pesquisa de satisfação enviada ao paciente após procedimento cirúrgico</td>
+                <td><code>uni_desfecho_cirurgico: "true"</code></td>
+              </tr>
+              <tr>
+                <td><strong>Universal (Questionários)</strong></td>
+                <td>Envio de pesquisas, formulários de saúde e questionários pendentes</td>
+                <td><code>uni_questionariospendentes: "true"</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 2: ARQUITETURA -->
+    <div class="section-card" id="ag-sec2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Arquitetura e Fluxo de Dados</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          A integração segue um modelo de <strong>orquestração</strong> onde o CRM Dynamics atua como
+          ponto central de comando:
+        </p>
+        <ol>
+          <li>
+            <strong>Origem — Viver Bem:</strong> o sistema busca os dados, realiza o tratamento
+            necessário e dispara a requisição para o CRM.
+          </li>
+          <li>
+            <strong>Processamento — Dynamics CRM:</strong> o CRM recebe o gatilho, valida o contato
+            e prepara os parâmetros para a Blip.
+          </li>
+          <li>
+            <strong>Execução — Blip:</strong> o CRM consome a API da Blip, que efetua a entrega
+            final ao WhatsApp do cliente.
+          </li>
+        </ol>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+flowchart LR
+  VB["🖥️ Viver Bem\n(Origem)"]
+  CRM["⚙️ Dynamics CRM\n(Orquestrador)"]
+  BLIP["📡 Blip\n(Mensageria)"]
+  WA["📱 WhatsApp\n(Beneficiário)"]
+  VB -->|"Dados + gatilho"| CRM
+  CRM -->|"API call"| BLIP
+  BLIP -->|"Template"| WA
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 3: ESPECIFICAÇÕES TÉCNICAS -->
+    <div class="section-card" id="ag-sec3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Especificações Técnicas (API)</h2>
+      </div>
+      <div class="section-body">
+
+        <!-- 3.1 AUTENTICAÇÃO -->
+        <div class="subsection" id="ag-sec3-1">
+          <div class="subsection-title">3.1 Autenticação</div>
+          <p>
+            Obtenção do token de acesso via <strong>Azure AD</strong>. Atentar-se à URL de ambiente
+            (HML ou PRD).
+          </p>
+          <table>
+            <thead>
+              <tr><th>Campo</th><th>Valor</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Método</strong></td>
+                <td><code>POST</code></td>
+              </tr>
+              <tr>
+                <td><strong>Endpoint</strong></td>
+                <td><code>https://login.windows.net/{{tenantid}}/oauth2/token</code></td>
+              </tr>
+              <tr>
+                <td><strong>Resource HML</strong></td>
+                <td><code>https://unimedpoa-hml.crm2.dynamics.com</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 3.2 IDENTIFICAÇÃO DO BENEFICIÁRIO -->
+        <div class="subsection" id="ag-sec3-2">
+          <div class="subsection-title">3.2 Identificação do Beneficiário</div>
+          <p>
+            Antes de processar o envio, realiza-se a busca pelo CPF para garantir que o campo
+            <code>telephone1</code> (celular) esteja atualizado no CRM.
+          </p>
+          <table>
+            <thead>
+              <tr><th>Campo</th><th>Valor</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Método</strong></td>
+                <td><code>GET</code></td>
+              </tr>
+              <tr>
+                <td><strong>Filtro</strong></td>
+                <td><code>{{resource}}/api/data/v9.2/contacts?$select=fullname,telephone1&amp;$filter=uni_cpf eq 'CPF_VALOR'</code></td>
+              </tr>
+              <tr>
+                <td><strong>Campo validado</strong></td>
+                <td><code>telephone1</code> — celular do beneficiário</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 3.3 GATILHO DE DISPARO -->
+        <div class="subsection" id="ag-sec3-3">
+          <div class="subsection-title">3.3 Gatilho de Disparo (Linha de Cuidado)</div>
+          <p>
+            O envio é realizado através da entidade <code>uni_linhadecuidados</code>.
+          </p>
+          <table>
+            <thead>
+              <tr><th>Situação</th><th>Método</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Linha de cuidado <strong>não existe</strong></td>
+                <td><code>POST</code> — cria novo registro</td>
+              </tr>
+              <tr>
+                <td>Linha de cuidado <strong>já existe</strong></td>
+                <td><code>PATCH</code> — atualiza pelo ID correspondente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 3.3a PAYLOAD QUESTIONÁRIOS -->
+        <div class="subsection" id="ag-sec3-3a">
+          <div class="subsection-title">3.3a Payload — Envio de Questionários Pendentes</div>
+          <p>
+            A flag <code>uni_questionariospendentes: "true"</code> ativa o <strong>template Universal</strong> na Blip.
+          </p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:8px;font-size:13px;overflow-x:auto;"><code>{
+    "uni_variaveis_whatsapp": "[\"valor1\", \"valor2\", \"texto\"]",
+    "uni_questionariospendentes": "true"
+}</code></pre>
+        </div>
+
+        <!-- 3.3b PAYLOAD DESFECHO CIRÚRGICO -->
+        <div class="subsection" id="ag-sec3-3b">
+          <div class="subsection-title">3.3b Payload — Envio de Desfecho Cirúrgico</div>
+          <p>
+            A flag <code>uni_desfecho_cirurgico: "true"</code> ativa o <strong>template de pesquisa de
+            satisfação pós-cirúrgica</strong> na Blip.
+          </p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:8px;font-size:13px;overflow-x:auto;"><code>{
+    "uni_variaveis_whatsapp": "[\"valor1\", \"valor2\", \"valor3\", \"valor4\", \"texto\"]",
+    "uni_desfecho_cirurgico": "true"
+}</code></pre>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEC 4: REGRAS DE DISPARO -->
+    <div class="section-card" id="ag-sec4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Regras de Disparo e Validação</h2>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead>
+            <tr><th>Regra</th><th>Descrição</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Gatilho Imediato</strong></td>
+              <td>O envio para a Blip ocorre de forma imediata após o CRM receber os dados e a flag do template ser ativada.</td>
+            </tr>
+            <tr>
+              <td><strong>Ordem das Variáveis</strong></td>
+              <td>O array <code>uni_variaveis_whatsapp</code> deve conter os valores na <strong>ordem exata</strong> configurada nos templates da Blip.</td>
+            </tr>
+            <tr>
+              <td><strong>Validação do Celular</strong></td>
+              <td>O campo <code>telephone1</code> deve estar preenchido no CRM antes do disparo; caso contrário, o envio não é processado.</td>
+            </tr>
+            <tr>
+              <td><strong>Seleção do Template</strong></td>
+              <td>Apenas uma flag pode ser <code>"true"</code> por requisição — <code>uni_questionariospendentes</code> ou <code>uni_desfecho_cirurgico</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout info" style="margin-top:20px;">
+          <strong>ℹ️ Método POST vs PATCH</strong>
+          Verificar sempre a existência da <code>uni_linhadecuidados</code> antes do disparo para
+          evitar duplicidade de registros no CRM.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-automacoes-gerais -->
+</div><!-- /main-automacoes-gerais -->
+
 <script>
 /* ── PAYLOADS ── */
 const H = { Authorization: "Bearer {token}", KeyDS: "production" };
@@ -7526,7 +7846,8 @@ const _projectNames = {
   ma:                 'Modelo Assistencial',
   ja:                 'Jornada Assistencial',
   automacoes:         'Automações — Alta Complexidade',
-  automonitoramento:  'Automações — Automonitoramento'
+  automonitoramento:  'Automações — Automonitoramento',
+  'automacoes-gerais': 'Automações Gerais'
 };
 function openProject(id) {
   _pendingProject = id;
@@ -7564,7 +7885,7 @@ let _guestMode = false;
   if (isGuest) {
     _guestMode = true;
     const _gp = params.get('projeto');
-    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : _gp === 'automonitoramento' ? 'automonitoramento' : 'cbv';
+    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : _gp === 'automonitoramento' ? 'automonitoramento' : _gp === 'automacoes-gerais' ? 'automacoes-gerais' : 'cbv';
     // Oculta overlays instantaneamente
     const ov = document.getElementById('auth-overlay');
     if (ov) { ov.classList.remove('show'); }
@@ -7605,29 +7926,34 @@ function loadProject(id) {
   const isJa   = id === 'ja';
   const isAuto = id === 'automacoes';
   const isMon  = id === 'automonitoramento';
+  const isAG   = id === 'automacoes-gerais';
   // sidebar
   const sbCbv  = document.getElementById('sidebar');
   const sbMa   = document.getElementById('sidebar-ma');
   const sbJa   = document.getElementById('sidebar-ja');
   const sbAuto = document.getElementById('sidebar-automacoes');
   const sbMon  = document.getElementById('sidebar-automonitoramento');
+  const sbAG   = document.getElementById('sidebar-automacoes-gerais');
   if (sbCbv)  sbCbv.style.display  = isCbv  ? '' : 'none';
   if (sbMa)   sbMa.style.display   = isMa   ? 'flex' : 'none';
   if (sbJa)   sbJa.style.display   = isJa   ? 'flex' : 'none';
   if (sbAuto) sbAuto.style.display = isAuto ? 'flex' : 'none';
   if (sbMon)  sbMon.style.display  = isMon  ? 'flex' : 'none';
+  if (sbAG)   sbAG.style.display   = isAG   ? 'flex' : 'none';
   // main
   const mCbv  = document.getElementById('main');
   const mMa   = document.getElementById('main-ma');
   const mJa   = document.getElementById('main-ja');
   const mAuto = document.getElementById('main-automacoes');
   const mMon  = document.getElementById('main-automonitoramento');
+  const mAG   = document.getElementById('main-automacoes-gerais');
   if (mCbv)  mCbv.style.display  = isCbv  ? 'block' : 'none';
   if (mMa)   mMa.style.display   = isMa   ? 'block' : 'none';
   if (mJa)   mJa.style.display   = isJa   ? 'block' : 'none';
   if (mAuto) mAuto.style.display = isAuto ? 'block' : 'none';
   if (mMon)  mMon.style.display  = isMon  ? 'block' : 'none';
-  if (isAuto || isMon) mermaid.run();
+  if (mAG)   mAG.style.display   = isAG   ? 'block' : 'none';
+  if (isAuto || isMon || isAG) mermaid.run();
 }
 
 function _applyGuestUI(proj) {
@@ -7677,6 +8003,17 @@ function _applyGuestUI(proj) {
       const exportBtn = document.getElementById('btn-export-automonitoramento');
       meta.insertBefore(chip, exportBtn);
     }
+  } else if (proj === 'automacoes-gerais') {
+    const dashAG = document.getElementById('btn-dashboard-automacoes-gerais');
+    if (dashAG) dashAG.style.display = 'none';
+    const meta = document.querySelector('#page-header-automacoes-gerais .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export-automacoes-gerais');
+      meta.insertBefore(chip, exportBtn);
+    }
   } else {
     // CBV (default)
     ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
@@ -7698,10 +8035,10 @@ function _applyGuestUI(proj) {
 function goHome() {
   if (_guestMode) return;
   sessionStorage.removeItem('_p');
-  ['main','main-ma','main-ja','main-automacoes','main-automonitoramento'].forEach(id => {
+  ['main','main-ma','main-ja','main-automacoes','main-automonitoramento','main-automacoes-gerais'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
-  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes','sidebar-automonitoramento'].forEach(id => {
+  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes','sidebar-automonitoramento','sidebar-automacoes-gerais'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   const ho = document.getElementById('home-overlay');
