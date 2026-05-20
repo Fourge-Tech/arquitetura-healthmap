@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -37,7 +37,7 @@
     }
 
     /* ── SIDEBAR (CBV + MA + JA + AUTOMACOES) ── */
-    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes, #sidebar-automonitoramento, #sidebar-automacoes-gerais, #sidebar-cockpit-navegacao {
+    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes, #sidebar-automonitoramento, #sidebar-automacoes-gerais, #sidebar-cockpit-navegacao, #sidebar-cockpit-navegacao-2 {
       width: var(--sidebar-w);
       background: var(--blue-dark);
       color: #cde;
@@ -216,6 +216,23 @@
     #page-header-cockpit-navegacao {
       background: linear-gradient(135deg, var(--blue-dark) 0%, #6366f1 100%);
     }
+
+    /* Cockpit Navegação 2.0 — sidebar accent purple/rose */
+    #main-cockpit-navegacao-2 { display: none; }
+    #sidebar-cockpit-navegacao-2 { display: none; background: #1a1035; }
+    #sidebar-cockpit-navegacao-2 nav a:hover, #sidebar-cockpit-navegacao-2 nav a.active {
+      background: rgba(168, 85, 247, .18);
+      border-left-color: #a855f7;
+      color: #fff;
+    }
+    #sidebar-cockpit-navegacao-2 .badge-cn2 {
+      display: inline-block; background: #a855f7; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 10px;
+      border-radius: 10px; margin-top: 8px; letter-spacing: .5px;
+    }
+    #page-header-cockpit-navegacao-2 {
+      background: linear-gradient(135deg, #1a1035 0%, #a855f7 100%);
+    }
     #btn-dashboard-cockpit-navegacao, #btn-export-cockpit-navegacao {
       background: transparent; color: #fff;
       border: 1.5px solid rgba(255,255,255,.5);
@@ -342,8 +359,8 @@
       background: #2a7a5a; color: #fff;
       font-size: 10px; padding: 2px 8px; border-radius: 10px;
     }
-    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav, #sidebar-automonitoramento nav, #sidebar-automacoes-gerais nav, #sidebar-cockpit-navegacao nav { padding: 12px 0; flex: 1; }
-    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a, #sidebar-automonitoramento nav a, #sidebar-automacoes-gerais nav a, #sidebar-cockpit-navegacao nav a {
+    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav, #sidebar-automonitoramento nav, #sidebar-automacoes-gerais nav, #sidebar-cockpit-navegacao nav, #sidebar-cockpit-navegacao-2 nav { padding: 12px 0; flex: 1; }
+    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a, #sidebar-automonitoramento nav a, #sidebar-automacoes-gerais nav a, #sidebar-cockpit-navegacao nav a, #sidebar-cockpit-navegacao-2 nav a {
       display: block; padding: 8px 20px;
       color: #a8c4dc; text-decoration: none;
       font-size: 12.5px; line-height: 1.4;
@@ -359,11 +376,11 @@
     #sidebar-ma nav a:hover, #sidebar-ma nav a.active {
       border-left-color: #3ab882;
     }
-    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section, #sidebar-automonitoramento nav .nav-section, #sidebar-automacoes-gerais nav .nav-section, #sidebar-cockpit-navegacao nav .nav-section {
+    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section, #sidebar-automonitoramento nav .nav-section, #sidebar-automacoes-gerais nav .nav-section, #sidebar-cockpit-navegacao nav .nav-section, #sidebar-cockpit-navegacao-2 nav .nav-section {
       font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
       color: #5a7a96; padding: 16px 20px 4px; font-weight: 600;
     }
-    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub, #sidebar-automonitoramento nav a.sub, #sidebar-automacoes-gerais nav a.sub, #sidebar-cockpit-navegacao nav a.sub { padding-left: 32px; font-size: 12px; }
+    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub, #sidebar-automonitoramento nav a.sub, #sidebar-automacoes-gerais nav a.sub, #sidebar-cockpit-navegacao nav a.sub, #sidebar-cockpit-navegacao-2 nav a.sub { padding-left: 32px; font-size: 12px; }
 
     /* ── HAMBURGER ── */
     #menu-toggle {
@@ -374,7 +391,7 @@
     }
 
     /* ── MAIN (CBV + MA) ── */
-    #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento, #main-automacoes-gerais, #main-cockpit-navegacao {
+    #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento, #main-automacoes-gerais, #main-cockpit-navegacao, #main-cockpit-navegacao-2 {
       margin-left: var(--sidebar-w);
       flex: 1;
       min-width: 0;
@@ -382,7 +399,7 @@
     #main-ma { display: none; }
 
     /* ── HEADER ── */
-    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes, #page-header-automonitoramento, #page-header-automacoes-gerais, #page-header-cockpit-navegacao {
+    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes, #page-header-automonitoramento, #page-header-automacoes-gerais, #page-header-cockpit-navegacao, #page-header-cockpit-navegacao-2 {
       color: #fff;
       padding: 48px 48px 36px;
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
@@ -888,21 +905,39 @@
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
       /* Esconder tudo que não é conteúdo */
-      #auth-overlay, #home-overlay, #sidebar, #menu-toggle, #sb-toggle,
+      #auth-overlay, #home-overlay, #menu-toggle, #sb-toggle,
       #scroll-top, .btn-payload, .diag-tabs, .diag-toolbar,
-      .diag-wrapper, .diag-tooltip, .modal-overlay, #changelog-overlay,
+      .diag-tooltip, .modal-overlay, #changelog-overlay,
       #btn-export, #btn-dashboard, #btn-history,
       #btn-export-ja, #btn-dashboard-ja,
       #btn-export-ma, #btn-dashboard-ma,
-      #btn-export-automacoes, #btn-dashboard-automacoes, #btn-sim-automacoes { display: none !important; }
-      #btn-export-automonitoramento, #btn-dashboard-automonitoramento { display: none !important; }
-      #btn-export-automacoes-gerais, #btn-dashboard-automacoes-gerais { display: none !important; }
-      #btn-export-cockpit-navegacao, #btn-dashboard-cockpit-navegacao { display: none !important; }
+      #btn-export-automacoes, #btn-dashboard-automacoes, #btn-sim-automacoes,
+      #btn-export-automonitoramento, #btn-dashboard-automonitoramento,
+      #btn-export-automacoes-gerais, #btn-dashboard-automacoes-gerais,
+      #btn-export-cockpit-navegacao, #btn-dashboard-cockpit-navegacao,
+      #btn-export-cockpit-navegacao-2, #btn-dashboard-cockpit-navegacao-2 { display: none !important; }
 
-      /* Layout sem sidebar */
+      /* Esconder todos os sidebars na impressão */
+      #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes,
+      #sidebar-automonitoramento, #sidebar-automacoes-gerais,
+      #sidebar-cockpit-navegacao, #sidebar-cockpit-navegacao-2 { display: none !important; }
+
+      /* Layout sem sidebar — remover margin-left de todos os mains */
       body { background: #fff !important; }
-      #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento, #main-automacoes-gerais, #main-cockpit-navegacao { margin-left: 0 !important; }
+      #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento,
+      #main-automacoes-gerais, #main-cockpit-navegacao, #main-cockpit-navegacao-2 { margin-left: 0 !important; }
       #content { padding: 16px 0 !important; width: 100% !important; }
+
+      /* Diagrama — exibe apenas o painel ativo, sem scroll, sem overflow */
+      .diag-wrapper {
+        overflow: visible !important;
+        background: #fff !important;
+        break-before: page;
+      }
+      .diag-canvas { width: 100% !important; transform: none !important; }
+      .diag-panel { display: none !important; }
+      .diag-panel.active { display: block !important; break-inside: avoid; }
+      .diag-panel svg { width: 100% !important; height: auto !important; max-width: 100% !important; }
 
       /* Header impresso — mantém gradiente */
       #page-header, #page-header-ma {
@@ -1492,6 +1527,24 @@
           <span>🧭 Unimed POA</span>
           <span>📅 2026</span>
           <span>🩺 Monitoras</span>
+        </div>
+        <div class="pc-open">Abrir documentação →</div>
+      </div>
+
+      <!-- Projeto 8: Cockpit de Navegação 2.0 -->
+      <div class="project-card" onclick="openProject('cockpit-navegacao-2')">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#4a1d96,#a855f7);">🖥️</div>
+          <span class="pc-badge">Em elaboração</span>
+        </div>
+        <div class="pc-title">Cockpit de Navegação 2.0</div>
+        <div class="pc-sub">Tela de Monitoramentos — Perfil Gestor</div>
+        <div class="pc-desc">Documentação funcional e técnica completa da tela de Monitoramentos do Cockpit de Navegação, perfil Gestor: regras de negócio, integrações, filtros, ordenação, drawer e cenários de QA.</div>
+        <div class="pc-meta">
+          <span>📋 Versão 1.0</span>
+          <span>🖥️ Unimed POA</span>
+          <span>📅 2026</span>
+          <span>👤 Gestor</span>
         </div>
         <div class="pc-open">Abrir documentação →</div>
       </div>
@@ -7406,6 +7459,857 @@ flowchart LR
   </div><!-- /content-cockpit-navegacao -->
 </div><!-- /main-cockpit-navegacao -->
 
+<!-- ══════════════════════════════════════════════════════════════════
+     PROJETO: COCKPIT DE NAVEGAÇÃO 2.0 — Tela de Monitoramentos (Gestor)
+══════════════════════════════════════════════════════════════════ -->
+<aside id="sidebar-cockpit-navegacao-2">
+  <div id="sidebar-logo">
+    <div class="org">Unimed POA</div>
+    <div class="title">Cockpit 2.0</div>
+    <span class="badge-cn2">Tela de Monitoramentos</span>
+  </div>
+  <nav>
+    <div class="nav-section">Documentação</div>
+    <a href="#cn2-sec1">1. Visão Geral</a>
+    <a href="#cn2-sec2">2. Interface</a>
+    <a href="#cn2-sec2-1" class="sub">2.1 Menu Lateral</a>
+    <a href="#cn2-sec2-2" class="sub">2.2 Header e Contador</a>
+    <a href="#cn2-sec2-3" class="sub">2.3 Busca e Filter Chips</a>
+    <a href="#cn2-sec2-4" class="sub">2.4 Tabela Principal</a>
+    <a href="#cn2-sec2-5" class="sub">2.5 Drawer do Paciente</a>
+    <a href="#cn2-sec3">3. Mapeamento de Dados</a>
+    <div class="nav-section">Regras de Negócio</div>
+    <a href="#cn2-sec4">4. Regras de Negócio</a>
+    <a href="#cn2-sec4-1" class="sub">4.1 Ordenação</a>
+    <a href="#cn2-sec4-2" class="sub">4.2 Filter Chips</a>
+    <a href="#cn2-sec4-3" class="sub">4.3 Busca Local</a>
+    <a href="#cn2-sec4-4" class="sub">4.4 Drawer do Paciente</a>
+    <a href="#cn2-sec4-5" class="sub">4.5 Estado Vazio</a>
+    <div class="nav-section">Técnico</div>
+    <a href="#cn2-sec5">5. Fluxo Completo</a>
+    <a href="#cn2-sec6">6. Integrações Externas</a>
+    <a href="#cn2-sec7">7. Regras Técnicas</a>
+    <a href="#cn2-sec8">8. Cenários de Teste</a>
+    <a href="#cn2-sec9">9. Erros e Contingência</a>
+    <a href="#cn2-sec10">10. Preparação Dev</a>
+  </nav>
+</aside>
+
+<div id="main-cockpit-navegacao-2">
+
+  <header id="page-header-cockpit-navegacao-2">
+    <div class="label">Cockpit de Navegação 2.0 · Tela de Monitoramentos — Perfil Gestor</div>
+    <h1>🖥️ Cockpit de Navegação 2.0</h1>
+    <div class="subtitle">Documentação Funcional e Técnica — Tela de Monitoramentos (Gestor)</div>
+    <div class="meta">
+      <span class="chip"><span class="chip-icon">🖥️</span> Unimed POA</span>
+      <span class="chip"><span class="chip-icon">📋</span> Em elaboração</span>
+      <button id="btn-dashboard-cockpit-navegacao-2" onclick="goHome()" title="Voltar ao dashboard">← Dashboard</button>
+      <button id="btn-export-cockpit-navegacao-2" onclick="window.print()" title="Exportar como PDF"><span>📄</span> Exportar PDF</button>
+    </div>
+  </header>
+
+  <div id="content-cockpit-navegacao-2" style="padding:40px 48px;width:100%;">
+
+    <!-- ESTILO INTERNO DO PROTÓTIPO -->
+    <style>
+      .proto-wrap { position:relative; background:#f1f5f9; border-radius:12px; padding:20px; margin-bottom:32px; border:1px solid #e2e8f0; }
+      .proto-screen { display:flex; border-radius:8px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.18); font-family:'Segoe UI',Arial,sans-serif; font-size:13px; background:#fff; min-height:520px; }
+      .proto-sidebar { width:210px; background:#fff; border-right:1px solid #e9ecef; flex-shrink:0; display:flex; flex-direction:column; }
+      .proto-sidebar-logo { display:flex; align-items:center; gap:8px; padding:14px 16px; border-bottom:1px solid #e9ecef; }
+      .proto-sidebar-logo-box { background:#00843d; color:#fff; font-size:11px; font-weight:700; padding:6px 10px; border-radius:6px; line-height:1.3; }
+      .proto-nav-section { font-size:10px; text-transform:uppercase; letter-spacing:1.2px; color:#94a3b8; padding:14px 16px 4px; font-weight:600; }
+      .proto-nav-item { display:flex; align-items:center; justify-content:space-between; padding:9px 16px; cursor:pointer; color:#374151; font-size:13px; }
+      .proto-nav-item.active { color:#00843d; font-weight:600; }
+      .proto-nav-badge { background:#00843d; color:#fff; font-size:11px; font-weight:700; padding:1px 7px; border-radius:10px; min-width:24px; text-align:center; }
+      .proto-avatar { margin-top:auto; display:flex; align-items:center; gap:10px; padding:14px 16px; border-top:1px solid #e9ecef; }
+      .proto-avatar-circle { width:34px; height:34px; border-radius:50%; background:#00843d; color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+      .proto-avatar-name { font-size:12px; font-weight:600; color:#1f2937; line-height:1.3; }
+      .proto-avatar-role { font-size:11px; color:#6b7280; }
+      .proto-main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+      .proto-topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid #e9ecef; gap:16px; }
+      .proto-title-block h2 { font-size:18px; font-weight:700; color:#111; margin:0; }
+      .proto-date-chip { display:inline-block; background:#e0f2f1; color:#00796b; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; margin-left:8px; }
+      .proto-title-block p { font-size:12px; color:#6b7280; margin:2px 0 0; }
+      .proto-topbar-right { display:flex; align-items:center; gap:12px; }
+      .proto-total { background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:600; white-space:nowrap; color:#374151; }
+      .proto-cpf-input { border:1px solid #e2e8f0; border-radius:6px; padding:6px 12px; font-size:12px; color:#9ca3af; width:220px; background:#fff; }
+      .proto-chips { display:flex; align-items:center; gap:8px; padding:12px 20px; border-bottom:1px solid #e9ecef; flex-wrap:wrap; }
+      .proto-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:500; cursor:pointer; border:1.5px solid transparent; }
+      .proto-chip.active { background:#00843d; color:#fff; border-color:#00843d; }
+      .proto-chip.inactive { background:#fff; color:#374151; border-color:#d1d5db; }
+      .proto-table-wrap { flex:1; overflow:auto; }
+      .proto-table-wrap table { width:100%; border-collapse:collapse; }
+      .proto-table-wrap th { padding:8px 16px; text-align:left; font-size:11px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid #e9ecef; background:#f8fafc; }
+      .proto-table-wrap td { padding:12px 16px; border-bottom:1px solid #f1f5f9; font-size:13px; color:#1f2937; }
+      .proto-tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; margin-right:4px; }
+      .proto-tag.monitor { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
+      .proto-tag.reinternacao { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+      .proto-tag.internado { background:#fce7f3; color:#9d174d; border:1px solid #f9a8d4; }
+      .proto-pagination { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-top:1px solid #e9ecef; font-size:12px; color:#6b7280; }
+      .proto-pagination-btns { display:flex; gap:4px; }
+      .proto-pg-btn { width:28px; height:28px; display:flex; align-items:center; justify-content:center; border:1px solid #e2e8f0; border-radius:5px; font-size:12px; font-weight:500; cursor:pointer; color:#374151; }
+      .proto-pg-btn.active { background:#00843d; color:#fff; border-color:#00843d; }
+      .callout-legend { margin-top:20px; display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:10px; }
+      .callout-item { display:flex; gap:10px; align-items:flex-start; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; font-size:12px; line-height:1.5; }
+      .callout-num { width:22px; height:22px; border-radius:50%; background:#a855f7; color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+      .callout-num.green { background:#00843d; }
+      .callout-num.blue { background:#2563eb; }
+      .callout-num.orange { background:#ea580c; }
+      .callout-num.teal { background:#0d9488; }
+      .callout-body strong { font-size:12px; color:#1f2937; display:block; margin-bottom:2px; }
+      .callout-body code { background:#f1f5f9; padding:1px 5px; border-radius:3px; font-size:11px; color:#4f46e5; }
+
+      /* Overlay bolinhas na imagem */
+      .proto-img-wrap { position:relative; display:block; }
+      .proto-pin {
+        position:absolute; width:24px; height:24px; border-radius:50%;
+        background:#a855f7; color:#fff; font-size:11px; font-weight:700;
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; border:2px solid #fff;
+        box-shadow:0 2px 8px rgba(0,0,0,.35);
+        transform:translate(-50%,-50%);
+        transition:transform .15s, box-shadow .15s;
+        z-index:10; text-decoration:none;
+      }
+      .proto-pin:hover { transform:translate(-50%,-50%) scale(1.25); box-shadow:0 4px 14px rgba(0,0,0,.45); }
+      .proto-pin.green { background:#00843d; }
+      .proto-pin.blue  { background:#2563eb; }
+      .proto-pin.orange{ background:#ea580c; }
+      .proto-pin.teal  { background:#0d9488; }
+
+      /* Highlight ao receber foco via bolinha */
+      .callout-item.highlighted {
+        border-color:#a855f7;
+        background:#faf5ff;
+        box-shadow:0 0 0 3px rgba(168,85,247,.3);
+        transition:box-shadow .2s, border-color .2s;
+      }
+    </style>
+
+    <!-- SEC 1: VISÃO GERAL -->
+    <div class="section-card" id="cn2-sec1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>🎯 Visão Geral da Funcionalidade</h2>
+      </div>
+      <div class="section-body">
+        <p>A <strong>Tela de Monitoramentos do Cockpit de Navegação 2.0</strong> é a principal interface operacional para os perfis <strong>Gestor/Navegador</strong> e <strong>Monitor</strong> na plataforma Unimed POA. Ela permite visualizar, filtrar e gerenciar a carteira de pacientes com base nos vínculos configurados no Backoffice.</p>
+
+        <div class="subsection" style="margin-top:16px;">
+          <div class="subsection-title">1.1 Identificação dos pacientes</div>
+          <table>
+            <thead><tr><th>API</th><th>Método</th><th>Parâmetro</th><th>Finalidade</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>POST /v1/relatorio/dinamico-descritivo/380</code></td>
+                <td>POST</td>
+                <td><code>profRefTipoRetorno=LISTA_TEXTO</code> + <code>IdGestor</code></td>
+                <td>Retorna a lista de pacientes vinculados ao gestor/navegador ou monitor logado</td>
+              </tr>
+              <tr>
+                <td><code>GET /api/beneficiario/v1/beneficiario</code></td>
+                <td>GET</td>
+                <td><code>cpf</code> (idExterno)</td>
+                <td>Enriquecimento: obtém <code>idHMAP</code> e <code>idGestor</code> para aplicar regra de visibilidade</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:8px;">Os vínculos (gestor ↔ paciente ↔ monitor) são gerenciados via <strong>Backoffice</strong>. Cada paciente é exibido somente para o gestor responsável e seus respectivos monitores.</p>
+        </div>
+
+        <div class="subsection" style="margin-top:16px;">
+          <div class="subsection-title">1.2 Diferença entre perfis</div>
+          <table>
+            <thead><tr><th>Funcionalidade</th><th>Gestor / Navegador</th><th>Monitor</th></tr></thead>
+            <tbody>
+              <tr><td>Visualizar pacientes</td><td>✅ Toda a equipe vinculada</td><td>✅ Apenas carteira própria</td></tr>
+              <tr><td>Busca global por CPF</td><td>✅ Disponível</td><td>✅ Disponível</td></tr>
+              <tr><td>Avatar fixo (iniciais + nome + perfil)</td><td>✅ Exibido</td><td>✅ Exibido</td></tr>
+              <tr><td>Drawer do paciente</td><td>✅ Read-only (sem ações)</td><td>✅ Com botões de ação</td></tr>
+              <tr><td>Menus Alertas do Navegador / Enviados para Navegação</td><td>✅ Visível</td><td>✅ Visível</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 2: PROTÓTIPO VISUAL -->
+    <div class="section-card" id="cn2-sec2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>🖼️ Protótipo Visual Anotado</h2>
+      </div>
+      <div class="section-body">
+        <p>Representação fiel da interface de Monitoramentos com mapeamento da origem de cada informação. Os números nas legendas correspondem às áreas da tela.</p>
+
+        <div class="proto-wrap">
+          <div class="proto-img-wrap">
+            <img src="images/home-navegacao.png" alt="Protótipo — Tela de Monitoramentos" style="width:100%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.18);display:block;" />
+            <!-- Bolinhas posicionadas sobre a imagem (% left / % top) -->
+            <a class="proto-pin green"  style="left:8%;  top:22%;" onclick="highlightCallout(1)"  title="Menu Lateral — contadores">1</a>
+            <a class="proto-pin green"  style="left:8%;  top:91%;" onclick="highlightCallout(2)"  title="Avatar">2</a>
+            <a class="proto-pin blue"   style="left:63%; top:7%;"  onclick="highlightCallout(3)"  title="Total de Clientes">3</a>
+            <a class="proto-pin blue"   style="left:83%; top:7%;"  onclick="highlightCallout(4)"  title="Busca global por CPF">4</a>
+            <a class="proto-pin orange" style="left:36%; top:18%;" onclick="highlightCallout(5)"  title="Chip: Reinternações">5</a>
+            <a class="proto-pin orange" style="left:51%; top:18%;" onclick="highlightCallout(6)"  title="Chip: Risco de Reinternação">6</a>
+            <a class="proto-pin teal"   style="left:32%; top:27%;" onclick="highlightCallout(7)"  title="Coluna Cliente">7</a>
+            <a class="proto-pin teal"   style="left:54%; top:37%;" onclick="highlightCallout(8)"  title="Tag Monitor">8</a>
+            <a class="proto-pin teal"   style="left:63%; top:37%;" onclick="highlightCallout(9)"  title="Tag Reinternação">9</a>
+            <a class="proto-pin teal"   style="left:72%; top:37%;" onclick="highlightCallout(10)" title="Tag Internado">10</a>
+            <a class="proto-pin"        style="left:86%; top:27%;" onclick="highlightCallout(11)" title="Coluna Última Ação">11</a>
+            <a class="proto-pin"        style="left:83%; top:93%;" onclick="highlightCallout(12)" title="Paginação">12</a>
+          </div>
+
+          <!-- LEGENDAS -->
+          <div style="display:none">
+          <div class="proto-screen">
+
+            <!-- Sidebar -->
+            <div class="proto-sidebar">
+              <div class="proto-sidebar-logo">
+                <div class="proto-sidebar-logo-box">Unimed<br>Porto Alegre</div>
+              </div>
+              <div class="proto-nav-section">Monitoramentos</div>
+              <div class="proto-nav-item active">Todos <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-item">Piora Clínica <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-item">Pós-Alta <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-item">Confirmados <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-item">Alertas do navegador <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-item">Em atraso <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-item">Em dia <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-section">Acompanhamento</div>
+              <div class="proto-nav-item">Realizados <span class="proto-nav-badge">10</span></div>
+              <div class="proto-nav-item">Enviados para navegação <span class="proto-nav-badge">10</span></div>
+              <div class="proto-avatar">
+                <div class="proto-avatar-circle">AM</div>
+                <div>
+                  <div class="proto-avatar-name">Amanda Martins</div>
+                  <div class="proto-avatar-role">Monitor</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main -->
+            <div class="proto-main">
+              <div class="proto-topbar">
+                <div class="proto-title-block">
+                  <h2>Monitoramentos <span class="proto-date-chip">15/01/2026</span></h2>
+                  <p>Gerencie seus atendimentos do dia</p>
+                </div>
+                <div class="proto-topbar-right">
+                  <div class="proto-total">TOTAL DE CLIENTES: 3451</div>
+                  <div class="proto-cpf-input">🔍 Digite o CPF para buscar o paciente Unimed</div>
+                </div>
+              </div>
+
+              <div class="proto-chips">
+                <span class="proto-chip active">Todos 100</span>
+                <span class="proto-chip inactive">Reinternações 100</span>
+                <span class="proto-chip inactive">Risco de reinternações 100</span>
+                <div class="proto-cpf-input" style="width:220px;margin-left:auto;">🔍 Digite o CPF para buscar meu paciente</div>
+              </div>
+
+              <div class="proto-table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Alertas</th>
+                      <th>Última Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Bernardo Felipe Rodrigues</td><td><span class="proto-tag monitor">Monitor</span><span class="proto-tag reinternacao">Reinternação</span><span class="proto-tag internado">Internado</span></td><td>Monitoramento</td></tr>
+                    <tr><td>Bernardo Felipe Rodrigues</td><td><span class="proto-tag monitor">Monitor</span><span class="proto-tag reinternacao">Reinternação</span><span class="proto-tag internado">Internado</span></td><td>Monitoramento</td></tr>
+                    <tr><td>Bernardo Felipe Rodrigues</td><td><span class="proto-tag monitor">Monitor</span><span class="proto-tag reinternacao">Reinternação</span><span class="proto-tag internado">Internado</span></td><td>Monitoramento</td></tr>
+                    <tr><td>Bernardo Felipe Rodrigues</td><td><span class="proto-tag monitor">Monitor</span><span class="proto-tag reinternacao">Reinternação</span><span class="proto-tag internado">Internado</span></td><td>Monitoramento</td></tr>
+                    <tr><td>Bernardo Felipe Rodrigues</td><td><span class="proto-tag monitor">Monitor</span><span class="proto-tag reinternacao">Reinternação</span><span class="proto-tag internado">Internado</span></td><td>Monitoramento</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="proto-pagination">
+                <span>XX de XX of XXX pacientes</span>
+                <div class="proto-pagination-btns">
+                  <div class="proto-pg-btn">‹</div>
+                  <div class="proto-pg-btn active">1</div>
+                  <div class="proto-pg-btn">2</div>
+                  <div class="proto-pg-btn">3</div>
+                  <div class="proto-pg-btn">4</div>
+                  <div class="proto-pg-btn">…</div>
+                  <div class="proto-pg-btn">10</div>
+                  <div class="proto-pg-btn">›</div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /proto-screen -->
+          </div><!-- /hidden mockup -->
+
+          <!-- LEGENDAS -->
+          <div class="callout-legend">
+            <div class="callout-item" id="callout-1">
+              <div class="callout-num green">1</div>
+              <div class="callout-body">
+                <strong>Menu Lateral — contadores</strong>
+                Contadores calculados via <code>POST /v1/relatorio/listar-acoes</code> com parâmetros específicos de cada opção. Chamada de resumo única no carregamento inicial.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-2">
+              <div class="callout-num green">2</div>
+              <div class="callout-body">
+                <strong>Avatar — iniciais, nome e perfil</strong>
+                Dados do usuário autenticado via SSO. Iniciais geradas no frontend. Nome completo e perfil (Monitor / Gestor) vindos das claims do token JWT. Exibido de forma fixa em todas as telas.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-3">
+              <div class="callout-num blue">3</div>
+              <div class="callout-body">
+                <strong>Total de Clientes</strong>
+                Campo <code>totalElements</code> retornado por <code>POST /v1/relatorio/dinamico-descritivo/380</code> com parâmetro <code>IdGestor</code> e <code>profRefTipoRetorno=LISTA_TEXTO</code>.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-4">
+              <div class="callout-num blue">4</div>
+              <div class="callout-body">
+                <strong>Busca global por CPF</strong>
+                <code>GET /api/beneficiario/v1/beneficiario?cpf=</code> — busca em toda a base, ignora filtros ativos. Retorna paciente independente do menu selecionado.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-5">
+              <div class="callout-num orange">5</div>
+              <div class="callout-body">
+                <strong>Chip: Reinternações</strong>
+                API ODC: <code>InternacoesByGestorList</code> com parâmetro <code>Reinternacao=true</code>. Filtra sobre a listagem do menu lateral ativo. Chips se excluem mutuamente.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-6">
+              <div class="callout-num orange">6</div>
+              <div class="callout-body">
+                <strong>Chip: Risco de Reinternação</strong>
+                <code>GET /analyticsBackoffice/v1/vidas?</code> — exibe apenas pacientes com campo <code>risco_reinternacao</code> preenchido. Filtra sobre o menu lateral ativo.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-7">
+              <div class="callout-num teal">7</div>
+              <div class="callout-body">
+                <strong>Coluna Cliente — nome</strong>
+                <code>GET /api/beneficiario/v1/beneficiario</code> usando CPF (idExterno). Enriquecimento após a lista de vínculos. Dados espelhados do TOTVS.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-8">
+              <div class="callout-num teal">8</div>
+              <div class="callout-body">
+                <strong>Tag Monitor</strong>
+                Alerta gerado pela engine do Healthmap. Exibido quando há pendência de ação de monitoramento para o paciente.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-9">
+              <div class="callout-num teal">9</div>
+              <div class="callout-body">
+                <strong>Tag Reinternação</strong>
+                ODC <code>InternacoesByGestorList</code> com <code>Reinternacao=true</code> + Base Vidas <code>/analyticsBackoffice/v1/vidas?</code> (campo <code>risco_reinternacao</code>).
+              </div>
+            </div>
+            <div class="callout-item" id="callout-10">
+              <div class="callout-num teal">10</div>
+              <div class="callout-body">
+                <strong>Tag Internado</strong>
+                Flag de internação ativa via ODC <code>InternacoesByGestorList</code>. Prioridade máxima na ordenação e exibição.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-11">
+              <div class="callout-num">11</div>
+              <div class="callout-body">
+                <strong>Coluna Última Ação</strong>
+                <code>GET /api/planoacao/v1/planoAcao</code> com <code>tipo=MONITORAMENTO</code> — retorna o nome da ação mais recente de monitoramento do paciente.
+              </div>
+            </div>
+            <div class="callout-item" id="callout-12">
+              <div class="callout-num">12</div>
+              <div class="callout-body">
+                <strong>Paginação</strong>
+                Server-side: 20 itens/página. Parâmetros <code>page</code> e <code>size</code> via query string. <code>totalElements</code> exibido como "XX de XXX pacientes".
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 3: MAPEAMENTO DE DADOS -->
+    <div class="section-card" id="cn2-sec3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>🗂️ Mapeamento Completo dos Dados</h2>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead>
+            <tr><th>Campo / Menu</th><th>Sistema</th><th>API / Serviço</th><th>Método</th><th>Parâmetros-chave</th><th>Regra de Negócio</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Lista de pacientes (todos os menus)</strong></td>
+              <td>Healthmap — Relatório</td>
+              <td><code>/v1/relatorio/dinamico-descritivo/380</code></td>
+              <td>POST</td>
+              <td><code>profRefTipoRetorno=LISTA_TEXTO</code>, <code>IdGestor</code></td>
+              <td>Retorna pacientes vinculados ao gestor/monitor via Backoffice</td>
+            </tr>
+            <tr>
+              <td><strong>Enriquecimento (nome, idHMAP, idGestor)</strong></td>
+              <td>Healthmap — Beneficiário</td>
+              <td><code>/api/beneficiario/v1/beneficiario</code></td>
+              <td>GET</td>
+              <td><code>cpf</code> (idExterno)</td>
+              <td>Obtém idHMAP e idGestor para regra de visibilidade e filtros server-side</td>
+            </tr>
+            <tr>
+              <td><strong>Chip: Reinternação</strong></td>
+              <td>Auditoria Clínica (ODC)</td>
+              <td><code>InternacoesByGestorList</code></td>
+              <td>ODC</td>
+              <td><code>Reinternacao=true</code></td>
+              <td>Filtra sobre o menu lateral ativo; chips mutuamente exclusivos</td>
+            </tr>
+            <tr>
+              <td><strong>Chip: Risco de Reinternação</strong></td>
+              <td>Base Vidas</td>
+              <td><code>/analyticsBackoffice/v1/vidas?</code></td>
+              <td>GET</td>
+              <td>—</td>
+              <td>Exibe apenas pacientes com campo <code>risco_reinternacao</code> preenchido</td>
+            </tr>
+            <tr>
+              <td><strong>Última Ação (coluna)</strong></td>
+              <td>Healthmap — Plano de Ação</td>
+              <td><code>/api/planoacao/v1/planoAcao</code></td>
+              <td>GET</td>
+              <td><code>tipo=MONITORAMENTO</code></td>
+              <td>Ação mais recente de monitoramento do paciente</td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Pós-Alta</strong></td>
+              <td>Healthmap — Relatório</td>
+              <td><code>/v1/relatorio/listar-acoes</code></td>
+              <td>POST</td>
+              <td>Ação <code>574</code>, período atual, <code>codigoGestor</code> ou <code>codigoProfRef</code></td>
+              <td>Campos: <code>periodoIniExecRealAcao</code> / <code>periodoFimExecRealAcao</code>. Migra para Realizados após conclusão.</td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Em Atraso</strong></td>
+              <td>Healthmap — Relatório</td>
+              <td><code>/v1/relatorio/listar-acoes</code></td>
+              <td>POST</td>
+              <td>Ações <code>245,672,619,262,646,622,673,620,621,493</code> + <code>statusAcao=5</code></td>
+              <td>Campos: <code>periodoIniPrevRealAcao</code> / <code>periodoFimPrevRealAcao</code></td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Em Dia</strong></td>
+              <td>Healthmap — Relatório</td>
+              <td><code>/v1/relatorio/listar-acoes</code></td>
+              <td>POST</td>
+              <td>Ações <code>245,672,619,262,646,622,673,620,621,493</code> + <code>statusAcao=4</code></td>
+              <td>Campos: <code>periodoIniPrevRealAcao</code> / <code>periodoFimPrevRealAcao</code></td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Realizados</strong></td>
+              <td>Healthmap — Relatório</td>
+              <td><code>/v1/relatorio/listar-acoes</code></td>
+              <td>POST</td>
+              <td>Ações <code>245,672,619,262,646,622,673,620,621,493</code> + <code>statusAcao=1</code></td>
+              <td>Campos: <code>periodoIniExecRealAcao</code> / <code>periodoFimExecRealAcao</code></td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Piora Clínica</strong></td>
+              <td>Modelo Assistencial (ODC)</td>
+              <td><code>ObterQuemRespondeuPorQuestao</code></td>
+              <td>ODC</td>
+              <td>Questionário <code>412</code>, questão <code>4579</code>, opção <code>14446</code> (Piorou)</td>
+              <td>Enriquecido via <code>/api/beneficiario/v1/beneficiario</code>. Última ação via <code>/api/planoacao/v1/planoAcao</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Confirmados</strong></td>
+              <td>Modelo Assistencial</td>
+              <td>Tabela de confirmados do Modelo Assistencial</td>
+              <td>—</td>
+              <td>—</td>
+              <td>Pacientes que aceitaram receber monitoramento via WhatsApp</td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Alertas do Navegador</strong></td>
+              <td>Cockpit Monitoramento</td>
+              <td>US: [Navegação] Alertas navegadora/monitora</td>
+              <td>—</td>
+              <td>—</td>
+              <td>Pacientes encaminhados pelo Cockpit Perfil Navegador para avaliação da monitora</td>
+            </tr>
+            <tr>
+              <td><strong>Menu: Enviados para Navegação</strong></td>
+              <td>Cockpit Monitoramento</td>
+              <td>US: [Navegação] Alertas navegadora/monitora</td>
+              <td>—</td>
+              <td>—</td>
+              <td>Removido automaticamente quando a navegadora visualizar no Mural do Paciente</td>
+            </tr>
+            <tr>
+              <td><strong>Avatar do usuário</strong></td>
+              <td>SSO / Token JWT</td>
+              <td>Claims do token</td>
+              <td>—</td>
+              <td>—</td>
+              <td>Iniciais geradas no frontend. Nome e perfil do token. Exibido de forma fixa.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEC 4: REGRAS DE NEGÓCIO -->
+    <div class="section-card" id="cn2-sec4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>⚙️ Regras de Negócio por Opção do Menu Lateral</h2>
+      </div>
+      <div class="section-body">
+
+        <div class="subsection" id="cn2-sec4-1">
+          <div class="subsection-title">4.1 Todos</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista todos os pacientes vinculados ao usuário logado, independente da classificação, respeitando a ordenação definida nos critérios de aceite.</td></tr>
+              <tr><td><strong>API principal</strong></td><td><code>POST /v1/relatorio/dinamico-descritivo/380?profRefTipoRetorno=LISTA_TEXTO</code> com <code>IdGestor</code></td></tr>
+              <tr><td><strong>Enriquecimento</strong></td><td><code>GET /api/beneficiario/v1/beneficiario</code> — obtém <code>idHMAP</code> e <code>idGestor</code></td></tr>
+              <tr><td><strong>Filter chips disponíveis</strong></td><td>Reinternações (ODC) e Risco de Reinternação (Base Vidas)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-2" style="margin-top:20px;">
+          <div class="subsection-title">4.2 Piora Clínica</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista pacientes que registraram piora durante o automonitoramento no Healthmap.</td></tr>
+              <tr><td><strong>Serviço ODC</strong></td><td><code>ObterQuemRespondeuPorQuestao</code> (Modelo Assistencial)</td></tr>
+              <tr><td><strong>Critério</strong></td><td>Questionário <strong>412</strong> (Meu Acompanhamento) → Questão <strong>4579</strong> → Opção <strong>14446</strong> (Piorou)</td></tr>
+              <tr><td><strong>Enriquecimento</strong></td><td><code>GET /api/beneficiario/v1/beneficiario</code> com CPF → obtém <code>idHMAP</code> e <code>idGestor</code></td></tr>
+              <tr><td><strong>Regra de visibilidade</strong></td><td>Paciente exibido apenas para o gestor responsável e seus monitores</td></tr>
+              <tr><td><strong>Última Ação</strong></td><td><code>GET /api/planoacao/v1/planoAcao</code> com <code>tipo=MONITORAMENTO</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-3" style="margin-top:20px;">
+          <div class="subsection-title">4.3 Pós-Alta</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista pacientes com ação de pós-alta realizada no período atual.</td></tr>
+              <tr><td><strong>API</strong></td><td><code>POST /v1/relatorio/listar-acoes</code></td></tr>
+              <tr><td><strong>Parâmetros</strong></td><td>Código da ação: <strong>574</strong> | Período: data atual | <code>codigoGestor</code> ou <code>codigoProfRef</code></td></tr>
+              <tr><td><strong>Campos de período</strong></td><td><code>periodoIniExecRealAcao</code> e <code>periodoFimExecRealAcao</code></td></tr>
+              <tr><td><strong>Pré-requisito</strong></td><td>Identificar vínculo via <code>GET /api/beneficiario/v1/beneficiario</code> antes da chamada</td></tr>
+              <tr><td><strong>Transição de estado</strong></td><td>Após realização da ação → paciente migra de Pós-Alta para Realizados</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-4" style="margin-top:20px;">
+          <div class="subsection-title">4.4 Confirmados</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista pacientes que aceitaram receber o monitoramento via WhatsApp.</td></tr>
+              <tr><td><strong>Origem</strong></td><td>Tabela de confirmados do Modelo Assistencial</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-5" style="margin-top:20px;">
+          <div class="subsection-title">4.5 Alertas do Navegador</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista pacientes encaminhados para avaliação da monitora pelo Cockpit Monitoramento Perfil Navegador.</td></tr>
+              <tr><td><strong>Dependência</strong></td><td>Fluxo detalhado na US: <em>[Navegação] Alertas navegadora/monitora</em></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-6" style="margin-top:20px;">
+          <div class="subsection-title">4.6 Em Atraso</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista pacientes cujo monitoramento ou acolhimento está atrasado.</td></tr>
+              <tr><td><strong>API</strong></td><td><code>POST /v1/relatorio/listar-acoes</code></td></tr>
+              <tr><td><strong>Códigos de ação</strong></td><td><code>245, 672, 619, 262, 646, 622, 673, 620, 621, 493</code></td></tr>
+              <tr><td><strong>Status</strong></td><td><code>statusAcao = 5</code></td></tr>
+              <tr><td><strong>Campos de período</strong></td><td><code>periodoIniPrevRealAcao</code> e <code>periodoFimPrevRealAcao</code> (período previsto, não executado)</td></tr>
+              <tr><td><strong>Pré-requisito</strong></td><td><code>GET /api/beneficiario/v1/beneficiario</code> → obtém <code>codigoGestor</code> ou <code>codigoProfRef</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-7" style="margin-top:20px;">
+          <div class="subsection-title">4.7 Em Dia</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista pacientes agendados para o dia atual com ações dentro do prazo.</td></tr>
+              <tr><td><strong>API</strong></td><td><code>POST /v1/relatorio/listar-acoes</code></td></tr>
+              <tr><td><strong>Códigos de ação</strong></td><td><code>245, 672, 619, 262, 646, 622, 673, 620, 621, 493</code></td></tr>
+              <tr><td><strong>Status</strong></td><td><code>statusAcao = 4</code></td></tr>
+              <tr><td><strong>Campos de período</strong></td><td><code>periodoIniPrevRealAcao</code> e <code>periodoFimPrevRealAcao</code> (data atual)</td></tr>
+              <tr><td><strong>Pré-requisito</strong></td><td><code>GET /api/beneficiario/v1/beneficiario</code> → obtém <code>codigoGestor</code> ou <code>codigoProfRef</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-8" style="margin-top:20px;">
+          <div class="subsection-title">4.8 Realizados</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista todos os monitoramentos e acolhimentos do dia concluídos. Inclui pacientes migrados de Pós-Alta.</td></tr>
+              <tr><td><strong>API</strong></td><td><code>POST /v1/relatorio/listar-acoes</code></td></tr>
+              <tr><td><strong>Códigos de ação</strong></td><td><code>245, 672, 619, 262, 646, 622, 673, 620, 621, 493</code></td></tr>
+              <tr><td><strong>Status</strong></td><td><code>statusAcao = 1</code></td></tr>
+              <tr><td><strong>Campos de período</strong></td><td><code>periodoIniExecRealAcao</code> e <code>periodoFimExecRealAcao</code></td></tr>
+              <tr><td><strong>Pré-requisito</strong></td><td><code>GET /api/beneficiario/v1/beneficiario</code> → obtém <code>codigoGestor</code> ou <code>codigoProfRef</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-9" style="margin-top:20px;">
+          <div class="subsection-title">4.9 Enviados para Navegação</div>
+          <table>
+            <thead><tr><th>Aspecto</th><th>Detalhe</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comportamento</strong></td><td>Lista monitoramentos enviados para a navegadora via Cockpit que ainda não foram visualizados no Mural do Paciente.</td></tr>
+              <tr><td><strong>Remoção automática</strong></td><td>Quando a navegadora visualizar o item no Mural → paciente removido automaticamente desta lista.</td></tr>
+              <tr><td><strong>Dependência</strong></td><td>US: <em>[Navegação] Alertas navegadora/monitora</em></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" id="cn2-sec4-10" style="margin-top:20px;">
+          <div class="subsection-title">4.10 Regras dos Filter Chips</div>
+          <table>
+            <thead><tr><th>Chip</th><th>API / Serviço</th><th>Parâmetro</th><th>Comportamento</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Todos</strong></td>
+                <td>—</td>
+                <td>—</td>
+                <td>Exibe listagem completa do menu lateral ativo sem filtro adicional. Reseta automaticamente ao trocar de menu.</td>
+              </tr>
+              <tr>
+                <td><strong>Reinternações</strong></td>
+                <td>ODC: <code>InternacoesByGestorList</code></td>
+                <td><code>Reinternacao=true</code></td>
+                <td>Filtra sobre o menu lateral ativo. Chips mutuamente exclusivos.</td>
+              </tr>
+              <tr>
+                <td><strong>Risco de Reinternação</strong></td>
+                <td>Base Vidas: <code>/analyticsBackoffice/v1/vidas?</code></td>
+                <td>Campo <code>risco_reinternacao</code> preenchido</td>
+                <td>Filtra sobre o menu lateral ativo. Chips mutuamente exclusivos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 5: FLUXO -->
+    <div class="section-card" id="cn2-sec5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>🔄 Fluxo Completo da Tela</h2>
+      </div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title">5.1 Sequência de Carregamento</div>
+          <div style="font-family:monospace;font-size:12.5px;background:#f8f4ff;padding:16px 20px;border-radius:8px;line-height:2.2;">
+            1. USUÁRIO autentica via SSO (Azure AD) → token JWT com perfil (Monitor / Gestor)<br>
+            2. FRONTEND exibe skeleton na tabela e no menu lateral<br>
+            3. BACKEND: <code>POST /v1/relatorio/dinamico-descritivo/380</code> → lista de pacientes vinculados<br>
+            4. BACKEND: <code>GET /api/beneficiario/v1/beneficiario</code> → enriquece com idHMAP / idGestor<br>
+            5. BACKEND: calcula contadores de cada menu lateral<br>
+            6. FRONTEND renderiza tabela (20 itens) + contadores<br>
+            7. USUÁRIO clica em "Em Atraso"<br>
+            &nbsp;&nbsp;&nbsp;└─ <code>POST /v1/relatorio/listar-acoes</code> ações 245..493 + <code>statusAcao=5</code><br>
+            8. USUÁRIO ativa chip "Reinternações"<br>
+            &nbsp;&nbsp;&nbsp;└─ ODC <code>InternacoesByGestorList</code> + <code>Reinternacao=true</code> filtrando listagem atual<br>
+            9. USUÁRIO clica em paciente → drawer abre com skeleton<br>
+            &nbsp;&nbsp;&nbsp;└─ Chamadas paralelas: dados cadastrais + última ação + alertas<br>
+            10. USUÁRIO fecha drawer → retorna à lista
+          </div>
+        </div>
+        <div class="subsection" style="margin-top:20px;">
+          <div class="subsection-title">5.2 Tratamento de Erros</div>
+          <table>
+            <thead><tr><th>Etapa</th><th>Erro</th><th>Comportamento esperado</th></tr></thead>
+            <tbody>
+              <tr><td>SSO</td><td>Token expirado</td><td>Refresh silencioso; redireciona para login se falhar</td></tr>
+              <tr><td>Carga inicial</td><td>API relatório indisponível</td><td>Skeleton + banner de erro + botão "Tentar novamente"</td></tr>
+              <tr><td>Enriquecimento beneficiário</td><td>CPF não encontrado</td><td>Linha exibida sem enriquecimento; log de warning</td></tr>
+              <tr><td>Chip filtro</td><td>ODC / Base Vidas indisponíveis</td><td>Chip desabilitado com tooltip explicativo</td></tr>
+              <tr><td>Drawer</td><td>Uma API falha</td><td>Seção com falha exibe aviso; demais carregam normalmente</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 6: INTEGRAÇÕES -->
+    <div class="section-card" id="cn2-sec6">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>🔌 Integrações Externas</h2>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead><tr><th>Sistema</th><th>Dados fornecidos</th><th>API / Serviço</th><th>Quando é chamado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Healthmap — Relatório</strong></td><td>Lista de pacientes vinculados</td><td><code>POST /v1/relatorio/dinamico-descritivo/380</code></td><td>Carga inicial de cada menu lateral</td></tr>
+            <tr><td><strong>Healthmap — Beneficiário</strong></td><td>idHMAP, idGestor, nome, CPF, carteirinha</td><td><code>GET /api/beneficiario/v1/beneficiario</code></td><td>Enriquecimento após lista; busca global por CPF</td></tr>
+            <tr><td><strong>Healthmap — Plano de Ação</strong></td><td>Última ação de monitoramento</td><td><code>GET /api/planoacao/v1/planoAcao</code></td><td>Coluna "Última Ação" + drawer</td></tr>
+            <tr><td><strong>Healthmap — Listar Ações</strong></td><td>Pós-Alta, Em Atraso, Em Dia, Realizados</td><td><code>POST /v1/relatorio/listar-acoes</code></td><td>Ao selecionar cada menu correspondente</td></tr>
+            <tr><td><strong>Auditoria Clínica (ODC)</strong></td><td>Internações e reinternações</td><td><code>InternacoesByGestorList</code> (<code>Reinternacao=true</code>)</td><td>Chip "Reinternações" + tag Internado/Reinternação</td></tr>
+            <tr><td><strong>Modelo Assistencial (ODC)</strong></td><td>Respostas de piora no automonitoramento</td><td><code>ObterQuemRespondeuPorQuestao</code></td><td>Menu "Piora Clínica"</td></tr>
+            <tr><td><strong>Base Vidas</strong></td><td>Score de risco de reinternação</td><td><code>GET /analyticsBackoffice/v1/vidas?</code></td><td>Chip "Risco de Reinternação"</td></tr>
+            <tr><td><strong>TOTVS</strong></td><td>Cadastro de beneficiários</td><td>Sincronização via job → espelhado no Healthmap</td><td>Não consultado em tempo real</td></tr>
+            <tr><td><strong>SSO (Azure AD)</strong></td><td>Token JWT com perfil e claims do usuário</td><td>OAuth 2.0 / OpenID Connect</td><td>Login e refresh de sessão</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEC 7: REGRAS TÉCNICAS -->
+    <div class="section-card" id="cn2-sec7">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2>⚙️ Regras Técnicas</h2>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead><tr><th>Aspecto</th><th>Especificação</th><th>Cuidados</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Paginação</strong></td><td>Server-side; 20 itens/página; parâmetros <code>page</code> e <code>size</code></td><td>Nunca carregar todos os registros de uma vez</td></tr>
+            <tr><td><strong>Autenticação (SSO)</strong></td><td>Azure AD / OAuth 2.0. Perfil e vínculos vindos do token JWT.</td><td>Refresh silencioso; nunca expor token no localStorage</td></tr>
+            <tr><td><strong>Segurança</strong></td><td>Scoping por <code>IdGestor</code> / <code>codigoProfRef</code> validado no backend</td><td>Validação feita no backend; frontend não restringe dados sozinho</td></tr>
+            <tr><td><strong>Enriquecimento</strong></td><td>Chamar <code>/api/beneficiario/v1/beneficiario</code> antes de qualquer filtro server-side</td><td>Agrupar chamadas em lote para evitar N+1</td></tr>
+            <tr><td><strong>Avatar fixo</strong></td><td>Exibido em todas as telas; iniciais no frontend; nome e perfil do token</td><td>Atualizar em logout / troca de sessão</td></tr>
+            <tr><td><strong>SLA</strong></td><td>Carga inicial: &lt;2s; drawer: &lt;1s (skeleton imediato)</td><td>Cache de contadores por 30s</td></tr>
+            <tr><td><strong>Responsividade</strong></td><td>Desktop-first; scroll horizontal &lt;1280px; drawer 100% em mobile</td><td>Testar em Edge (padrão corporativo Unimed)</td></tr>
+            <tr><td><strong>Logs</strong></td><td>Registrar: login, filtros, clique em drawer, erros de API</td><td>Não logar CPF completo nem nome em logs de aplicação</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEC 8: CENÁRIOS DE TESTE -->
+    <div class="section-card" id="cn2-sec8">
+      <div class="section-header">
+        <div class="section-number">8</div>
+        <h2>🧪 Cenários de Teste (QA)</h2>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead><tr><th>ID</th><th>Descrição</th><th>Pré-condição</th><th>Resultado Esperado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>CT-01</strong></td><td>Carga inicial como Monitor</td><td>Usuário autenticado como Monitor</td><td>Tabela com 20 pacientes; contadores do menu populados; avatar com nome e "Monitor"</td></tr>
+            <tr><td><strong>CT-02</strong></td><td>Carga inicial como Gestor</td><td>Usuário autenticado como Gestor</td><td>Idem CT-01, lista inclui toda equipe vinculada via Backoffice</td></tr>
+            <tr><td><strong>CT-03</strong></td><td>Menu Em Atraso</td><td>Ações com <code>statusAcao=5</code> existentes</td><td><code>POST /v1/relatorio/listar-acoes</code> com ações 245..493; lista somente atrasados</td></tr>
+            <tr><td><strong>CT-04</strong></td><td>Menu Em Dia</td><td>Ações com <code>statusAcao=4</code> para hoje</td><td>Lista somente agendados para hoje</td></tr>
+            <tr><td><strong>CT-05</strong></td><td>Menu Realizados</td><td>Ações com <code>statusAcao=1</code> no dia</td><td>Inclui pacientes de Pós-Alta realizados; campo execReal preenchido</td></tr>
+            <tr><td><strong>CT-06</strong></td><td>Transição Pós-Alta → Realizados</td><td>Paciente em Pós-Alta; ação realizada</td><td>Desaparece de Pós-Alta; aparece em Realizados</td></tr>
+            <tr><td><strong>CT-07</strong></td><td>Piora Clínica</td><td>Paciente respondeu questão 4579 com opção 14446</td><td>Aparece em Piora Clínica com última ação tipo MONITORAMENTO</td></tr>
+            <tr><td><strong>CT-08</strong></td><td>Chip Reinternações</td><td>Paciente com reinternação no ODC</td><td>Chip filtra sobre menu ativo; tag "Reinternação" visível</td></tr>
+            <tr><td><strong>CT-09</strong></td><td>Chip Risco de Reinternação</td><td>Paciente com <code>risco_reinternacao</code> preenchido</td><td>Aparece somente quando chip ativo; chips se excluem mutuamente</td></tr>
+            <tr><td><strong>CT-10</strong></td><td>Reset chip ao trocar menu</td><td>Chip "Reinternações" ativo</td><td>Ao clicar em outro menu, chip retorna para "Todos"</td></tr>
+            <tr><td><strong>CT-11</strong></td><td>Busca global por CPF</td><td>Paciente na base com CPF conhecido</td><td>Ignora filtros; retorna via <code>/api/beneficiario/v1/beneficiario?cpf=</code></td></tr>
+            <tr><td><strong>CT-12</strong></td><td>Enviados para Navegação — remoção</td><td>Navegadora visualiza item no Mural</td><td>Paciente removido automaticamente da lista</td></tr>
+            <tr><td><strong>CT-13</strong></td><td>Avatar exibição fixa</td><td>Qualquer usuário autenticado</td><td>Avatar sempre visível; iniciais, nome e perfil corretos do token</td></tr>
+            <tr><td><strong>CT-14</strong></td><td>ODC indisponível</td><td>ODC mockado para retornar erro</td><td>Chip "Reinternações" desabilitado com tooltip explicativo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEC 9: ERROS -->
+    <div class="section-card" id="cn2-sec9">
+      <div class="section-header">
+        <div class="section-number">9</div>
+        <h2>🚨 Casos de Erro e Contingência</h2>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead><tr><th>Cenário</th><th>Comportamento da UI</th><th>Mensagem</th><th>Fallback</th></tr></thead>
+          <tbody>
+            <tr><td>API relatório (380) indisponível</td><td>Skeleton + banner de erro</td><td>"Erro ao carregar pacientes. Tente novamente."</td><td>Botão de retry</td></tr>
+            <tr><td>API beneficiário indisponível</td><td>Linha sem enriquecimento; log warning</td><td>Graceful degradation — sem mensagem ao usuário</td><td>Campos com valor "—"</td></tr>
+            <tr><td>ODC indisponível (Reinternações)</td><td>Chip desabilitado com tooltip</td><td>"Dados de reinternação temporariamente indisponíveis"</td><td>Reativado quando ODC retornar</td></tr>
+            <tr><td>Base Vidas indisponível</td><td>Chip desabilitado com tooltip</td><td>"Dados de risco temporariamente indisponíveis"</td><td>Reativado quando Base Vidas retornar</td></tr>
+            <tr><td>Timeout (&gt;10s)</td><td>Cancela requisição; estado de erro</td><td>"A requisição demorou muito. Verifique sua conexão."</td><td>Botão de retry</td></tr>
+            <tr><td>Usuário sem vínculo no Backoffice</td><td>Empty state com orientação</td><td>"Nenhuma equipe vinculada ao seu perfil."</td><td>Link para suporte</td></tr>
+            <tr><td>Token expirado (401)</td><td>Refresh silencioso; redirect para login se falhar</td><td>Sem mensagem — redirecionamento silencioso</td><td>SSO refresh automático</td></tr>
+            <tr><td>Acesso fora do escopo (403)</td><td>Mensagem de acesso negado</td><td>"Você não tem permissão para visualizar este paciente."</td><td>Retorno à lista</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SEC 10: PREPARAÇÃO -->
+    <div class="section-card" id="cn2-sec10">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <h2>🛠️ Preparação para Desenvolvimento</h2>
+      </div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title">10.1 Dependências Técnicas</div>
+          <table>
+            <thead><tr><th>Dependência</th><th>Status</th><th>Risco</th></tr></thead>
+            <tbody>
+              <tr><td><code>POST /v1/relatorio/dinamico-descritivo/380</code></td><td>Verificar contrato e campos disponíveis</td><td>Alto — bloqueia listagem principal</td></tr>
+              <tr><td><code>POST /v1/relatorio/listar-acoes</code> (filtros por statusAcao)</td><td>Verificar disponibilidade dos statusAcao 1, 4 e 5</td><td>Alto — bloqueia 4 menus laterais</td></tr>
+              <tr><td>ODC <code>InternacoesByGestorList</code></td><td>Validar parâmetro <code>Reinternacao</code></td><td>Médio — bloqueia chip de reinternação</td></tr>
+              <tr><td>ODC <code>ObterQuemRespondeuPorQuestao</code></td><td>Validar questionário 412 / questão 4579 / opção 14446</td><td>Médio — bloqueia menu Piora Clínica</td></tr>
+              <tr><td>Base Vidas <code>/analyticsBackoffice/v1/vidas?</code></td><td>Verificar campo <code>risco_reinternacao</code></td><td>Médio — bloqueia chip de risco</td></tr>
+              <tr><td>US: [Navegação] Alertas navegadora/monitora</td><td>Aguardando aprovação/início</td><td>Alto — bloqueia menus Alertas e Enviados para Navegação</td></tr>
+              <tr><td>Vínculos no Backoffice</td><td>Existente</td><td>Baixo</td></tr>
+              <tr><td>SSO Azure AD com claims de perfil</td><td>Existente</td><td>Baixo</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection" style="margin-top:20px;">
+          <div class="subsection-title">10.2 Sequência Sugerida de Implementação</div>
+          <div style="background:#f8f4ff;border-left:4px solid #a855f7;padding:14px 18px;border-radius:6px;font-size:13px;line-height:2.2;">
+            <strong>Sprint 1:</strong> Estrutura da tela + SSO + avatar fixo + menu lateral estático<br>
+            <strong>Sprint 2:</strong> <code>/relatorio/dinamico-descritivo/380</code> + tabela paginada básica (menu Todos)<br>
+            <strong>Sprint 3:</strong> Enriquecimento via <code>/beneficiario/v1/beneficiario</code> + coluna Última Ação via <code>/planoacao/v1/planoAcao</code><br>
+            <strong>Sprint 4:</strong> Menus Em Atraso, Em Dia e Realizados via <code>/relatorio/listar-acoes</code> com statusAcao<br>
+            <strong>Sprint 5:</strong> Menu Pós-Alta (ação 574) + transição automática para Realizados<br>
+            <strong>Sprint 6:</strong> Menu Piora Clínica (ODC <code>ObterQuemRespondeuPorQuestao</code>)<br>
+            <strong>Sprint 7:</strong> Chips Reinternações (ODC) + Risco de Reinternação (Base Vidas)<br>
+            <strong>Sprint 8:</strong> Menus Alertas do Navegador + Enviados para Navegação (aguardar US navegadora)<br>
+            <strong>Sprint 9:</strong> Drawer completo + empty states + tratamento de erros + testes de QA
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    </div><!-- /content-cockpit-navegacao-2 -->
+</div><!-- /main-cockpit-navegacao-2 -->
+
 <script>
 /* ── PAYLOADS ── */
 const H = { Authorization: "Bearer {token}", KeyDS: "production" };
@@ -8119,7 +9023,8 @@ const _projectNames = {
   automacoes:         'Automações — Alta Complexidade',
   automonitoramento:  'Automações — Automonitoramento',
   'automacoes-gerais': 'Automações Gerais',
-  'cockpit-navegacao': 'Cockpit de Navegação'
+  'cockpit-navegacao': 'Cockpit de Navegação',
+  'cockpit-navegacao-2': 'Cockpit de Navegação 2.0'
 };
 function openProject(id) {
   _pendingProject = id;
@@ -8157,7 +9062,7 @@ let _guestMode = false;
   if (isGuest) {
     _guestMode = true;
     const _gp = params.get('projeto');
-    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : _gp === 'automonitoramento' ? 'automonitoramento' : _gp === 'automacoes-gerais' ? 'automacoes-gerais' : _gp === 'cockpit-navegacao' ? 'cockpit-navegacao' : 'cbv';
+    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : _gp === 'automonitoramento' ? 'automonitoramento' : _gp === 'automacoes-gerais' ? 'automacoes-gerais' : _gp === 'cockpit-navegacao' ? 'cockpit-navegacao' : _gp === 'cockpit-navegacao-2' ? 'cockpit-navegacao-2' : 'cbv';
     // Oculta overlays instantaneamente
     const ov = document.getElementById('auth-overlay');
     if (ov) { ov.classList.remove('show'); }
@@ -8200,6 +9105,7 @@ function loadProject(id) {
   const isMon  = id === 'automonitoramento';
   const isAG   = id === 'automacoes-gerais';
   const isCN   = id === 'cockpit-navegacao';
+  const isCN2  = id === 'cockpit-navegacao-2';
   // sidebar
   const sbCbv  = document.getElementById('sidebar');
   const sbMa   = document.getElementById('sidebar-ma');
@@ -8208,6 +9114,7 @@ function loadProject(id) {
   const sbMon  = document.getElementById('sidebar-automonitoramento');
   const sbAG   = document.getElementById('sidebar-automacoes-gerais');
   const sbCN   = document.getElementById('sidebar-cockpit-navegacao');
+  const sbCN2  = document.getElementById('sidebar-cockpit-navegacao-2');
   if (sbCbv)  sbCbv.style.display  = isCbv  ? '' : 'none';
   if (sbMa)   sbMa.style.display   = isMa   ? 'flex' : 'none';
   if (sbJa)   sbJa.style.display   = isJa   ? 'flex' : 'none';
@@ -8215,6 +9122,7 @@ function loadProject(id) {
   if (sbMon)  sbMon.style.display  = isMon  ? 'flex' : 'none';
   if (sbAG)   sbAG.style.display   = isAG   ? 'flex' : 'none';
   if (sbCN)   sbCN.style.display   = isCN   ? 'flex' : 'none';
+  if (sbCN2)  sbCN2.style.display  = isCN2  ? 'flex' : 'none';
   // main
   const mCbv  = document.getElementById('main');
   const mMa   = document.getElementById('main-ma');
@@ -8223,6 +9131,7 @@ function loadProject(id) {
   const mMon  = document.getElementById('main-automonitoramento');
   const mAG   = document.getElementById('main-automacoes-gerais');
   const mCN   = document.getElementById('main-cockpit-navegacao');
+  const mCN2  = document.getElementById('main-cockpit-navegacao-2');
   if (mCbv)  mCbv.style.display  = isCbv  ? 'block' : 'none';
   if (mMa)   mMa.style.display   = isMa   ? 'block' : 'none';
   if (mJa)   mJa.style.display   = isJa   ? 'block' : 'none';
@@ -8230,6 +9139,7 @@ function loadProject(id) {
   if (mMon)  mMon.style.display  = isMon  ? 'block' : 'none';
   if (mAG)   mAG.style.display   = isAG   ? 'block' : 'none';
   if (mCN)   mCN.style.display   = isCN   ? 'block' : 'none';
+  if (mCN2)  mCN2.style.display  = isCN2  ? 'block' : 'none';
   if (isAuto || isMon || isAG) mermaid.run();
 }
 
@@ -8302,6 +9212,17 @@ function _applyGuestUI(proj) {
       const exportBtn = document.getElementById('btn-export-cockpit-navegacao');
       meta.insertBefore(chip, exportBtn);
     }
+  } else if (proj === 'cockpit-navegacao-2') {
+    const dashCN2 = document.getElementById('btn-dashboard-cockpit-navegacao-2');
+    if (dashCN2) dashCN2.style.display = 'none';
+    const meta = document.querySelector('#page-header-cockpit-navegacao-2 .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export-cockpit-navegacao-2');
+      meta.insertBefore(chip, exportBtn);
+    }
   } else {
     // CBV (default)
     ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
@@ -8319,14 +9240,25 @@ function _applyGuestUI(proj) {
   }
 }
 
+// Clique nas bolinhas do protótipo → scroll + highlight do card
+function highlightCallout(n) {
+  const card = document.getElementById('callout-' + n);
+  if (!card) return;
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.querySelectorAll('.callout-item').forEach(el => el.classList.remove('highlighted'));
+  card.classList.add('highlighted');
+  clearTimeout(card._ht);
+  card._ht = setTimeout(() => card.classList.remove('highlighted'), 2500);
+}
+
 // Voltar ao dashboard (home overlay) — desabilitado em modo visitante
 function goHome() {
   if (_guestMode) return;
   sessionStorage.removeItem('_p');
-  ['main','main-ma','main-ja','main-automacoes','main-automonitoramento','main-automacoes-gerais','main-cockpit-navegacao'].forEach(id => {
+  ['main','main-ma','main-ja','main-automacoes','main-automonitoramento','main-automacoes-gerais','main-cockpit-navegacao','main-cockpit-navegacao-2'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
-  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes','sidebar-automonitoramento','sidebar-automacoes-gerais','sidebar-cockpit-navegacao'].forEach(id => {
+  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes','sidebar-automonitoramento','sidebar-automacoes-gerais','sidebar-cockpit-navegacao','sidebar-cockpit-navegacao-2'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   const ho = document.getElementById('home-overlay');
