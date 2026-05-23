@@ -6529,6 +6529,15 @@ sequenceDiagram
           selecionando os <strong>100 pacientes prioritários</strong> de Alta Complexidade sem gestor
           e criando automaticamente a <strong>Linha de Cuidado</strong> no Dynamics 365 (Viver Bem CRM).
         </p>
+        <p>
+          A execução é feita <strong>via script</strong> (e não via aplicação OutSystems) porque o
+          processo sempre foi conduzido de <strong>forma controlada</strong>, lote a lote, com
+          validação manual a cada rodada. A decisão é <strong>não investir em desenvolvimento
+          OutSystems enquanto o fluxo não estiver totalmente validado</strong> — o script Python é
+          a forma mais rápida de iterar, ajustar filtros e corrigir o payload sem custo de
+          deploy. A spec de migração para ODC (<code>docs/SPEC_OUTSYSTEMS_ODC.md</code>) só será
+          executada depois que o processo estiver estável em produção.
+        </p>
 
         <div class="callout warn">
           <strong>⚠️ Ambiente atual</strong>
