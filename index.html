@@ -6542,8 +6542,19 @@ sequenceDiagram
 
         <div class="callout warn">
           <strong>⚠️ Ambiente atual</strong>
-          CRM apontando para <code>unimedpoa-hml.crm2.dynamics.com</code> (HML).
-          Antes de virar produção, alterar a constante <code>CRM_RESOURCE</code> e validar com dry-run.
+          CRM apontando para <code>unimedpoa.crm2.dynamics.com</code> (<strong>PRD</strong>).
+          Linhas comentadas com HML (<code>unimedpoa-hml…</code>) e DEV (<code>unimedpoa-dev…</code>) ficam como
+          referência no topo dos scripts <code>03_enviar_crm_linha_cuidado.py</code> e
+          <code>04_consulta_whatsapps_crm.py</code>. Para alternar, descomentar a linha desejada e comentar a de PRD.
+        </div>
+
+        <div class="callout info">
+          <strong>📁 Organização dos scripts</strong>
+          Todos os arquivos <code>.py</code> ficam em <code>scripts/</code> com prefixo numérico indicando
+          a ordem de execução (<code>01_</code> → <code>05_</code>). Há um módulo compartilhado
+          <code>scripts/_vidas_api.py</code> com as credenciais Sensedia e a função <code>obter_token()</code>
+          reutilizada pelos scripts 01 e 05. Os arquivos de saída (CSVs, XLSXs, JSONs, log, cache)
+          ficam na raiz do projeto.
         </div>
 
         <div class="subsection" id="auto-sec7-1">
@@ -6600,7 +6611,7 @@ sequenceDiagram
 
           <p style="margin-top:20px;"><strong>1) Buscar pacientes na base de Vidas</strong></p>
           <pre class="step-code"><span class="c"># Pagina API de Vidas e filtra os 100 prioritários</span>
-<span class="s">python consulta_alta_complexidade.py</span></pre>
+<span class="s">python scripts/01_consulta_alta_complexidade.py</span></pre>
           <p style="font-size:14px;color:#475569;">
             Pagina a API, aplica filtros locais, para nos 100 primeiros e ordena por <code>hs_escore_priorizacao</code> desc. Duração ≈ 2–3 min.
           </p>
@@ -6612,20 +6623,20 @@ sequenceDiagram
 
           <p style="margin-top:20px;"><strong>2) (Opcional) Gerar XLSX formatado</strong></p>
           <pre class="step-code"><span class="c"># Lê os JSONs brutos e gera planilha formatada</span>
-<span class="s">python _gerar_xlsx.py</span></pre>
+<span class="s">python scripts/02_gerar_xlsx_pacientes.py</span></pre>
           <p style="font-size:14px;color:#475569;">
             Gera <code>alta_complexidade_sem_gestor_nao_navegado.xlsx</code> com cabeçalho azul, zebra, bordas, freeze pane e auto-filter.
           </p>
 
           <p style="margin-top:20px;"><strong>3) Enviar ao CRM Dynamics</strong></p>
           <p style="font-size:14px;"><em>Modo dry-run (default — NÃO envia POST):</em></p>
-          <pre class="step-code"><span class="s">python enviar_crm_linha_cuidado.py</span>                 <span class="c"># dry-run com todos os 100</span>
-<span class="s">python enviar_crm_linha_cuidado.py --limite 5</span>      <span class="c"># dry-run só com 5</span></pre>
+          <pre class="step-code"><span class="s">python scripts/03_enviar_crm_linha_cuidado.py</span>                 <span class="c"># dry-run com todos os 100</span>
+<span class="s">python scripts/03_enviar_crm_linha_cuidado.py --limite 5</span>      <span class="c"># dry-run só com 5</span></pre>
 
           <p style="font-size:14px;"><em>Modo real (exige flag explícita <code>--confirmar</code>):</em></p>
-          <pre class="step-code"><span class="s">python enviar_crm_linha_cuidado.py --confirmar --limite 1</span>   <span class="c"># 1º teste real</span>
-<span class="s">python enviar_crm_linha_cuidado.py --confirmar --limite 5</span>   <span class="c"># cria 5</span>
-<span class="s">python enviar_crm_linha_cuidado.py --confirmar</span>              <span class="c"># cria todos os 100</span></pre>
+          <pre class="step-code"><span class="s">python scripts/03_enviar_crm_linha_cuidado.py --confirmar --limite 1</span>   <span class="c"># 1º teste real</span>
+<span class="s">python scripts/03_enviar_crm_linha_cuidado.py --confirmar --limite 5</span>   <span class="c"># cria 5</span>
+<span class="s">python scripts/03_enviar_crm_linha_cuidado.py --confirmar</span>              <span class="c"># cria todos os 100</span></pre>
 
           <p style="margin-top:16px;font-size:14px;"><strong>Por paciente, o script faz:</strong></p>
           <ol style="line-height:1.9;font-size:14px;">
@@ -6635,12 +6646,12 @@ sequenceDiagram
           </ol>
 
           <p style="margin-top:16px;"><strong>Ordem recomendada para o primeiro uso:</strong></p>
-          <pre class="step-code"><span class="s">python consulta_alta_complexidade.py</span>                       <span class="c"># 1. busca</span>
-<span class="s">python enviar_crm_linha_cuidado.py --limite 5</span>               <span class="c"># 2. dry-run</span>
+          <pre class="step-code"><span class="s">python scripts/01_consulta_alta_complexidade.py</span>                       <span class="c"># 1. busca</span>
+<span class="s">python scripts/03_enviar_crm_linha_cuidado.py --limite 5</span>               <span class="c"># 2. dry-run</span>
 <span class="c"># 3. inspecionar log_crm_linha_cuidado.csv</span>
-<span class="s">python enviar_crm_linha_cuidado.py --confirmar --limite 1</span>   <span class="c"># 4. 1 envio real</span>
+<span class="s">python scripts/03_enviar_crm_linha_cuidado.py --confirmar --limite 1</span>   <span class="c"># 4. 1 envio real</span>
 <span class="c"># 5. validar no Dynamics o uni_linhadecuidadoid do log</span>
-<span class="s">python enviar_crm_linha_cuidado.py --confirmar</span>              <span class="c"># 6. resto</span></pre>
+<span class="s">python scripts/03_enviar_crm_linha_cuidado.py --confirmar</span>              <span class="c"># 6. resto</span></pre>
 
           <p style="margin-top:16px;"><strong>Travas de segurança:</strong></p>
           <ul style="line-height:1.9;font-size:14px;">
@@ -6675,10 +6686,10 @@ sequenceDiagram
             <table>
               <thead><tr><th>Arquivo</th><th>Constante</th><th>Default</th><th>Observação</th></tr></thead>
               <tbody>
-                <tr><td rowspan="3"><code>consulta_alta_complexidade.py</code></td><td><code>MAX_RESULTADOS</code></td><td>100</td><td>Quantos pacientes coletar antes de parar</td></tr>
+                <tr><td rowspan="3"><code>scripts/01_consulta_alta_complexidade.py</code></td><td><code>MAX_RESULTADOS</code></td><td>100</td><td>Quantos pacientes coletar antes de parar</td></tr>
                 <tr><td><code>PAGE_SIZE</code></td><td>25</td><td>Limite máximo da API</td></tr>
                 <tr><td><code>SLEEP_BETWEEN_PAGES_S</code></td><td>0.3</td><td>Pausa entre páginas (rate limit)</td></tr>
-                <tr><td rowspan="2"><code>enviar_crm_linha_cuidado.py</code></td><td><code>CRM_RESOURCE</code></td><td><code>…-hml.crm2…</code></td><td><strong>HML</strong> — trocar antes de produção</td></tr>
+                <tr><td rowspan="2"><code>scripts/03_enviar_crm_linha_cuidado.py</code></td><td><code>CRM_RESOURCE</code></td><td><code>unimedpoa.crm2.dynamics.com</code></td><td><strong>PRD</strong> — HML/DEV ficam comentados como referência</td></tr>
                 <tr><td><code>SLEEP_ENTRE_CPFS_S</code></td><td>0.2</td><td>Pausa entre pacientes</td></tr>
               </tbody>
             </table>
@@ -6711,7 +6722,7 @@ sequenceDiagram
           <div class="subsection-title">7.4 Dados de Retorno do CRM — Mensagens WhatsApp (BLIP → Dynamics)</div>
 
           <p>
-            Script Python complementar (<code>consulta_whatsapps_crm.py</code>) que <strong>lê os dados que
+            Script Python complementar (<code>scripts/04_consulta_whatsapps_crm.py</code>) que <strong>lê os dados que
             o BLIP devolve ao CRM</strong> através da entidade <code>uni_whatsapps</code>. Cada vez que o BLIP
             dispara um template, recebe uma mensagem do cliente, ou recebe um <em>callback</em> de status do
             WhatsApp (entregue, lido, falha), ele grava esse evento como um <code>uni_whatsapps</code> no
@@ -6741,12 +6752,27 @@ sequenceDiagram
               <thead><tr><th>Status</th><th>Código (OptionSet)</th><th>Significado</th></tr></thead>
               <tbody>
                 <tr><td><strong>Enviada</strong></td><td><code>122880000</code></td><td>BLIP enviou o template ao WhatsApp</td></tr>
-                <tr><td><strong>Recebida</strong></td><td><code>122880001</code></td><td>Mensagem do cliente recebida pelo BLIP (resposta vai em <code>description</code>)</td></tr>
+                <tr><td><strong>Recebida</strong></td><td><code>122880001</code></td><td>Mensagem do cliente recebida pelo BLIP</td></tr>
                 <tr><td><strong>Entregue</strong></td><td><code>122880002</code></td><td>WhatsApp confirmou entrega ao aparelho do cliente</td></tr>
                 <tr><td><strong>Lida</strong></td><td><code>122880003</code></td><td>Cliente abriu a conversa (✓✓ azul)</td></tr>
                 <tr><td><strong>Falha</strong></td><td><code>122880004</code></td><td>Falha de entrega — motivo em <code>uni_falha</code></td></tr>
+                <tr><td><strong>Respondida</strong></td><td><code>122880005</code></td><td>Cliente respondeu ao template (texto livre em <code>description</code>)</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="callout warn" style="margin-top:16px;">
+            <strong>⚠️ Limitação conhecida — integração BLIP → CRM parcialmente quebrada em PRD</strong>
+            Análise feita em PRD em 23/05/2026:
+            <ul style="line-height:1.8;margin-top:8px;">
+              <li><code>Recebida</code> / <code>Entregue</code> / <code>Lida</code> (122880001–003): <strong>0 registros</strong> — nunca alimentados pela integração.</li>
+              <li><code>Enviada</code> (122880000): último registro em <strong>18/03/2026</strong>.</li>
+              <li><code>Falha</code> (122880004): 9 registros, último em <strong>27/04/2026</strong>.</li>
+              <li><code>Respondida</code> (122880005): único fluxo ativo — qualquer relatório atual só vê respostas.</li>
+            </ul>
+            <strong>Consequência:</strong> não dá pra cruzar disparos × respostas pelo CRM hoje.
+            Para identificar quem foi disparado mas não respondeu, é preciso consultar o BLIP diretamente
+            ou cruzar com a lista de elegíveis (saída do script 01).
           </div>
 
           <p style="margin-top:16px;"><strong>O que o script faz:</strong></p>
@@ -6758,11 +6784,11 @@ sequenceDiagram
           </ol>
 
           <p style="margin-top:16px;"><strong>Uso:</strong></p>
-          <pre class="step-code"><span class="s">python consulta_whatsapps_crm.py</span>                              <span class="c"># últimos 500</span>
-<span class="s">python consulta_whatsapps_crm.py --limite 100</span>                   <span class="c"># últimos 100</span>
-<span class="s">python consulta_whatsapps_crm.py --desde 2026-05-01</span>             <span class="c"># filtra scheduledend</span>
-<span class="s">python consulta_whatsapps_crm.py --template vb_experiencia_paciente</span>  <span class="c"># só esse template</span>
-<span class="s">python consulta_whatsapps_crm.py --status 122880004</span>             <span class="c"># só falhas</span></pre>
+          <pre class="step-code"><span class="s">python scripts/04_consulta_whatsapps_crm.py</span>                              <span class="c"># últimos 500</span>
+<span class="s">python scripts/04_consulta_whatsapps_crm.py --limite 100</span>                   <span class="c"># últimos 100</span>
+<span class="s">python scripts/04_consulta_whatsapps_crm.py --desde 2026-05-01</span>             <span class="c"># filtra scheduledend</span>
+<span class="s">python scripts/04_consulta_whatsapps_crm.py --template vb_experiencia_paciente</span>  <span class="c"># só esse template</span>
+<span class="s">python scripts/04_consulta_whatsapps_crm.py --status 122880005</span>             <span class="c"># só respondidas</span></pre>
 
           <p style="margin-top:16px;"><strong>Saída — <code>retorno_whatsapps_crm.csv</code>:</strong></p>
           <div class="table-wrap">
@@ -6787,7 +6813,7 @@ sequenceDiagram
             <li><code>CRM_TENANT_ID</code> = <code>062096f2-76c0-4ed8-b8bf-6644178496b2</code></li>
             <li><code>CRM_CLIENT_ID</code> = <code>0a5a06df-63ed-4942-a056-bab0ede8142d</code></li>
             <li><code>CRM_CLIENT_SECRET</code> = (definido no arquivo)</li>
-            <li><code>CRM_RESOURCE</code> = <code>https://unimedpoa-hml.crm2.dynamics.com</code> (HML)</li>
+            <li><code>CRM_RESOURCE</code> = <code>https://unimedpoa.crm2.dynamics.com</code> (<strong>PRD</strong>)</li>
           </ul>
 
           <div class="callout warn" style="margin-top:16px;">
@@ -6795,6 +6821,89 @@ sequenceDiagram
             Esse script serve para <strong>auditoria pós-envio</strong> — checar quantos templates foram lidos,
             ver respostas dos clientes para enviar à equipe de saúde populacional, e identificar falhas de entrega
             recorrentes. Não substitui o BLIP para fluxos de mensageria ativa.
+          </div>
+        </div>
+
+        <!-- 7.5 RELATÓRIO ENRIQUECIDO -->
+        <div class="subsection" id="auto-sec7-5">
+          <div class="subsection-title">7.5 Relatório Enriquecido — Cruzamento Retornos × Base Vidas</div>
+
+          <p>
+            Script (<code>scripts/05_enriquecer_whatsapps_com_vidas.py</code>) que <strong>cruza</strong>
+            o CSV de retornos do WhatsApp (saída do script 04) com a base de Vidas para entregar
+            ao time de Care Management uma planilha pronta para ação, com <strong>nome do beneficiário,
+            gestor, complexidade, risco e telefone</strong> de cada CPF que respondeu.
+          </p>
+
+          <p style="margin-top:12px;"><strong>O que o script faz:</strong></p>
+          <ol style="line-height:1.9;">
+            <li>Lê <code>retorno_whatsapps_crm.csv</code> (gerado pelo script 04).</li>
+            <li>Por default filtra para <strong>dias úteis (seg-sex)</strong>; use <code>--todos-dias</code> para incluir fds.</li>
+            <li>Extrai o CPF do campo <code>description</code> (padrão <code>+ CPF Disparo: XXXXXXXXXXX</code>).</li>
+            <li>Para cada CPF único, consulta a API de Vidas e captura: nome, gestor, complexidade,
+                <code>hs_risco</code>, <code>hs_escore_priorizacao</code>, <code>telefone_1</code>,
+                <code>cooperado</code>, <code>ultimo_status_linha_cuidado_primaria</code>.
+                Cacheado em <code>cache_vidas_gestor.json</code> (re-runs não rebatem na API).</li>
+            <li>Categoriza cada resposta do paciente em uma das 6 classes (regra heurística por texto):
+                <strong>Resposta real</strong>, <strong>Resposta curta</strong>, <strong>Cumprimento vazio</strong>,
+                <strong>Adia</strong>, <strong>Negativo</strong>, <strong>Sistema</strong>.</li>
+            <li>Gera <code>retorno_whatsapps_crm_enriquecido.xlsx</code> com 5 abas
+                (formatado, com freeze pane, auto-filter, cores semânticas e zebra).</li>
+          </ol>
+
+          <p style="margin-top:16px;"><strong>Estrutura do XLSX (5 abas):</strong></p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Aba</th><th>Conteúdo</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Resumo</strong></td><td>Métricas do período: total de mensagens, CPFs únicos, % por categoria, top templates, contagem por dia.</td></tr>
+                <tr><td><strong>Acionáveis</strong> ⭐</td><td>Lista priorizada (categoria ≠ "Resposta real") ordenada por <strong>Alta Complexidade → Risco → Escore</strong>. Linha vermelha = Alta Complexidade pendente. Amarela = sem gestor atribuído.</td></tr>
+                <tr><td><strong>Por_Paciente</strong></td><td>Uma linha por CPF. Agrega quantas mensagens recebeu, distribuição de categorias, última data e última resposta. Verde claro = paciente teve ao menos uma "Resposta real".</td></tr>
+                <tr><td><strong>Por_Gestor</strong></td><td>Métricas por gestor: total de mensagens, CPFs únicos, respostas reais, quantos "a acionar", % a acionar, alta complexidade.</td></tr>
+                <tr><td><strong>Mensagens</strong></td><td>Detalhe linha-por-linha (raw) para auditoria.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p style="margin-top:16px;"><strong>Categorização de respostas (heurística):</strong></p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Categoria</th><th>Critério</th><th>Exemplo</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Resposta real</strong></td><td>Texto com &gt; 3 palavras</td><td>"Ainda estou internado no Mãe de Deus"</td></tr>
+                <tr><td><strong>Resposta curta</strong></td><td>1-2 palavras genéricas</td><td>"ok", "sim"</td></tr>
+                <tr><td><strong>Cumprimento vazio</strong></td><td>Até 3 palavras + saudação</td><td>"boa tarde", "oi", "olá"</td></tr>
+                <tr><td><strong>Adia</strong></td><td>Contém "depois", "outra hora", "amanhã"</td><td>"melhor outra hora"</td></tr>
+                <tr><td><strong>Negativo</strong></td><td>Contém "não quero", "pare", "sair", "cancelar"</td><td>"não quero receber"</td></tr>
+                <tr><td><strong>Sistema</strong></td><td>"sent", "received", "delivered", "lido"</td><td>"Sent"</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p style="margin-top:16px;"><strong>Uso:</strong></p>
+          <pre class="step-code"><span class="s">python scripts/05_enriquecer_whatsapps_com_vidas.py</span>                <span class="c"># default: D-7 seg-sex, usa cache</span>
+<span class="s">python scripts/05_enriquecer_whatsapps_com_vidas.py --todos-dias</span>   <span class="c"># inclui fim de semana</span>
+<span class="s">python scripts/05_enriquecer_whatsapps_com_vidas.py --forcar</span>       <span class="c"># ignora o cache da Vidas</span>
+<span class="s">python scripts/05_enriquecer_whatsapps_com_vidas.py --limite-cpfs 50</span>  <span class="c"># só os 50 primeiros (teste)</span></pre>
+
+          <p style="margin-top:16px;"><strong>Saídas:</strong></p>
+          <ul style="line-height:1.9;">
+            <li><code>retorno_whatsapps_crm_enriquecido.xlsx</code> — relatório executivo com 5 abas.</li>
+            <li><code>cache_vidas_gestor.json</code> — cache local dos lookups na Vidas (re-uso em re-runs).</li>
+          </ul>
+
+          <p style="margin-top:16px;"><strong>Fluxo completo de uso (04 + 05):</strong></p>
+          <pre class="step-code"><span class="c"># 1. Buscar retornos no CRM (últimos 7 dias)</span>
+<span class="s">python scripts/04_consulta_whatsapps_crm.py --desde 2026-05-16 --limite 5000</span>
+
+<span class="c"># 2. Enriquecer e gerar relatório executivo (D-7 seg-sex por default)</span>
+<span class="s">python scripts/05_enriquecer_whatsapps_com_vidas.py</span></pre>
+
+          <div class="callout info" style="margin-top:16px;">
+            <strong>💡 Onde focar na planilha</strong>
+            A aba <strong>Acionáveis</strong> é a mais importante: lista todos os CPFs cuja resposta
+            <em>não</em> foi "Resposta real", já priorizados por Alta Complexidade + Risco. As linhas
+            vermelhas são onde o time de Care Management deve concentrar contatos de recaptação no dia.
           </div>
         </div>
 
