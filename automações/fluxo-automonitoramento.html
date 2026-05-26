@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fluxo de Automonitoramento · Jornada Clínica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --blue-dark:   #1a3a5c;
+      --blue-main:   #2E75B6;
+      --blue-mid:    #4a90d9;
+      --blue-light:  #D5E8F0;
+      --blue-pale:   #eef5fb;
+      --green-yes:   #E2EFDA;
+      --green-text:  #375623;
+      --red-note:    #c00000;
+      --gray-border: #c8d6e0;
+      --gray-text:   #444;
+      --white:       #fff;
+      --sidebar-w:   260px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      color: var(--gray-text);
+      background: #f0f4f8;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR (CBV + MA + JA + AUTOMACOES) ── */
+    #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes, #sidebar-automonitoramento, #sidebar-automacoes-gerais, #sidebar-cockpit-navegacao, #sidebar-cockpit-navegacao-2 {
+      width: var(--sidebar-w);
+      background: var(--blue-dark);
+      color: #cde;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform .3s;
+      display: flex;
+      flex-direction: column;
+    }
+    #sidebar-ma { display: none; background: #1b2f3f; }
+    #sidebar-ja { display: none; background: #1b2f3f; }
+    #sidebar-ja nav a:hover, #sidebar-ja nav a.active {
+      color: #fff;
+      background: rgba(255,255,255,.07);
+      border-left-color: #a660d8;
+    }
+    #sidebar-ja .badge-ja {
+      display: inline-block; margin-top: 8px;
+      background: #2E75B6; color: #fff;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    }
+    #sidebar-automacoes { display: none; background: #1b2f3f; }
+    #sidebar-automacoes nav a:hover, #sidebar-automacoes nav a.active {
+      color: #fff;
+      background: rgba(255,255,255,.07);
+      border-left-color: var(--blue-mid);
+    }
+    #sidebar-automacoes .badge-automacoes {
+      display: inline-block; margin-top: 8px;
+      background: var(--blue-mid); color: #fff;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    }
+    #page-header-automacoes .label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #9dc4e8; margin-bottom: 8px; }
+    #page-header-automacoes h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    #page-header-automacoes .subtitle { font-size: 16px; color: #b8d8f0; margin-bottom: 20px; }
+    #page-header-automacoes .meta { display: flex; flex-wrap: wrap; gap: 12px; }
+    #btn-dashboard-automacoes, #btn-export-automacoes {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.35);
+      border-radius: 20px; color: #fff;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-dashboard-automacoes { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-automacoes:hover, #btn-export-automacoes:hover, #btn-sim-automacoes:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+    #btn-sim-automacoes {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.5);
+      border-radius: 20px; color: #fff;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* ── SIMULATOR MODAL ── */
+    #sim-overlay {
+      position: fixed; inset: 0; z-index: 900;
+      background: rgba(0,0,0,.75);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    #sim-overlay.open { opacity: 1; pointer-events: all; }
+    #sim-modal {
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      transform: scale(.93) translateY(20px);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    #sim-overlay.open #sim-modal { transform: scale(1) translateY(0); }
+    #sim-modal-header {
+      width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+      padding: 0 4px;
+    }
+    #sim-modal-header .sim-title {
+      font-size: 14px; font-weight: 700; color: #e9edef;
+      display: flex; align-items: center; gap: 8px;
+    }
+    #sim-close {
+      background: rgba(255,255,255,.15); border: none; border-radius: 50%;
+      width: 32px; height: 32px; cursor: pointer;
+      color: #fff; font-size: 16px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    #sim-close:hover { background: rgba(255,255,255,.3); }
+    #sim-iframe {
+      border: none;
+      border-radius: 0;
+      width: 380px;
+      height: 850px;
+      background: transparent;
+    }
+    #main-automacoes { display: none; }
+    #main-automonitoramento { display: none; }
+
+    /* Automonitoramento — sidebar no padrão dos demais projetos, accent teal */
+    #sidebar-automonitoramento { display: none; background: #1b2f3f; }
+    #sidebar-automonitoramento nav a:hover, #sidebar-automonitoramento nav a.active {
+      background: rgba(20, 184, 166, .18);
+      border-left-color: #14b8a6;
+      color: #fff;
+    }
+    #sidebar-automonitoramento .badge-automonitoramento {
+      display: inline-block; background: #14b8a6; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 10px;
+      border-radius: 10px; margin-top: 8px; letter-spacing: .5px;
+    }
+    #page-header-automonitoramento {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, #14b8a6 100%);
+    }
+    #btn-dashboard-automonitoramento, #btn-export-automonitoramento {
+      background: transparent; color: #fff;
+      border: 1.5px solid rgba(255,255,255,.5);
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .2s; margin-left: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    #btn-dashboard-automonitoramento { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-automonitoramento:hover, #btn-export-automonitoramento:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+
+    /* Automações Gerais — sidebar accent âmbar */
+    #main-automacoes-gerais { display: none; }
+    #sidebar-automacoes-gerais { display: none; background: #1b2f3f; }
+    #sidebar-automacoes-gerais nav a:hover, #sidebar-automacoes-gerais nav a.active {
+      background: rgba(245, 158, 11, .18);
+      border-left-color: #f59e0b;
+      color: #fff;
+    }
+    #sidebar-automacoes-gerais .badge-automacoes-gerais {
+      display: inline-block; background: #f59e0b; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 10px;
+      border-radius: 10px; margin-top: 8px; letter-spacing: .5px;
+    }
+    #page-header-automacoes-gerais {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, #f59e0b 100%);
+    }
+    #btn-dashboard-automacoes-gerais, #btn-export-automacoes-gerais {
+      background: transparent; color: #fff;
+      border: 1.5px solid rgba(255,255,255,.5);
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .2s; margin-left: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    #btn-dashboard-automacoes-gerais { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-automacoes-gerais:hover, #btn-export-automacoes-gerais:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+
+    /* Cockpit Navegação — sidebar accent indigo/violeta */
+    #main-cockpit-navegacao { display: none; }
+    #sidebar-cockpit-navegacao { display: none; background: #1b2f3f; }
+    #sidebar-cockpit-navegacao nav a:hover, #sidebar-cockpit-navegacao nav a.active {
+      background: rgba(99, 102, 241, .18);
+      border-left-color: #6366f1;
+      color: #fff;
+    }
+    #sidebar-cockpit-navegacao .badge-cockpit-navegacao {
+      display: inline-block; background: #6366f1; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 10px;
+      border-radius: 10px; margin-top: 8px; letter-spacing: .5px;
+    }
+    #page-header-cockpit-navegacao {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, #6366f1 100%);
+    }
+
+    /* Cockpit Navegação 2.0 — sidebar accent purple/rose */
+    #main-cockpit-navegacao-2 { display: none; }
+    #sidebar-cockpit-navegacao-2 { display: none; background: #1a1035; }
+    #sidebar-cockpit-navegacao-2 nav a:hover, #sidebar-cockpit-navegacao-2 nav a.active {
+      background: rgba(168, 85, 247, .18);
+      border-left-color: #a855f7;
+      color: #fff;
+    }
+    #sidebar-cockpit-navegacao-2 .badge-cn2 {
+      display: inline-block; background: #a855f7; color: #fff;
+      font-size: 10px; font-weight: 700; padding: 2px 10px;
+      border-radius: 10px; margin-top: 8px; letter-spacing: .5px;
+    }
+    #page-header-cockpit-navegacao-2 {
+      background: linear-gradient(135deg, #1a1035 0%, #a855f7 100%);
+    }
+    #btn-dashboard-cockpit-navegacao, #btn-export-cockpit-navegacao {
+      background: transparent; color: #fff;
+      border: 1.5px solid rgba(255,255,255,.5);
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .2s; margin-left: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    #btn-dashboard-cockpit-navegacao { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-cockpit-navegacao:hover, #btn-export-cockpit-navegacao:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+
+    .mermaid-wrap {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 24px;
+      overflow-x: auto;
+      text-align: center;
+      margin: 16px 0;
+    }
+    .msg-bubble {
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+    .ep-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .ep-table th, .ep-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .ep-table thead tr { background: #f1f5f9; }
+    .ep-table th { font-weight: 600; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+    .ep-table tbody tr:last-child td { border-bottom: none; }
+    .ep-table tbody tr:hover { background: #f8fafc; }
+    .btn-pill {
+      display: inline-block;
+      background: #0891b2;
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 4px 2px;
+    }
+    .btn-pill.danger { background: #dc2626; }
+    .btn-pill.success { background: #059669; }
+    .action-tag {
+      background: #fed7aa;
+      border-left: 4px solid #ea580c;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin: 8px 0;
+    }
+    .action-tag::before { content: "⚙️ "; }
+    .branch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 20px;
+    }
+    @media (max-width: 768px) { .branch-grid { grid-template-columns: 1fr; } }
+    .branch-col {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .branch-col.col-no  { background: #fef2f2; border-color: #fecaca; }
+    .branch-col.col-yes { background: #ecfdf5; border-color: #a7f3d0; }
+    .branch-col h4 { margin: 0 0 16px; font-size: 15px; text-transform: uppercase; letter-spacing: .5px; }
+    .branch-col.col-no  h4 { color: #dc2626; }
+    .branch-col.col-yes h4 { color: #059669; }
+    .flow-step {
+      display: flex; gap: 14px; align-items: flex-start;
+      margin: 14px 0; padding: 14px;
+      background: #f1f5f9; border-radius: 8px;
+      border-left: 4px solid #06b6d4;
+    }
+    .flow-step-num {
+      background: #06b6d4; color: #fff;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; flex-shrink: 0;
+    }
+    #page-header-ja .label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #9dc4e8; margin-bottom: 8px; }
+    #page-header-ja h1 { font-size: 28px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+    #page-header-ja .subtitle { font-size: 16px; color: #b8d8f0; margin-bottom: 20px; }
+    #page-header-ja .meta { display: flex; flex-wrap: wrap; gap: 12px; }
+    #btn-dashboard-ja, #btn-export-ja {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.35);
+      border-radius: 20px; color: #fff;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-dashboard-ja { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.8); }
+    #btn-dashboard-ja:hover, #btn-export-ja:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); color:#fff; }
+    #main-ja { display: none; }
+    #sidebar-logo {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    #sidebar-logo .org { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #7fa8c8; }
+    #sidebar-logo .title { font-size: 15px; font-weight: 700; color: #fff; margin-top: 4px; line-height: 1.3; }
+    #sidebar-logo .badge {
+      display: inline-block; margin-top: 8px;
+      background: var(--blue-mid); color: #fff;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    }
+    #sidebar-logo .badge-ma {
+      display: inline-block; margin-top: 8px;
+      background: #2a7a5a; color: #fff;
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    }
+    #sidebar nav, #sidebar-ma nav, #sidebar-ja nav, #sidebar-automacoes nav, #sidebar-automonitoramento nav, #sidebar-automacoes-gerais nav, #sidebar-cockpit-navegacao nav, #sidebar-cockpit-navegacao-2 nav { padding: 12px 0; flex: 1; }
+    #sidebar nav a, #sidebar-ma nav a, #sidebar-ja nav a, #sidebar-automacoes nav a, #sidebar-automonitoramento nav a, #sidebar-automacoes-gerais nav a, #sidebar-cockpit-navegacao nav a, #sidebar-cockpit-navegacao-2 nav a {
+      display: block; padding: 8px 20px;
+      color: #a8c4dc; text-decoration: none;
+      font-size: 12.5px; line-height: 1.4;
+      border-left: 3px solid transparent;
+      transition: all .15s;
+    }
+    #sidebar nav a:hover, #sidebar nav a.active,
+    #sidebar-ma nav a:hover, #sidebar-ma nav a.active {
+      color: #fff;
+      background: rgba(255,255,255,.07);
+      border-left-color: var(--blue-mid);
+    }
+    #sidebar-ma nav a:hover, #sidebar-ma nav a.active {
+      border-left-color: #3ab882;
+    }
+    #sidebar nav .nav-section, #sidebar-ma nav .nav-section, #sidebar-ja nav .nav-section, #sidebar-automacoes nav .nav-section, #sidebar-automonitoramento nav .nav-section, #sidebar-automacoes-gerais nav .nav-section, #sidebar-cockpit-navegacao nav .nav-section, #sidebar-cockpit-navegacao-2 nav .nav-section {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: #5a7a96; padding: 16px 20px 4px; font-weight: 600;
+    }
+    #sidebar nav a.sub, #sidebar-ma nav a.sub, #sidebar-ja nav a.sub, #sidebar-automacoes nav a.sub, #sidebar-automonitoramento nav a.sub, #sidebar-automacoes-gerais nav a.sub, #sidebar-cockpit-navegacao nav a.sub, #sidebar-cockpit-navegacao-2 nav a.sub { padding-left: 32px; font-size: 12px; }
+
+    /* ── HAMBURGER ── */
+    #menu-toggle {
+      display: none;
+      position: fixed; top: 12px; left: 12px; z-index: 200;
+      background: var(--blue-main); border: none; border-radius: 6px;
+      color: #fff; width: 38px; height: 38px; cursor: pointer; font-size: 18px;
+    }
+
+    /* ── MAIN (CBV + MA) ── */
+    #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento, #main-automacoes-gerais, #main-cockpit-navegacao, #main-cockpit-navegacao-2 {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+    }
+    #main-ma { display: none; }
+
+    /* ── HEADER ── */
+    #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes, #page-header-automonitoramento, #page-header-automacoes-gerais, #page-header-cockpit-navegacao, #page-header-cockpit-navegacao-2 {
+      color: #fff;
+      padding: 48px 48px 36px;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
+    }
+    #page-header .label, #page-header-ma .label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+      color: #9dc4e8; margin-bottom: 8px;
+    }
+    #page-header h1, #page-header-ma h1 {
+      font-size: 28px; font-weight: 700; line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    #page-header .subtitle, #page-header-ma .subtitle {
+      font-size: 16px; color: #b8d8f0; margin-bottom: 20px;
+    }
+    #page-header .meta, #page-header-ma .meta {
+      display: flex; flex-wrap: wrap; gap: 12px;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px; padding: 4px 14px; font-size: 12px; color: #daeeff;
+    }
+    .chip-icon { font-size: 13px; }
+    .chip.chip-guest {
+      background: rgba(255,180,0,.18); border-color: rgba(255,180,0,.4);
+      color: #ffe08a; font-weight: 600;
+    }
+    #btn-export, #btn-export-ma {
+      display: inline-flex; align-items: center; gap: 7px;
+      margin-left: auto;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.35);
+      border-radius: 20px; color: #fff;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .2s, border-color .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-export:hover, #btn-export-ma:hover {
+      background: rgba(255,255,255,.28);
+      border-color: rgba(255,255,255,.7);
+    }
+    #btn-export:active, #btn-export-ma:active { transform: scale(.97); }
+    #btn-dashboard, #btn-dashboard-ma {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 18px;
+      background: rgba(255,255,255,.1);
+      border: 1.5px solid rgba(255,255,255,.25);
+      border-radius: 20px; color: rgba(255,255,255,.8);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .2s, border-color .2s, color .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-dashboard:hover, #btn-dashboard-ma:hover {
+      background: rgba(255,255,255,.22);
+      border-color: rgba(255,255,255,.6);
+      color: #fff;
+    }
+    #btn-dashboard:active, #btn-dashboard-ma:active { transform: scale(.97); }
+
+    /* ── CHANGELOG MODAL ── */
+    #changelog-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 500;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #changelog-overlay.open { display: flex; }
+    #changelog-box {
+      background: #fff; border-radius: 12px;
+      width: 100%; max-width: 640px; max-height: 82vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 12px 50px rgba(0,0,0,.35);
+      animation: modalIn .18s ease;
+      overflow: hidden;
+    }
+    #changelog-head {
+      background: var(--blue-dark); color: #fff;
+      padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    #changelog-head h3 { font-size: 15px; font-weight: 600; }
+    #changelog-head .cl-sub { font-size: 11px; color: #7faac8; margin-top: 2px; }
+    #changelog-close {
+      background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; border-radius: 6px; padding: 4px 10px;
+      font-size: 16px; cursor: pointer; line-height: 1;
+    }
+    #changelog-close:hover { background: rgba(255,255,255,.25); }
+    #changelog-body { overflow-y: auto; padding: 24px 28px; flex: 1; }
+
+    /* timeline */
+    .cl-timeline { position: relative; padding-left: 24px; }
+    .cl-timeline::before {
+      content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px;
+      width: 2px; background: var(--blue-light);
+    }
+    .cl-entry { position: relative; margin-bottom: 28px; }
+    .cl-entry:last-child { margin-bottom: 0; }
+    .cl-dot {
+      position: absolute; left: -21px; top: 4px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--blue-main);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--blue-main);
+    }
+    .cl-dot.current { background: #276027; box-shadow: 0 0 0 2px #276027; }
+    .cl-version {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-bottom: 6px;
+    }
+    .cl-ver-badge {
+      font-size: 11px; font-weight: 700; padding: 2px 9px;
+      border-radius: 10px; background: var(--blue-light);
+      color: var(--blue-dark); border: 1px solid #b0cfe8;
+    }
+    .cl-ver-badge.current {
+      background: #e2f4e8; color: #276027; border-color: #68c97a;
+    }
+    .cl-date { font-size: 11px; color: #94a3b8; font-weight: 500; }
+    .cl-title { font-size: 13px; font-weight: 700; color: var(--blue-dark); margin-bottom: 6px; }
+    .cl-items { list-style: none; padding: 0; margin: 0; }
+    .cl-items li {
+      font-size: 12.5px; color: #475569; line-height: 1.6;
+      padding: 2px 0 2px 16px; position: relative;
+    }
+    .cl-items li::before {
+      content: '›'; position: absolute; left: 4px;
+      color: var(--blue-main); font-weight: 700;
+    }
+    #btn-history {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 20px; color: rgba(255,255,255,.75);
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background .2s, color .2s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #btn-history:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+    /* ── CONTENT ── */
+    #content { padding: 40px 48px; width: 100%; }
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .section-header {
+      background: var(--blue-main);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .section-header:hover { filter: brightness(1.08); }
+    .section-number {
+      background: rgba(255,255,255,.2);
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px; flex-shrink: 0;
+    }
+    .section-header h2 { font-size: 16px; font-weight: 600; flex: 1; }
+    .section-chevron {
+      font-size: 14px;
+      opacity: .75;
+      transition: transform .25s ease;
+      flex-shrink: 0;
+    }
+    .section-card.collapsed .section-chevron { transform: rotate(-90deg); }
+    .section-body {
+      padding: 24px;
+      overflow: hidden;
+      transition: max-height .35s ease, padding .35s ease, opacity .25s ease;
+      max-height: 9999px;
+      opacity: 1;
+    }
+    .section-card.collapsed .section-body {
+      max-height: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      opacity: 0;
+    }
+
+    /* ── SUB SECTION ── */
+    .subsection { margin-bottom: 24px; }
+    .subsection:last-child { margin-bottom: 0; }
+    .subsection-title {
+      font-size: 14px; font-weight: 700; color: var(--blue-dark);
+      border-bottom: 2px solid var(--blue-light);
+      padding-bottom: 6px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tag {
+      background: var(--blue-light); color: var(--blue-dark);
+      font-size: 10px; font-weight: 600; padding: 2px 8px;
+      border-radius: 4px; text-transform: uppercase; letter-spacing: .5px;
+    }
+
+    p { line-height: 1.7; margin-bottom: 10px; color: var(--gray-text); }
+
+    /* ── LISTS ── */
+    ul, ol { padding-left: 22px; margin-bottom: 12px; }
+    li { line-height: 1.8; }
+
+    /* ── TABLES ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--gray-border);
+      margin-bottom: 16px;
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 12.5px; min-width: 500px;
+    }
+    thead tr { background: var(--blue-main); color: #fff; }
+    thead th {
+      padding: 10px 14px; text-align: left;
+      font-weight: 600; white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,.15);
+    }
+    thead th:last-child { border-right: none; }
+    tbody tr:nth-child(even) { background: var(--blue-pale); }
+    tbody tr:hover { background: #dceef8; }
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--gray-border);
+      border-right: 1px solid var(--gray-border);
+      vertical-align: top; line-height: 1.5;
+    }
+    tbody td:last-child { border-right: none; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* ── SEÇÃO 10 — colunas fixas para alinhar todas as tabelas ── */
+    #sec10 table {
+      table-layout: fixed;
+    }
+    #sec10 table th:nth-child(1) { width: 22%; }
+    #sec10 table th:nth-child(2) { width: 9%; }
+    #sec10 table th:nth-child(3) { width: 60%; }
+    #sec10 table th:nth-child(4) { width: 9%; }
+    #sec10 table td { word-break: break-word; }
+    #sec10 table code { word-break: break-all; }
+
+    /* ── SEÇÃO 4 — padroniza colunas nas tabelas de API ── */
+    /* Tabelas 5 colunas: Operação | Método | Endpoint | Parâmetros | Retorno */
+    #sec4 table:has(thead th:nth-child(5)) { table-layout: fixed; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(1) { width: 18%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(2) { width: 8%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(3) { width: 33%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(4) { width: 26%; }
+    #sec4 table:has(thead th:nth-child(5)) th:nth-child(5) { width: 15%; }
+    #sec4 table:has(thead th:nth-child(5)) td { word-break: break-word; }
+    #sec4 table:has(thead th:nth-child(5)) code { word-break: break-all; }
+    /* Tabelas 4 colunas: Operação | Método | Endpoint | Parâmetros (sec 4.1 e 4.3) */
+    #sec4-1 table:not(:has(thead th:nth-child(5))),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) { table-layout: fixed; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(1),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(1) { width: 20%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(2),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(2) { width: 9%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(3),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(3) { width: 38%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) th:nth-child(4),
+    #sec4-3 table:not(:has(thead th:nth-child(5))) th:nth-child(4) { width: 33%; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) td,
+    #sec4-3 table:not(:has(thead th:nth-child(5))) td { word-break: break-word; }
+    #sec4-1 table:not(:has(thead th:nth-child(5))) code,
+    #sec4-3 table:not(:has(thead th:nth-child(5))) code { word-break: break-all; }
+
+    /* sim / não badges */
+    .sim {
+      background: var(--green-yes); color: var(--green-text);
+      font-weight: 600; font-size: 11px;
+      padding: 2px 10px; border-radius: 10px;
+      display: inline-block; text-align: center;
+    }
+    .nao {
+      color: #aaa; font-size: 11px; display: inline-block;
+      text-align: center;
+    }
+
+    /* method badges */
+    .method {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 4px; letter-spacing: .5px;
+    }
+    .get  { background: #e3f4e3; color: #276027; }
+    .post { background: #fff0d6; color: #7a4a00; }
+    .put  { background: #e8e0f4; color: #3d1f7a; }
+    .del  { background: #fde8e8; color: #8b0000; }
+
+    /* endpoint code */
+    code {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 11.5px;
+      background: #f0f4f8;
+      border: 1px solid #d0dde8;
+      padding: 1px 6px; border-radius: 4px;
+      color: #1a3a5c; word-break: break-all;
+    }
+
+    /* Step cards (exemplo encadeado) */
+    .step-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0;
+      margin: 14px 0;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(15,23,42,.04);
+    }
+    .step-card-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
+      background: linear-gradient(to right, #f8fafc, #fff);
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .step-num {
+      background: #1a3a5c; color: #fff;
+      width: 26px; height: 26px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-title {
+      color: #1a3a5c; font-size: 14px; font-weight: 700;
+      flex: 1;
+    }
+    .step-body { padding: 14px 16px; }
+    .step-endpoint {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .step-endpoint code {
+      font-size: 12px;
+    }
+    .step-code {
+      background: #0f172a;
+      border-radius: 6px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 12px;
+      line-height: 1.65;
+      color: #e2e8f0;
+      white-space: pre;
+      margin: 0;
+    }
+    .step-code .k { color: #7dd3fc; }          /* keyword / chave */
+    .step-code .s { color: #86efac; }          /* string */
+    .step-code .n { color: #fbbf24; }          /* number */
+    .step-code .c { color: #64748b; font-style: italic; } /* comment */
+    .step-code .p { color: #cbd5e1; }          /* punctuation */
+    .step-foot {
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: #475569;
+      padding: 8px 12px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      border-left: 3px solid #0284c7;
+    }
+    .step-foot strong, .step-foot .tag-out {
+      color: #1a3a5c; font-weight: 600;
+    }
+    .step-foot code {
+      font-size: 11.5px;
+      background: #fff;
+    }
+    .ext-url code { color: #7a3000; background: #fff4e8; border-color: #e8c890; }
+    .dev-url td { background: #fffbea; }
+    .dev-url code { color: #6b4c00; background: #fff8dc; border-color: #f0d060; border-style: dashed; }
+    .badge-dev {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 700; letter-spacing: .4px;
+      padding: 2px 8px; border-radius: 10px;
+      background: #fff3cd; color: #856404; border: 1px solid #f0c040;
+      vertical-align: middle; margin-left: 6px;
+    }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-left: 4px solid;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px; margin: 16px 0;
+      font-size: 13px; line-height: 1.6;
+    }
+    .callout.info  { border-color: var(--blue-main); background: var(--blue-pale); color: #1a3a5c; }
+    .callout.warn  { border-color: #e8a020; background: #fff8ec; color: #6a3a00; }
+    .callout.danger { border-color: var(--red-note); background: #fff0f0; color: #6a0000; }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    /* ── RISK CARDS ── */
+    .risk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .risk-card {
+      border: 1px solid var(--gray-border);
+      border-radius: 8px; padding: 16px;
+      border-top: 4px solid var(--blue-main);
+      transition: box-shadow .2s, transform .2s;
+      cursor: default;
+    }
+    .risk-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      transform: translateY(-2px);
+    }
+    .risk-card.high { border-top-color: var(--red-note); }
+    .risk-card.high:hover { box-shadow: 0 4px 16px rgba(192,0,0,.15); }
+    .risk-card.medium { border-top-color: #e8a020; }
+    .risk-card.medium:hover { box-shadow: 0 4px 16px rgba(232,160,32,.15); }
+    .risk-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; color: var(--blue-dark); }
+    .risk-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px; }
+    .risk-label.r { color: var(--red-note); }
+    .risk-label.m { color: #276027; }
+    .risk-text { font-size: 12px; line-height: 1.5; margin-bottom: 8px; }
+
+    /* ── ENV PILLS ── */
+    .env-prd { background: #e3f4e3; color: #276027; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+    .env-hmg { background: #fff0d6; color: #7a4a00; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+    /* ── OVERVIEW CARDS ── */
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .overview-card {
+      border: 1px solid var(--gray-border);
+      border-radius: 8px; padding: 16px;
+      transition: transform .25s ease, box-shadow .25s ease;
+      background: var(--blue-pale);
+      transition: box-shadow .2s, transform .2s;
+      cursor: default;
+    }
+    .overview-card:hover {
+      box-shadow: 0 4px 16px rgba(46,117,182,.15);
+      transform: translateY(-2px);
+    }
+    .overview-card .oc-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--blue-main); font-weight: 600; }
+    .overview-card .oc-value { font-size: 13px; font-weight: 600; color: var(--blue-dark); margin-top: 4px; word-break: break-all; }
+
+    /* ── SYSTEMS LIST ── */
+    .system-pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .system-pill {
+      background: var(--blue-light); color: var(--blue-dark);
+      border-radius: 20px; padding: 6px 16px;
+      font-size: 12.5px; font-weight: 600;
+      border: 1px solid #b0cfe8;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background .2s, box-shadow .2s, transform .2s;
+    }
+    .system-pill:hover {
+      background: var(--blue-main);
+      color: #fff;
+      border-color: var(--blue-main);
+      box-shadow: 0 4px 12px rgba(46,117,182,.25);
+      transform: translateY(-2px);
+    }
+
+    /* ── FOOTER ── */
+    #page-footer {
+      background: var(--blue-dark); color: #6a8fa8;
+      padding: 24px 48px 18px;
+      font-size: 12px;
+      margin-left: 0;
+    }
+    #page-footer .footer-top {
+      display: flex; flex-wrap: wrap;
+      justify-content: space-between; align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding-bottom: 16px; margin-bottom: 14px;
+    }
+    #page-footer .footer-brand { display: flex; align-items: center; gap: 10px; }
+    #page-footer .footer-brand .brand-name {
+      font-size: 15px; font-weight: 700; color: #fff; letter-spacing: .5px;
+    }
+    #page-footer .footer-brand .brand-sub {
+      font-size: 10px; color: #5a7a96; text-transform: uppercase; letter-spacing: 1px;
+    }
+    #page-footer .footer-badge {
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px; padding: 4px 14px; font-size: 11px; color: #9dc4e8;
+    }
+    #page-footer .footer-bottom {
+      text-align: center; font-size: 11px; color: #4a6a82; line-height: 1.7;
+    }
+    #page-footer .footer-bottom a { color: #5a8aaa; text-decoration: none; }
+    #page-footer .footer-bottom a:hover { color: #9dc4e8; }
+
+    /* ── PRINT ── */
+    @page { size: A4; margin: 1.4cm 1.2cm 1.6cm; }
+
+    @media print {
+      /* Forçar cores de fundo */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+      /* Esconder tudo que não é conteúdo */
+      #auth-overlay, #home-overlay, #menu-toggle, #sb-toggle,
+      #scroll-top, .btn-payload, .diag-tabs, .diag-toolbar,
+      .diag-tooltip, .modal-overlay, #changelog-overlay,
+      #btn-export, #btn-dashboard, #btn-history,
+      #btn-export-ja, #btn-dashboard-ja,
+      #btn-export-ma, #btn-dashboard-ma,
+      #btn-export-automacoes, #btn-dashboard-automacoes, #btn-sim-automacoes,
+      #btn-export-automonitoramento, #btn-dashboard-automonitoramento,
+      #btn-export-automacoes-gerais, #btn-dashboard-automacoes-gerais,
+      #btn-export-cockpit-navegacao, #btn-dashboard-cockpit-navegacao,
+      #btn-export-cockpit-navegacao-2, #btn-dashboard-cockpit-navegacao-2 { display: none !important; }
+
+      /* Esconder todos os sidebars na impressão */
+      #sidebar, #sidebar-ma, #sidebar-ja, #sidebar-automacoes,
+      #sidebar-automonitoramento, #sidebar-automacoes-gerais,
+      #sidebar-cockpit-navegacao, #sidebar-cockpit-navegacao-2 { display: none !important; }
+
+      /* Layout sem sidebar — remover margin-left de todos os mains */
+      body { background: #fff !important; }
+      #main, #main-ma, #main-ja, #main-automacoes, #main-automonitoramento,
+      #main-automacoes-gerais, #main-cockpit-navegacao, #main-cockpit-navegacao-2 { margin-left: 0 !important; }
+      #content { padding: 16px 0 !important; width: 100% !important; }
+
+      /* Diagrama — exibe apenas o painel ativo, sem scroll, sem overflow */
+      .diag-wrapper {
+        overflow: visible !important;
+        background: #fff !important;
+        break-before: page;
+      }
+      .diag-canvas { width: 100% !important; transform: none !important; }
+      .diag-panel { display: none !important; }
+      .diag-panel.active { display: block !important; break-inside: avoid; }
+      .diag-panel svg { width: 100% !important; height: auto !important; max-width: 100% !important; }
+
+      /* Header impresso — mantém gradiente */
+      #page-header, #page-header-ma {
+        padding: 28px 24px 22px !important;
+        margin-bottom: 16px;
+        border-radius: 0 !important;
+        break-after: avoid;
+      }
+      #page-header h1, #page-header-ma h1 { font-size: 22px !important; }
+
+      /* Section cards */
+      .section-card {
+        box-shadow: none !important;
+        border: 1px solid #c8d6e0 !important;
+        border-radius: 6px !important;
+        break-inside: avoid;
+        margin-bottom: 14px !important;
+      }
+      .section-header { break-after: avoid; }
+
+      /* Tabelas */
+      .table-wrap { overflow: visible !important; max-height: none !important; }
+      table { min-width: unset !important; width: 100% !important; font-size: 11px !important; }
+      th, td { padding: 5px 8px !important; }
+      tr { break-inside: avoid; }
+      thead { display: table-header-group; }
+
+      /* Evitar quebra em blocos importantes */
+      .subsection, .risk-card, .overview-card { break-inside: avoid; }
+
+      /* Forçar quebra antes de seção nova */
+      .section-card + .section-card { break-before: auto; }
+
+      /* Diagramas — mostrar apenas o painel ativo como imagem estática */
+      .diag-panel { display: none !important; }
+      .diag-panel.active {
+        display: block !important;
+        padding: 0 !important;
+        break-inside: avoid;
+      }
+      .diag-panel.active svg {
+        width: 100% !important;
+        max-height: 22cm;
+      }
+      #diagCanvas { transform: none !important; }
+
+      /* Callouts e badges */
+      .callout { break-inside: avoid; }
+      code { background: #f0f4f8 !important; border: 1px solid #d0dde8 !important; }
+
+      /* Rodapé de impressão */
+      #page-footer { margin-top: 8px; border-top: 1px solid #e0e0e0; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      #sidebar, #sidebar-ma { transform: translateX(-100%); }
+      #sidebar.open, #sidebar-ma.open { transform: translateX(0); }
+      #menu-toggle { display: flex; align-items: center; justify-content: center; }
+      #main, #main-ma { margin-left: 0; }
+      #page-header { padding: 60px 24px 28px; }
+      #page-header h1 { font-size: 22px; }
+      #content { padding: 24px 16px; }
+    }
+    @media (max-width: 600px) {
+      .risk-grid { grid-template-columns: 1fr; }
+      .overview-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── PAYLOAD BUTTON ── */
+    .btn-payload {
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+      background: var(--blue-pale); border: 1px solid var(--blue-main);
+      color: var(--blue-main); border-radius: 6px;
+      width: 60px; height: 22px;
+      font-size: 10.5px; font-weight: 700;
+      cursor: pointer; margin-left: 8px;
+      transition: background .15s, color .15s, box-shadow .15s;
+      white-space: nowrap; flex-shrink: 0;
+      vertical-align: middle; letter-spacing: .3px;
+    }
+    .btn-payload:hover {
+      background: var(--blue-main); color: #fff;
+      box-shadow: 0 2px 6px rgba(46,117,182,.3);
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 500;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 10px;
+      width: 100%; max-width: 720px; max-height: 84vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 12px 50px rgba(0,0,0,.35);
+      animation: modalIn .18s ease;
+    }
+    @keyframes modalIn { from { transform: scale(.95); opacity:0; } to { transform: scale(1); opacity:1; } }
+    .modal-head {
+      padding: 14px 18px 0; background: var(--blue-dark); color: #fff;
+      border-radius: 10px 10px 0 0;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+    }
+    .modal-head-title { font-size: 13px; font-weight: 600; }
+    .modal-head-sub { font-size: 11px; color: #7faac8; margin-top: 2px; }
+    .modal-head-actions { display: flex; gap: 8px; flex-shrink: 0; padding-bottom: 14px; }
+    .modal-btn {
+      background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; border-radius: 6px; padding: 4px 12px;
+      font-size: 12px; cursor: pointer; transition: background .15s;
+    }
+    .modal-btn:hover { background: rgba(255,255,255,.25); }
+    .modal-btn.close { padding: 4px 10px; font-size: 15px; }
+    /* ── tabs ── */
+    .modal-tabs {
+      display: flex; background: var(--blue-dark);
+      padding: 0 18px; gap: 2px;
+    }
+    .modal-tab {
+      padding: 8px 18px; font-size: 12px; font-weight: 600;
+      color: #7faac8; border: none; background: transparent;
+      cursor: pointer; border-radius: 6px 6px 0 0;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, background .15s;
+    }
+    .modal-tab:hover { color: #fff; background: rgba(255,255,255,.07); }
+    .modal-tab.active {
+      color: #fff; background: #1e2836;
+      border-bottom-color: var(--blue-mid);
+    }
+    .modal-body { overflow-y: auto; flex: 1; border-radius: 0 0 10px 10px; }
+    .json-panel { display: none; }
+    .json-panel.active { display: block; }
+    pre.json-view {
+      margin: 0; padding: 20px;
+      font-family: 'Cascadia Code','Consolas',monospace;
+      font-size: 12px; line-height: 1.7;
+      background: #1e2836; color: #cdd6f4;
+      white-space: pre-wrap; word-break: break-word;
+      min-height: 120px;
+    }
+    .json-panel:last-child pre.json-view { border-radius: 0 0 10px 10px; }
+    .jk { color: #89dceb; }
+    .js { color: #a6e3a1; }
+    .jn { color: #cba6f7; }
+    .jb { color: #cba6f7; }
+    .jl { color: #7f849c; }
+
+    /* ── SCROLL TOP ── */
+    #scroll-top {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--blue-main); color: #fff;
+      border: none; border-radius: 50%;
+      width: 40px; height: 40px; font-size: 18px;
+      cursor: pointer; display: none;
+      align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      z-index: 50;
+    }
+    #scroll-top.visible { display: flex; }
+
+    /* ── HOME OVERLAY ── */
+    #home-overlay {
+      position: fixed; inset: 0; z-index: 9997;
+      display: flex; flex-direction: column;
+      background: #f0f4f8;
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      transition: opacity .4s ease;
+    }
+    #home-overlay.hide { opacity: 0; pointer-events: none; }
+
+    /* cabeçalho Fourge Tech — mantém identidade da marca */
+    .home-header {
+      background: #000;
+      padding: 22px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+      border-bottom: 3px solid #FF00BD;
+    }
+    .home-logo { display: flex; align-items: center; gap: 16px; }
+    .home-logo img {
+      height: 38px; width: auto; display: block;
+    }
+    .home-logo-sep {
+      width: 1px; height: 32px; background: rgba(255,255,255,.2); flex-shrink: 0;
+    }
+    .home-logo-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: 1.5px; text-transform: uppercase; }
+    .home-header-right {
+      font-size: 12px; color: rgba(255,255,255,.45);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .home-header-right span { color: #FF00BD; font-weight: 600; }
+
+    /* corpo claro */
+    .home-body {
+      flex: 1; overflow-y: auto; padding: 48px 56px;
+      background: #f0f4f8;
+    }
+    .home-welcome { margin-bottom: 40px; }
+    .home-tagline {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #FF00BD;
+      margin-bottom: 16px;
+    }
+    .home-tagline::before {
+      content: ''; display: block; width: 20px; height: 2px; background: #FF00BD;
+    }
+    .home-welcome h2 {
+      font-size: 26px; font-weight: 700; color: #1a3a5c; margin-bottom: 8px;
+    }
+    .home-welcome p { font-size: 15px; color: #64748b; max-width: 560px; line-height: 1.7; }
+
+    .home-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 16px;
+    }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .project-card {
+      background: #fff; border-radius: 14px;
+      border: 1.5px solid #e2e8f0;
+      padding: 28px; cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s;
+      display: flex; flex-direction: column; gap: 10px;
+      text-decoration: none; color: inherit;
+    }
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(255,0,189,.13);
+      border-color: #FF00BD;
+    }
+    .project-card--new {
+      border-style: dashed; background: #f8fafc;
+      align-items: center; justify-content: center;
+      cursor: default; opacity: .6;
+    }
+    .project-card--new:hover { transform: none; box-shadow: none; border-color: #cbd5e1; }
+
+    .pc-top { display: flex; align-items: center; justify-content: space-between; }
+    .pc-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: linear-gradient(135deg, #1a3a5c, #2E75B6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .pc-badge {
+      font-size: 10px; font-weight: 700; padding: 3px 10px;
+      border-radius: 10px; background: #fff8dc; color: #856404;
+      border: 1px solid #f0c040;
+    }
+    .pc-badge.active { background: #e2f4e8; color: #276027; border-color: #68c97a; }
+    .pc-title { font-size: 17px; font-weight: 700; color: #1a3a5c; }
+    .pc-sub { font-size: 12px; color: #64748b; margin-top: -4px; }
+    .pc-desc { font-size: 13px; color: #475569; line-height: 1.6; flex: 1; }
+    .pc-meta {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      font-size: 11px; color: #94a3b8;
+      border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: 4px;
+    }
+    .pc-open {
+      font-size: 13px; font-weight: 600; color: #FF00BD;
+      display: flex; align-items: center; gap: 4px;
+      margin-top: 4px;
+    }
+    .pc-new-icon {
+      font-size: 32px; color: #94a3b8; font-weight: 300; line-height: 1;
+    }
+
+    .home-footer {
+      background: #000; border-top: 1px solid rgba(255,255,255,.07);
+      padding: 14px 56px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .home-footer-left { font-size: 11px; color: rgba(255,255,255,.3); }
+    .home-footer-right { font-size: 11px; color: rgba(255,255,255,.2); }
+
+    /* ── AUTH OVERLAY ── */
+    #auth-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      background: rgba(13,31,51,.88);
+      display: none; align-items: center; justify-content: center;
+      transition: opacity .3s ease;
+      backdrop-filter: blur(4px);
+    }
+    #auth-overlay.show { display: flex; }
+    #auth-overlay.hide { opacity: 0; pointer-events: none; }
+    #auth-cancel {
+      position: absolute; top: 20px; right: 24px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; border-radius: 8px; padding: 6px 14px;
+      font-size: 12px; cursor: pointer; font-family: 'Segoe UI', Arial, sans-serif;
+      transition: background .15s;
+    }
+    #auth-cancel:hover { background: rgba(255,255,255,.22); }
+    #auth-card {
+      background: #fff; border-radius: 16px;
+      padding: 44px 40px 36px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.45);
+      text-align: center;
+    }
+    #auth-card .auth-logo {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+      color: #7fa8c8; margin-bottom: 4px;
+    }
+    #auth-card .auth-title {
+      font-size: 20px; font-weight: 700; color: #1a3a5c;
+      margin-bottom: 2px;
+    }
+    #auth-card .auth-sub {
+      font-size: 13px; color: #64748b; margin-bottom: 28px;
+    }
+    #auth-card .auth-badge {
+      display: inline-block; background: #eef5fb; color: #2E75B6;
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 10px; margin-bottom: 24px; border: 1px solid #c8dff0;
+    }
+    .auth-field {
+      position: relative; margin-bottom: 16px;
+    }
+    .auth-field input {
+      width: 100%; padding: 12px 44px 12px 16px;
+      border: 1.5px solid #d1dbe8; border-radius: 8px;
+      font-size: 15px; color: #1a3a5c; outline: none;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      transition: border-color .2s;
+      letter-spacing: 2px;
+    }
+    .auth-field input:focus { border-color: #2E75B6; }
+    .auth-field input.err { border-color: #e24b4a; background: #fff5f5; }
+    .auth-field .eye-btn {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: #94a3b8;
+      font-size: 16px; padding: 2px;
+    }
+    .auth-field .eye-btn:hover { color: #1a3a5c; }
+    #auth-submit {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #2E75B6, #1a3a5c);
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    #auth-submit:hover { opacity: .9; }
+    #auth-submit:active { transform: scale(.98); }
+    #auth-submit:disabled { opacity: .6; cursor: not-allowed; }
+    #auth-error {
+      margin-top: 12px; font-size: 13px; color: #c0392b;
+      min-height: 18px; display: none;
+    }
+    #auth-error.show { display: block; }
+    #auth-card .auth-footer {
+      margin-top: 24px; font-size: 11px; color: #94a3b8;
+    }
+
+    /* ══════════════════════════════════════
+       DIAGRAM SECTION — dynamic multi-tab
+    ══════════════════════════════════════ */
+    .diag-tabs {
+      display: flex; gap: 4px; padding: 14px 20px 0;
+      border-bottom: 2px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .diag-tab {
+      padding: 8px 18px; border: none; background: transparent;
+      border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 600;
+      color: #64748b; cursor: pointer; transition: all .2s;
+      border: 1px solid transparent; border-bottom: none;
+      margin-bottom: -2px;
+    }
+    .diag-tab:hover { background: #e2e8f0; color: #1e3a5f; }
+    .diag-tab.active {
+      background: #fff; color: #1a3a5c; border-color: #e2e8f0;
+      border-bottom-color: #fff;
+    }
+    .diag-toolbar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 20px; background: #fff;
+      border-bottom: 1px solid #e2e8f0; flex-wrap: wrap;
+    }
+    .diag-btn {
+      padding: 5px 12px; border: 1px solid #cbd5e1;
+      background: #fff; color: #475569; border-radius: 6px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: all .15s; line-height: 1; font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .diag-btn:hover { background: #f1f5f9; border-color: #94a3b8; color: #1e293b; }
+    .diag-btn.accent {
+      padding: 6px 16px; border: 1px solid #1a3a5c;
+      background: #1a3a5c; color: #fff; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .15s;
+    }
+    .diag-btn.accent:hover { background: #0f2a47; }
+    .diag-btn.accent.active-mode { background: #c0392b; border-color: #c0392b; }
+    .diag-wrapper {
+      background: #f1f5f9; overflow: auto;
+    }
+    .diag-canvas { width: 100%; }
+    .diag-panel { display: none; padding: 20px; }
+    .diag-panel.active { display: block; }
+    .diag-panel svg { display: block; width: 50%; height: auto; margin: 0 auto; }
+    .diag-loading {
+      text-align: center; padding: 60px 20px;
+      color: #94a3b8; font-size: 14px;
+    }
+    /* tooltip */
+    .diag-tooltip {
+      position: fixed; background: #1e293b; color: #f1f5f9;
+      padding: 8px 12px; border-radius: 8px; font-size: 12px;
+      line-height: 1.5; max-width: 260px; pointer-events: none;
+      z-index: 9999; opacity: 0; transition: opacity .15s;
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    }
+    .diag-tooltip.show { opacity: 1; }
+    /* node interactivity injected into SVGs */
+    .diag-panel svg g.diag-node { cursor: pointer; }
+    .diag-panel svg g.diag-node rect,
+    .diag-panel svg g.diag-node path { transition: filter .2s; }
+    .diag-panel svg g.diag-node:hover rect { filter: brightness(1.08) drop-shadow(0 2px 6px rgba(0,0,0,.18)); }
+    .diag-panel svg g.diag-node.dimmed { opacity: .25; }
+    .diag-panel svg g.diag-node.highlighted rect { filter: drop-shadow(0 0 6px rgba(26,58,92,.6)); }
+    /* animated flow arrows */
+    @keyframes flowDash {
+      from { stroke-dashoffset: 20; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .diag-panel svg .flow-anim {
+      animation: flowDash .6s linear infinite;
+    }
+    /* migration mode glow */
+    .migration-mode .tabia-node rect {
+      filter: drop-shadow(0 0 8px #e24b4a) brightness(1.1) !important;
+      animation: tabiaGlow 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes tabiaGlow {
+      from { filter: drop-shadow(0 0 4px #e24b4a); }
+      to   { filter: drop-shadow(0 0 14px #e24b4a) brightness(1.15); }
+    }
+    .migration-mode .migration-path {
+      stroke-dasharray: 7 3 !important;
+      animation: flowDash .5s linear infinite;
+    }
+
+
+/* ── Overrides para o HTML standalone ── */
+#sidebar-automonitoramento { display: flex !important; }
+#main-automonitoramento { display: block !important; margin-left: var(--sidebar-w); }
+@media (max-width: 900px) {
+  #sidebar-automonitoramento { transform: translateX(-100%); }
+  #sidebar-automonitoramento.open { transform: translateX(0); }
+  #main-automonitoramento { margin-left: 0 !important; }
+}
+
+  </style>
+</head>
+<body>
+
+<aside id="sidebar-automonitoramento">
+  <div id="sidebar-logo">
+    <div class="org">Unimed POA</div>
+    <div class="title">Automonitoramento</div>
+    <span class="badge-automonitoramento">Jornada Clínica</span>
+  </div>
+  <nav>
+    <div class="nav-section">Documento</div>
+    <a href="#mon-sec1">1. Objetivo e Contexto</a>
+    <a href="#mon-sec2">2. Visão Geral do Fluxo</a>
+    <a href="#mon-sec3">3. Templates WhatsApp</a>
+    <a href="#mon-sec3-1" class="sub">3.1 Pré-agendamento (D-5)</a>
+    <a href="#mon-sec3-2" class="sub">3.2 Véspera / Dia</a>
+    <a href="#mon-sec3-3" class="sub">3.3 Reforço (sem interação)</a>
+    <a href="#mon-sec3-4" class="sub">3.4 Confirmação (recebimento)</a>
+    <a href="#mon-sec4">4. Fluxo de Confirmação</a>
+    <a href="#mon-sec5">5. Tratamento V2 — Ação em Atraso</a>
+    <a href="#mon-sec5-1" class="sub">5.1 Atraso no dia</a>
+    <a href="#mon-sec5-2" class="sub">5.2 Reprogramação (+15d)</a>
+    <a href="#mon-sec5-3" class="sub">5.3 Registro sem sucesso</a>
+    <div class="nav-section">Referência</div>
+    <a href="#mon-sec6">6. Variáveis dos Templates</a>
+    <a href="#mon-sec7">7. APIs / Integrações</a>
+    <a href="#mon-sec8">8. Validações Pendentes</a>
+  </nav>
+</aside>
+
+<div id="main-automonitoramento">
+
+  <header id="page-header-automonitoramento">
+    <div class="label">Automações — Jornada Clínica · Automonitoramento</div>
+    <h1>Fluxo de Automonitoramento</h1>
+    <div class="subtitle">Acompanhamento remoto via questionários periódicos</div>
+    <div class="meta">
+      <span class="chip"><span class="chip-icon">⚙️</span> Blip + Viver Bem</span>
+      <span class="chip"><span class="chip-icon">🔄</span> Em elaboração</span>
+      <button id="btn-dashboard-automonitoramento" onclick="goHome()" title="Voltar ao dashboard">← Dashboard</button>
+      <button id="btn-export-automonitoramento" onclick="window.print()" title="Exportar como PDF"><span>📄</span> Exportar PDF</button>
+    </div>
+  </header>
+
+  <div id="content-automonitoramento" style="padding:40px 48px;width:100%;">
+
+    <!-- SEC 1: OBJETIVO -->
+    <div class="section-card" id="mon-sec1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Objetivo e Contexto</h2>
+      </div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title">Objetivo da demanda</div>
+          <p>
+            Melhorar o fluxo da jornada de <strong>automonitoramento</strong> atualmente utilizada pela Unimed,
+            que consiste no envio periódico de questionários aos clientes para acompanhamento remoto de sua saúde.
+            A meta é tornar o processo mais eficiente a partir dos aprendizados do piloto — otimizando o tempo
+            das navegadoras (enfermeiras), aumentando a taxa de resposta dos clientes e permitindo maior
+            controle, personalização da comunicação e agilidade no retorno das informações essenciais.
+          </p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Situação atual</div>
+          <p>
+            A jornada atual consiste no envio de questionários para que os clientes informem periodicamente
+            seu estado de saúde. Essa automação apoia o trabalho das navegadoras permitindo acompanhamento
+            remoto dos pacientes. A proposta contempla revisar e aperfeiçoar esse fluxo a partir do piloto
+            já realizado.
+          </p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Solução desejada — mudanças previstas</div>
+          <ol>
+            <li><strong>Novo template de pré-agendamento</strong> — gatilho automático 5 dias antes do monitoramento com botão único <code>Realizar</code>.</li>
+            <li><strong>Alteração do template atual</strong> — remover a opção <code>Reagendar</code>, mantendo apenas <code>Realizar agora</code> e <code>Confirmar</code>.</li>
+            <li><strong>Novo template de reforço</strong> — gatilho após X dias sem resposta, até 2 tentativas.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 2: VISÃO GERAL -->
+    <div class="section-card" id="mon-sec2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Visão Geral do Fluxo</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Fluxo macro da jornada de automonitoramento, do disparo automático (D-5) até a confirmação,
+          tratamento de atraso e reprogramação da próxima ação.
+        </p>
+
+        <div class="subsection">
+          <div class="subsection-title">Diagrama do Fluxo</div>
+          <div class="mermaid-wrap">
+            <div class="mermaid">
+flowchart TD
+    D([Disparo automático]):::start --> T1[Envia template 5 dias antes<br/>pré-agendamento]
+    T1 --> T2[Envia template 1 dia antes<br/>Realizar / Confirmar]
+    T2 --> ESC{Paciente escolhe<br/>a opção}
+
+    ESC -- Confirmar --> CF1[[Registra confirmação<br/>no Cockpit]]:::action
+    CF1 --> CF2[Envia template<br/>de recebimento]
+    CF2 --> INP{Inputs<br/>inesperados?}
+    INP -- Sim --> GF[[Consulta Base Vidas por CPF<br/>e direciona para fila do gestor]]:::action
+    INP -- Não --> FIM1([Fim — confirmado]):::end_yes
+
+    ESC -- Realizar agora --> Q[Preenche<br/>questionário]
+    Q --> FIM2([Fim — respondido]):::end_yes
+
+    ESC -- Sem interação --> R1[Template de reforço<br/>1ª tentativa em X dias]
+    R1 --> R2{Interagiu?}
+    R2 -- Sim --> ESC
+    R2 -- Não --> R3[Template de reforço<br/>2ª tentativa em +X dias]
+    R3 --> R4{Interagiu?}
+    R4 -- Sim --> ESC
+    R4 -- Não --> ATR[[Atraso no dia do monitoramento]]:::action
+
+    ATR --> V2A[POST EnviaQuestionario<br/>Registro sem sucesso]
+    V2A --> V2B[PUT AtualizarAcao<br/>status Realizado sem sucesso]
+    V2B --> V2C[[Cria nova ação em +15 dias]]:::action
+    V2C --> D
+
+    classDef start fill:#14b8a6,stroke:#0f766e,color:#fff
+    classDef action fill:#fed7aa,stroke:#ea580c,color:#7c2d12
+    classDef end_yes fill:#a7f3d0,stroke:#059669,color:#064e3b
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 3: TEMPLATES -->
+    <div class="section-card" id="mon-sec3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Templates WhatsApp</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          A jornada usa 4 templates distintos, cada um com gatilho, conteúdo e botões específicos.
+          Todos aceitam as variáveis <code>{{nome}}</code> e <code>{{cpf}}</code>.
+        </p>
+
+        <!-- 3.1 -->
+        <div class="subsection" id="mon-sec3-1">
+          <div class="subsection-title">3.1 Pré-agendamento (D-5) — NOVO</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Envio automático <strong>5 dias antes</strong> da data de agendamento do atendimento na agenda.</td></tr>
+                <tr><th>Conteúdo</th><td>Texto informativo orientando o cliente a realizar o automonitoramento.</td></tr>
+                <tr><th>Botões</th><td><span class="method post">Realizar agora</span> — único botão, direciona para URL do questionário.</td></tr>
+                <tr><th>Variáveis</th><td><code>{{nome}}</code>, <code>{{cpf}}</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3.2 -->
+        <div class="subsection" id="mon-sec3-2">
+          <div class="subsection-title">3.2 Véspera / Dia do monitoramento — ALTERAÇÃO</div>
+          <div class="callout warn">
+            <strong>⚠️ Mudança em relação ao template atual</strong>
+            O template atual possui <em>3 botões</em>: <code>Realizar agora</code>, <code>Confirmar</code> e <code>Reagendar</code>.
+            O botão <strong>Reagendar será removido</strong>, mantendo apenas <code>Realizar agora</code> e <code>Confirmar</code>.
+          </div>
+          <div class="table-wrap" style="margin-top:12px;">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Envio automático <strong>1 dia antes</strong> (ou no dia) do monitoramento.</td></tr>
+                <tr><th>Botão 1</th><td><span class="method post">Realizar agora</span> → direciona para URL do questionário.</td></tr>
+                <tr><th>Botão 2</th><td><span class="method post">Confirmar</span> → registra confirmação no Cockpit Viver Bem + dispara template de recebimento.</td></tr>
+                <tr><th>Inputs inesperados</th><td>Cliente digita texto livre → BLIP consulta Base Vidas por CPF, identifica o gestor do paciente e direciona para a fila do gestor.</td></tr>
+                <tr><th>Sem interação</th><td>Entra no fluxo do template de reforço (3.3).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3.3 -->
+        <div class="subsection" id="mon-sec3-3">
+          <div class="subsection-title">3.3 Reforço — sem interação — NOVO</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Após <strong>X dias sem resposta</strong> ao template da véspera/dia (3.2).</td></tr>
+                <tr><th>Tentativas</th><td>Até <strong>2 disparos</strong>: 1ª em X dias, 2ª em +X dias caso ainda sem interação.</td></tr>
+                <tr><th>Conteúdo</th><td>Mensagem de reforço incentivando o cliente a realizar o automonitoramento.</td></tr>
+                <tr><th>Botões</th><td><span class="method post">Realizar</span> — redireciona ao questionário.</td></tr>
+                <tr><th>Persistência sem resposta</th><td>Segue para o tratamento de atraso V2 (ver seção 5).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3.4 -->
+        <div class="subsection" id="mon-sec3-4">
+          <div class="subsection-title">3.4 Confirmação — recebimento</div>
+          <div class="table-wrap">
+            <table>
+              <tbody>
+                <tr><th style="width:160px;">Gatilho</th><td>Disparado automaticamente após o cliente clicar em <code>Confirmar</code> no template 3.2.</td></tr>
+                <tr><th>Conteúdo</th><td>Texto informativo. Ex.: <em>"Olá, recebemos sua confirmação, o nosso time entrará em contato…"</em>.</td></tr>
+                <tr><th>Botões</th><td>Nenhum — apenas confirmação textual.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 4: FLUXO DE CONFIRMAÇÃO -->
+    <div class="section-card" id="mon-sec4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Fluxo de Confirmação</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Fluxo automático disparado ao clicar em <strong>Confirmar</strong> no template da véspera/dia (3.2).
+          Envolve registro no Cockpit Viver Bem e retorno ao cliente.
+        </p>
+        <ol>
+          <li><strong>Registra confirmação</strong> no Cockpit Viver Bem via API (payload com CPF + data monitoramento).</li>
+          <li><strong>Envia template de confirmação (3.4)</strong> ao cliente.</li>
+          <li>
+            <strong>Input inesperado</strong> (cliente respondeu texto livre em vez de usar os botões):
+            <ul style="margin-top:6px;">
+              <li>BLIP consulta API Base Vidas por CPF para identificar o gestor responsável.</li>
+              <li>BLIP direciona o atendimento para a <strong>fila do gestor</strong>.</li>
+            </ul>
+          </li>
+        </ol>
+        <div class="callout info">
+          <strong>ℹ️ Diferenciação no Cockpit</strong>
+          O registro da confirmação deve permitir diferenciação clara entre <em>cliente que confirmou
+          via botão</em> e <em>cliente que entrou na fila por input inesperado</em> — para priorização
+          da gestora.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 5: TRATAMENTO V2 -->
+    <div class="section-card" id="mon-sec5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>Tratamento V2 — Ação em Atraso</h2>
+      </div>
+      <div class="section-body">
+        <p>
+          Tratamento para quando a data do monitoramento é alcançada e o cliente não realizou nem
+          confirmou, apesar dos reforços.
+        </p>
+
+        <!-- 5.1 -->
+        <div class="subsection" id="mon-sec5-1">
+          <div class="subsection-title">5.1 Ação em atraso no dia do monitoramento</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:140px;">Etapa</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Condição</strong></td><td>Data do monitoramento atingida com a ação em atraso.</td></tr>
+                <tr><td><strong>D+1 — Envio</strong></td><td>No dia seguinte, envia o questionário de automação <em>"Registro de contato sem sucesso"</em>. <br><span class="method post">POST</span> <code>EnviaQuestionario</code></td></tr>
+                <tr><td><strong>Atualização</strong></td><td>Atualiza o status da ação para <strong>Realizado sem sucesso</strong>. <br><span class="method put">PUT</span> <code>AtualizarAcao</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout warn">
+            <strong>⚠️ Validação pendente</strong>
+            Confirmar com a área de negócio se o status correto é <code>Realizado sem sucesso</code>
+            ou <code>Não realizado</code>, conforme regra vigente.
+          </div>
+        </div>
+
+        <!-- 5.2 -->
+        <div class="subsection" id="mon-sec5-2">
+          <div class="subsection-title">5.2 Reprogramação de ação de monitoramento</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:140px;">Etapa</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Condição</strong></td><td>Após o monitoramento anterior — independente de sucesso.</td></tr>
+                <tr><td><strong>Ação</strong></td><td>Criar nova ação de monitoramento com prazo de <strong>+15 dias</strong> a partir da data atual.</td></tr>
+                <tr><td><strong>Fluxo</strong></td><td>A nova ação segue o fluxo padrão: D-5 (pré-agendamento) e D-1 (véspera/dia).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 5.3 -->
+        <div class="subsection" id="mon-sec5-3">
+          <div class="subsection-title">5.3 Registro sem sucesso com interação no meio do tempo</div>
+          <div class="callout info">
+            <strong>ℹ️ Cenário de validação</strong>
+            Se no disparo do registro sem sucesso o cliente <em>interagir</em> (tiver resposta no meio
+            do tempo), o sistema deve validar essa interação. Caso a nova tentativa também não seja
+            concluída com sucesso, <strong>não haverá nova reprogramação</strong> de monitoramento.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 6: VARIÁVEIS -->
+    <div class="section-card" id="mon-sec6">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>Variáveis dos Templates</h2>
+      </div>
+      <div class="section-body">
+        <p>Todos os templates da jornada utilizam o mesmo conjunto base de variáveis:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Variável</th><th>Descrição</th><th>Origem</th></tr></thead>
+            <tbody>
+              <tr><td><code>{{nome}}</code></td><td>Primeiro nome do cliente para personalização da mensagem</td><td>Base Vidas / CRM</td></tr>
+              <tr><td><code>{{cpf}}</code></td><td>CPF do beneficiário — usado para consultas downstream (gestor, Cockpit)</td><td>Base Vidas / CRM</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 7: APIs -->
+    <div class="section-card" id="mon-sec7">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2>APIs / Integrações</h2>
+      </div>
+      <div class="section-body">
+        <p>Integrações envolvidas na jornada de automonitoramento:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Sistema</th><th>Método</th><th>Endpoint</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Plataforma Viver Bem</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>EnviaQuestionario</code></td>
+                <td>Envio de questionário (ex.: "Registro de contato sem sucesso" no D+1 de atraso)</td>
+              </tr>
+              <tr>
+                <td>Plataforma Viver Bem</td>
+                <td><span class="method put">PUT</span></td>
+                <td><code>AtualizarAcao</code></td>
+                <td>Atualização de status da ação (ex.: <code>Realizado sem sucesso</code>)</td>
+              </tr>
+              <tr>
+                <td>Base Vidas</td>
+                <td><span class="method get">GET</span></td>
+                <td><code>/analyticsBackoffice/v1/vidas?cpf={cpf}</code></td>
+                <td>Identificação do gestor responsável pelo beneficiário (inputs inesperados)</td>
+              </tr>
+              <tr>
+                <td>Cockpit Viver Bem</td>
+                <td><span class="method post">POST</span></td>
+                <td><code>/cockpit/confirmacao</code></td>
+                <td>Registro de confirmação de recebimento do monitoramento</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout info">
+          <strong>ℹ️ Contratos detalhados</strong>
+          Os payloads exatos de <code>EnviaQuestionario</code> e <code>AtualizarAcao</code> serão
+          adicionados nesta seção conforme forem recebidos da equipe da Plataforma Viver Bem.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 8: VALIDAÇÕES PENDENTES -->
+    <div class="section-card" id="mon-sec8">
+      <div class="section-header">
+        <div class="section-number">8</div>
+        <h2>Validações Pendentes</h2>
+      </div>
+      <div class="section-body">
+        <div class="callout warn">
+          <strong>⚠️ Itens que precisam de definição antes do go-live</strong>
+        </div>
+        <table class="ep-table" style="margin-top:16px;">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Pendência</th>
+              <th style="width:130px">Tipo</th>
+              <th style="width:110px">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Definir o valor de <strong>X dias</strong> entre os disparos do template de reforço (1ª e 2ª tentativa).</td>
+              <td><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Regra</span></td>
+              <td><span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">⚠ Aberto</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Confirmar status correto na atualização da ação em atraso: <code>Realizado sem sucesso</code> ou <code>Não realizado</code>.</td>
+              <td><span style="background:#fce7f3;color:#9f1239;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Técnica</span></td>
+              <td><span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">⚠ Aberto</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Definir contratos (request/response) de <code>EnviaQuestionario</code> e <code>AtualizarAcao</code>.</td>
+              <td><span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">API</span></td>
+              <td><span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">⚠ Aberto</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Comportamento quando o cliente interage no disparo de registro sem sucesso — validar e confirmar se evita nova reprogramação.</td>
+              <td><span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Fluxo</span></td>
+              <td><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Em análise</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content-automonitoramento -->
+</div><!-- /main-automonitoramento -->
+
+
+<script>
+
+mermaid.initialize({ startOnLoad: false, theme: 'default', flowchart: { curve: 'basis', padding: 20 } });
+document.addEventListener('DOMContentLoaded', () => { mermaid.run(); });
+
+function goHome() { window.location.href = '../index.html'; }
+
+// Realça o link da TOC conforme a secao visivel
+const sections = document.querySelectorAll('.section-card[id], .subsection[id]');
+const tocLinks = document.querySelectorAll('#sidebar-automonitoramento nav a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+
+</script>
+
+</body>
+</html>
