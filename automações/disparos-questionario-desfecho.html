@@ -1751,46 +1751,12 @@ flowchart LR
           A integração técnica (autenticação, payload, endpoint PATCH em
           <code>uni_linhadecuidados</code>) está mapeada e funcional, mas os
           <strong>gatilhos de negócio</strong> que disparam cada template
-          ainda precisam ser definidos com o time clínico / operacional.
+          ainda precisam ser definidos.
         </div>
-
-        <p style="margin-top:16px;"><strong>Perguntas em aberto a alinhar:</strong></p>
-        <ul style="line-height:1.9;">
-          <li>
-            <strong>Desfecho Cirúrgico</strong> — em que momento disparar? (alta hospitalar, D+1, D+7?)
-            Quem identifica o evento de alta? (HMAP, CRM, sistema do hospital?)
-            Existe janela mínima/máxima após a cirurgia?
-          </li>
-          <li>
-            <strong>Questionário Avulso</strong> — qual a régua de envio?
-            (sob demanda manual pelo gestor, agendado por período, automático
-            ao mudar de linha de cuidado?)
-            Como evitar disparo duplicado para o mesmo questionário?
-          </li>
-          <li>
-            <strong>Fonte dos dados das variáveis</strong> — quem alimenta
-            <code>uni_variaveis_whatsapp</code> antes do PATCH? (workflow no
-            CRM, integração externa, fila intermediária?)
-          </li>
-          <li>
-            <strong>Tratamento de exclusão</strong> — pacientes com opt-out
-            (<em>Viver Bem Juntos</em>) devem ser bloqueados também aqui?
-            Como cruzar?
-          </li>
-          <li>
-            <strong>Janelas de envio</strong> — respeitar horário comercial?
-            Bloquear fins de semana / feriados?
-          </li>
-          <li>
-            <strong>Métricas de sucesso</strong> — o que medir? (taxa de
-            resposta, NPS pós-cirúrgico, questionários respondidos vs.
-            enviados?) Onde consultar?
-          </li>
-        </ul>
 
         <div class="callout info" style="margin-top:16px;">
           <strong>📋 Próximos passos</strong>
-          Reunião com time clínico + Care Management para mapear cada gatilho,
+          Reunião com o <strong>Time Viver Bem</strong> para mapear cada gatilho,
           frequência e critérios de elegibilidade. Documentar como seção
           adicional aqui assim que decidido.
         </div>
