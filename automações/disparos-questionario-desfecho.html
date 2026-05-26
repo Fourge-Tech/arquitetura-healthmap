@@ -1632,11 +1632,11 @@ flowchart LR
             A flag <code>uni_desfecho_cirurgico: "true"</code> ativa o <strong>template de pesquisa de
             satisfação pós-cirúrgica</strong> na Blip.
           </p>
-          <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:8px;font-size:13px;overflow-x:auto;"><code>{
-  "uni_variaveis_whatsapp": "[\"Douglas\", \"Cirurgia Mão\", \"Hosp. Clinicas\", \"12/03/2026\", \"453\"]",
-  "uni_desfecho_cirurgico": "true",
-  "uni_questionariospendentes": "false"
-}</code></pre>
+          <pre class="step-code"><span class="p">{</span>
+  <span class="k">"uni_variaveis_whatsapp"</span><span class="p">:</span> <span class="s">"[\"Douglas\", \"Cirurgia Mão\", \"Hosp. Clinicas\", \"12/03/2026\", \"453\"]"</span><span class="p">,</span>
+  <span class="k">"uni_desfecho_cirurgico"</span><span class="p">:</span> <span class="s">"true"</span><span class="p">,</span>
+  <span class="k">"uni_questionariospendentes"</span><span class="p">:</span> <span class="s">"false"</span>
+<span class="p">}</span></pre>
           <p style="margin-top:12px;"><strong>Ordem das variáveis em <code>uni_variaveis_whatsapp</code>:</strong></p>
           <table>
             <thead>
@@ -1659,11 +1659,11 @@ flowchart LR
             A flag <code>uni_questionariospendentes: "true"</code> ativa o <strong>template Universal</strong>
             na Blip, usado para envio de questionários e formulários de saúde sob demanda.
           </p>
-          <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:8px;font-size:13px;overflow-x:auto;"><code>{
-  "uni_variaveis_whatsapp": "[\"Douglas\", \"Perfil Qualidade de Vida\", \"355\"]",
-  "uni_questionariospendentes": "true",
-  "uni_desfecho_cirurgico": "false"
-}</code></pre>
+          <pre class="step-code"><span class="p">{</span>
+  <span class="k">"uni_variaveis_whatsapp"</span><span class="p">:</span> <span class="s">"[\"Douglas\", \"Perfil Qualidade de Vida\", \"355\"]"</span><span class="p">,</span>
+  <span class="k">"uni_questionariospendentes"</span><span class="p">:</span> <span class="s">"true"</span><span class="p">,</span>
+  <span class="k">"uni_desfecho_cirurgico"</span><span class="p">:</span> <span class="s">"false"</span>
+<span class="p">}</span></pre>
           <p style="margin-top:12px;"><strong>Ordem das variáveis em <code>uni_variaveis_whatsapp</code>:</strong></p>
           <table>
             <thead>
@@ -1683,18 +1683,18 @@ flowchart LR
           <p>
             Disparo de Desfecho Cirúrgico para uma linha de cuidado existente:
           </p>
-          <pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:8px;font-size:13px;overflow-x:auto;"><code>curl -X PATCH \
-  "https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/uni_linhadecuidados(GUID-DA-LINHA)" \
-  -H "Authorization: Bearer eyJ0eXAi..." \
-  -H "Content-Type: application/json" \
-  -H "OData-MaxVersion: 4.0" \
-  -H "OData-Version: 4.0" \
-  -H "If-Match: *" \
-  -d '{
+          <pre class="step-code"><span class="k">curl</span> <span class="n">-X</span> <span class="k">PATCH</span> \
+  <span class="s">"https://unimedpoa-hml.crm2.dynamics.com/api/data/v9.2/uni_linhadecuidados(GUID-DA-LINHA)"</span> \
+  <span class="n">-H</span> <span class="s">"Authorization: Bearer eyJ0eXAi..."</span> \
+  <span class="n">-H</span> <span class="s">"Content-Type: application/json"</span> \
+  <span class="n">-H</span> <span class="s">"OData-MaxVersion: 4.0"</span> \
+  <span class="n">-H</span> <span class="s">"OData-Version: 4.0"</span> \
+  <span class="n">-H</span> <span class="s">"If-Match: *"</span> \
+  <span class="n">-d</span> <span class="s">'{
     "uni_variaveis_whatsapp": "[\"Douglas\", \"Cirurgia Mão\", \"Hosp. Clinicas\", \"12/03/2026\", \"453\"]",
     "uni_desfecho_cirurgico": "true",
     "uni_questionariospendentes": "false"
-  }'</code></pre>
+  }'</span></pre>
         </div>
 
       </div>
