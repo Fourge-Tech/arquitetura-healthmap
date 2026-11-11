@@ -398,6 +398,41 @@
     }
     #main-ma { display: none; }
 
+    /* ── ARQ (Arquitetura Técnica) — reaproveita o visual do MA ── */
+    #sidebar-arq {
+      width: var(--sidebar-w); background: #1b2f3f; color: #cde;
+      position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto;
+      z-index: 100; transition: transform .3s; display: none; flex-direction: column;
+    }
+    #sidebar-arq nav { padding: 12px 0; flex: 1; }
+    #sidebar-arq nav a {
+      display: block; padding: 8px 20px; color: #a8c4dc; text-decoration: none;
+      font-size: 12.5px; line-height: 1.4; border-left: 3px solid transparent; transition: all .15s;
+    }
+    #sidebar-arq nav a:hover, #sidebar-arq nav a.active {
+      color: #fff; background: rgba(255,255,255,.07); border-left-color: #3ab882;
+    }
+    #sidebar-arq nav .nav-section {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: #5a7a96; padding: 16px 20px 4px; font-weight: 600;
+    }
+    #sidebar-arq nav a.sub { padding-left: 32px; font-size: 12px; }
+    #main-arq { margin-left: var(--sidebar-w); flex: 1; min-width: 0; display: none; }
+    #page-header-arq {
+      color: #fff; padding: 48px 48px 36px;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
+    }
+    @media (max-width: 900px) {
+      #sidebar-arq { transform: translateX(-100%); }
+      #sidebar-arq.open { transform: translateX(0); }
+      #main-arq { margin-left: 0; }
+    }
+    @media print {
+      #sidebar-arq { display: none !important; }
+      #main-arq { margin-left: 0 !important; }
+      #btn-export-arq, #btn-dashboard-arq { display: none !important; }
+    }
+
     /* ── HEADER ── */
     #page-header, #page-header-ma, #page-header-ja, #page-header-automacoes, #page-header-automonitoramento, #page-header-automacoes-gerais, #page-header-cockpit-navegacao, #page-header-cockpit-navegacao-2 {
       color: #fff;
@@ -605,6 +640,10 @@
       background: var(--blue-light); color: var(--blue-dark);
       font-size: 10px; font-weight: 600; padding: 2px 8px;
       border-radius: 4px; text-transform: uppercase; letter-spacing: .5px;
+    }
+    /* Status: conteúdo ainda em levantamento/validação */
+    .tag.wip {
+      background: #fff8ec; color: #8a5200; border: 1px solid #e8a020;
     }
 
     p { line-height: 1.7; margin-bottom: 10px; color: var(--gray-text); }
@@ -1390,6 +1429,37 @@
       stroke-dasharray: 7 3 !important;
       animation: flowDash .5s linear infinite;
     }
+  
+    /* ── ARQ v2.0 — estilos exclusivos da Arquitetura Técnica ── */
+    #main-arq .section-body { max-height: 40000px; }
+    #main-arq .callout.ok { border-color: #3ab882; background: #eefaf4; color: #14503a; }
+    #main-arq .tag.novo  { background: #e6f7ef; color: #1d6b4a; border: 1px solid #3ab882; }
+    #main-arq .tag.fora  { background: #fdeaea; color: #8a1010; border: 1px solid #d06060; }
+    #main-arq .tag.herda { background: #f0f0f4; color: #5a5a70; border: 1px solid #b8b8c8; }
+    #main-arq tr.linha-fora td { background: #fff6f6; }
+    #main-arq tr.linha-nova td { background: #f2fbf7; }
+    #main-arq .subsection-title { flex-wrap: wrap; }
+    #page-header-arq .chip.chip-new {
+      background: rgba(58,184,130,.22); border-color: rgba(58,184,130,.5);
+      color: #b6f0d4; font-weight: 600;
+    }
+    #main-arq .num-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px; margin-bottom: 16px;
+    }
+    #main-arq .num-card {
+      background: var(--blue-pale); border: 1px solid var(--gray-border);
+      border-radius: 8px; padding: 14px 16px;
+    }
+    #main-arq .num-card .n { font-size: 24px; font-weight: 700; color: var(--blue-dark); line-height: 1; }
+    #main-arq .num-card .l { font-size: 11.5px; color: #5a7a96; margin-top: 6px; line-height: 1.4; }
+    #main-arq pre.tree {
+      background: #0f2233; color: #cfe3f0;
+      padding: 18px 20px; border-radius: 8px; overflow-x: auto;
+      font-size: 12px; line-height: 1.6; border: 1px solid #24405a;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+    }
+    #main-arq pre.tree strong { color: #7fd4a8; }
   </style>
 </head>
 <body>
@@ -1460,6 +1530,24 @@
         <div class="pc-open">Abrir documentação →</div>
       </div>
 
+      <!-- Projeto 2b: Viver Bem — Arquitetura Técnica -->
+      <div class="project-card" onclick="openProject('arq')">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#0f2f27,#3ab882);">🏗️</div>
+          <span class="pc-badge">Em elaboração</span>
+        </div>
+        <div class="pc-title">Viver Bem — Arquitetura Técnica</div>
+        <div class="pc-sub">Deep-dive de Engenharia — OutSystems ODC</div>
+        <div class="pc-desc">Documentação de arquitetura do Viver Bem: controle de acesso, estado global, settings com valores, ciclo de vida da Home, contratos de integração, modelo de dados, contingência e logs.</div>
+        <div class="pc-meta">
+          <span>📋 Versão 1.0</span>
+          <span>🏗️ Arquitetura</span>
+          <span>📅 2026</span>
+          <span>🔗 10 integrações</span>
+        </div>
+        <div class="pc-open">Abrir documentação →</div>
+      </div>
+
       <!-- Projeto 3: Jornada Assistencial -->
       <div class="project-card" onclick="openProject('ja')">
         <div class="pc-top">
@@ -1494,6 +1582,60 @@
           <span>🤖 Alta Complexidade</span>
         </div>
         <div class="pc-open">Abrir documentação →</div>
+      </div>
+
+      <!-- Projeto: Captação Alta Complexidade — Análise da base -->
+      <div class="project-card" onclick="window.location.href='captacao_alta_complexidade.html'">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#00663d,#00995d);">📲</div>
+          <span class="pc-badge active">Ativo</span>
+        </div>
+        <div class="pc-title">Captação — Análise da Base</div>
+        <div class="pc-sub">Alta Complexidade · Funil BLIP/WhatsApp</div>
+        <div class="pc-desc">Painel interativo da base de alta complexidade (adultos 18+): funil de captação via BLIP/WhatsApp com retentativas, cenários, comparativo vs. meta de 60k e ideias de priorização extraídas do CSV.</div>
+        <div class="pc-meta">
+          <span>📊 83.991 adultos</span>
+          <span>📱 BLIP + WhatsApp</span>
+          <span>📅 2026</span>
+          <span>🎯 Viver Bem</span>
+        </div>
+        <div class="pc-open">Abrir painel →</div>
+      </div>
+
+      <!-- Projeto: Mix de Canais — Plano para fechar os 27k -->
+      <div class="project-card" onclick="window.location.href='mix_canais_captacao.html'">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#00857a,#5fb246);">🧩</div>
+          <span class="pc-badge active">Ativo</span>
+        </div>
+        <div class="pc-title">Mix de Canais</div>
+        <div class="pc-sub">Plano para fechar os 27k até dez/2026</div>
+        <div class="pc-desc">Planejador interativo de mix de canais (digital, navigator, médico, pontos físicos, novas bases): distribui a contribuição de cada frente para fechar o gap e checa a viabilidade de prazo por tier do WhatsApp.</div>
+        <div class="pc-meta">
+          <span>🎯 Gap de 27k</span>
+          <span>🧩 5 canais</span>
+          <span>📅 dez/2026</span>
+          <span>⏱️ Viabilidade</span>
+        </div>
+        <div class="pc-open">Abrir planejador →</div>
+      </div>
+
+      <!-- Projeto: Playbook de Execução -->
+      <div class="project-card" onclick="window.location.href='playbook_captacao.html'">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#00663d,#5fb246);">🗺️</div>
+          <span class="pc-badge active">Ativo</span>
+        </div>
+        <div class="pc-title">Playbook de Execução</div>
+        <div class="pc-sub">Plano de ação em ondas — Viver Bem 2026</div>
+        <div class="pc-desc">Como agir para fechar os 27k: ondas de execução priorizadas por risco e canal, abordagem do canal B2B por cluster de contratante, governança de métricas e arquivos de disparo segmentados.</div>
+        <div class="pc-meta">
+          <span>🌊 6 ondas</span>
+          <span>🏢 Canal B2B</span>
+          <span>📅 dez/2026</span>
+          <span>📈 Métricas</span>
+        </div>
+        <div class="pc-open">Abrir playbook →</div>
       </div>
 
       <!-- Projeto 6: Automações Gerais (HTML separado em automações/) -->
@@ -3098,10 +3240,16 @@
     <a href="#ma-sec7">7. Glossário</a>
     <div class="nav-section">Módulos da Plataforma</div>
     <a href="#ma-sec8">8. Meu Plano</a>
+    <a href="#ma-sec8-1" class="sub">8.1 Exames e Consultas (SAE)</a>
     <a href="#ma-sec9">9. Mude 1 Hábito</a>
     <a href="#ma-sec10">10. Perfil</a>
     <a href="#ma-sec11">11. Registros</a>
-    <a href="#ma-sec12">12. Roadmap — Comunidades</a>
+    <a href="#ma-sec12">12. Comunidades (Hábitos)</a>
+    <div class="nav-section">Referência Técnica</div>
+    <a href="#ma-sec13">13. Missões</a>
+    <a href="#ma-sec14">14. Analytics & Rastreamento</a>
+    <a href="#ma-sec15">15. Settings Configuráveis</a>
+    <a href="#ma-sec16">16. Componentes de UI</a>
   </nav>
 </aside>
 
@@ -3259,6 +3407,21 @@
           <strong>⚠️ Ponto de atenção para repasse</strong>
           O fluxo de fallback (login manual) é gerenciado inteiramente pelo UniiD. Em caso de problemas de autenticação, o time responsável é a <strong>TI da Unimed POA</strong>, não o time do Modelo Assistencial.
         </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Papéis, Sessão e Ambiente</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Recurso</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td>Concessão de papéis</td><td>Permissões atribuídas na entrada via <code>OnGrantRoleEvent</code></td></tr>
+                <tr><td>Primeiro acesso</td><td>Detecta beneficiário novo e dispara o fluxo de <a href="#ma-sec4">Onboarding</a></td></tr>
+                <tr><td>Logout</td><td>Encerramento de sessão via <code>DoLogout</code></td></tr>
+                <tr><td>Verificação de ambiente</td><td>Distingue <strong>Dev / HML / Prod</strong> para parametrização e integrações</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3375,8 +3538,27 @@
         <div class="subsection" id="ma-sec5-1">
           <div class="subsection-title">5.1 Minha Saúde <span class="tag">Healthmap</span></div>
 
-          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin-bottom:8px;">Questionários de Perfil</div>
-          <p>São exibidos 3 perfis padrão: <strong>Epidemiológico</strong>, <strong>Estilo de Vida</strong> e <strong>Qualidade de Vida</strong>.</p>
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin-bottom:8px;">Questionários de Saúde <span class="tag">Healthmap</span> <span class="tag">Tabia Health</span></div>
+          <p>Além dos 3 perfis padrão exibidos na Home, a plataforma dá acesso a <strong>8 questionários</strong> integrados ao Healthmap e ao Tabia Health. Cada um tem seu ID parametrizado nos <a href="#ma-sec15">Settings</a>:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Questionário</th><th>Grupo</th><th>Setting (ID)</th></tr></thead>
+              <tbody>
+                <tr><td>Perfil Sociodemográfico</td><td>Perfil padrão (Home)</td><td><code>PerfilSociodemograficoId</code></td></tr>
+                <tr><td>Perfil Epidemiológico</td><td>Perfil padrão (Home)</td><td><code>PerfilEpidemiologicoId</code></td></tr>
+                <tr><td>Estilo de Vida</td><td>Perfil padrão (Home)</td><td><code>PerfilEstiloDeVidaId</code></td></tr>
+                <tr><td>Qualidade de Vida</td><td>Perfil padrão (Home)</td><td><code>PerfilQualidadeDeVida</code></td></tr>
+                <tr><td>Saúde Mental</td><td>Complementar</td><td><code>SaudeMental</code></td></tr>
+                <tr><td>Câncer de Mama</td><td>Rastreio clínico</td><td><code>CancerMama</code></td></tr>
+                <tr><td>Fisioterapia / Dor Lombar</td><td>Rastreio clínico</td><td><code>FisioterapiaDorLombar</code></td></tr>
+                <tr><td>Neurocirurgião / Dor Lombar</td><td>Rastreio clínico</td><td><code>NeuroCirurgiaoDorLombar</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>🧮 Pré-requisitos e fórmulas</strong>
+            As questões podem ter <strong>pré-requisitos</strong> (só aparecem conforme respostas anteriores) e <strong>fórmulas</strong> de cálculo processadas no OutSystems (<code>ProcessaQuestionario</code>, <code>ProcessarFormula</code>, <code>VerificarFormulas</code>). Peso e altura têm tratamento próprio (<code>TratarPesoAltura</code>) usando os settings <code>PesoQuestaoId</code> e <code>AlturaQuestaoId</code>. Ao concluir, o histórico é salvo (<code>SalvarHistoricoQestionario</code>) e as respostas enviadas ao Healthmap.
+          </div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Etapa</th><th>Método</th><th>Endpoint</th><th>Frequência</th><th>JSON</th></tr></thead>
@@ -3404,7 +3586,21 @@
           </div>
 
           <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin-bottom:8px;margin-top:20px;">Mapa de Saúde</div>
-          <p>Painel com <strong>7 categorias</strong>: Corpo e Mente, Hábitos, Alimentação, Exercícios, Sono, Prevenção e Equilíbrio.</p>
+          <p>Painel visual com <strong>6 dimensões de risco</strong> calculadas pelo Healthmap. Cada dimensão corresponde a um ID de risco parametrizado nos <a href="#ma-sec15">Settings</a> do OutSystems:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dimensão</th><th>Setting (ID Healthmap)</th></tr></thead>
+              <tbody>
+                <tr><td>Alimentação</td><td><code>Alimentacao</code></td></tr>
+                <tr><td>Atividade Física</td><td><code>AtividadeFisica</code></td></tr>
+                <tr><td>Sono</td><td><code>Sono</code></td></tr>
+                <tr><td>Saúde Mental</td><td><code>SaudeMental</code></td></tr>
+                <tr><td>Social</td><td><code>Social</code></td></tr>
+                <tr><td>Tempo de Qualidade</td><td><code>TempoDeQualidade</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:8px;">Cada dimensão retorna <strong>classificação de risco</strong> e <strong>nível de premiação</strong> a partir dos scores.</p>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Dado</th><th>Método</th><th>Endpoint</th><th>Frequência</th><th>JSON</th></tr></thead>
@@ -3462,11 +3658,12 @@
       </div>
       <div class="section-body">
         <div class="overview-grid" style="margin-bottom:24px;">
-          <div class="overview-card"><div class="oc-label">Total de integrações</div><div class="oc-value">7</div></div>
-          <div class="overview-card"><div class="oc-label">Com Healthmap</div><div class="oc-value">5</div></div>
-          <div class="overview-card"><div class="oc-label">Com Dynamics CRM</div><div class="oc-value">2</div></div>
+          <div class="overview-card"><div class="oc-label">Sistemas integrados</div><div class="oc-value">8 + BLIP</div></div>
+          <div class="overview-card"><div class="oc-label">Chamadas Healthmap</div><div class="oc-value">5</div></div>
+          <div class="overview-card"><div class="oc-label">Chamadas Dynamics CRM</div><div class="oc-value">2</div></div>
           <div class="overview-card"><div class="oc-label">Mensageria (BLIP)</div><div class="oc-value">⚠️ pendente</div></div>
         </div>
+        <p style="margin-bottom:16px;">Sistemas: <strong>Healthmap</strong>, <strong>Dynamics 365</strong>, <strong>SAE</strong>, <strong>Tabia Health</strong>, <strong>Base de Vidas</strong>, <strong>BeneficiárioIS</strong>, <strong>Blog ViverBem</strong> e <strong>UniiD / AutenticacaoIS</strong> (SSO). Mensageria <strong>BLIP</strong> pendente de documentação.</p>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Funcionalidade</th><th>Módulo</th><th>Sistema</th><th>Método</th><th>Endpoint / Recurso</th><th>JSON</th></tr></thead>
@@ -3534,6 +3731,46 @@
                 <td><span class="method get">GET</span></td>
                 <td><code>/api/planoacao/v1/planoAcao/listar?status=E</code></td>
                 <td><button class="btn-payload" onclick="openPayload('ma-plano-acao')">{ } JSON</button></td>
+              </tr>
+              <tr>
+                <td>Guias de exame/consulta/internação</td>
+                <td>Meu Plano 8.1</td>
+                <td>SAE</td>
+                <td><span class="method get">GET</span></td>
+                <td>Procedimentos SAE (<code>ObterListaAcoesSAE</code>)</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Questionários clínicos</td>
+                <td>Home 5.1</td>
+                <td>Tabia Health</td>
+                <td><span class="method get">GET</span></td>
+                <td>Questionários e pacientes (Tabia)</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Dados cadastrais do beneficiário</td>
+                <td>Onboarding / Perfil</td>
+                <td>Base de Vidas</td>
+                <td><span class="method get">GET</span></td>
+                <td>Cadastro do beneficiário (Unimed)</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Plano e carteira do beneficiário</td>
+                <td>Autenticação / Home</td>
+                <td>BeneficiárioIS</td>
+                <td><span class="method get">GET</span></td>
+                <td>Dados de plano/carteira</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Eventos, programas e participação</td>
+                <td>Comunidades (Hábitos)</td>
+                <td>Blog ViverBem</td>
+                <td><span class="method get">GET</span></td>
+                <td>Listagem/inscrição em eventos e programas</td>
+                <td>—</td>
               </tr>
             </tbody>
           </table>
@@ -3627,6 +3864,90 @@
         <div class="callout warn">
           <strong>⚠️ APIs de conteúdo pendentes</strong>
           Os endpoints responsáveis por retornar conteúdos exclusivos (artigos, vídeos) vinculados ao plano não foram mapeados nesta versão do documento. Levantar com o time Healthmap.
+        </div>
+
+        <!-- 8.1 EXAMES E CONSULTAS (SAE) -->
+        <div class="subsection" id="ma-sec8-1">
+          <div class="subsection-title">8.1 Aba "Exames e Consultas" (Plano de Ação + SAE) <span class="tag">Healthmap</span> <span class="tag">SAE</span></div>
+          <p>Aba do Plano de Ação (bloco <code>AcoesPlanoCuidado</code>) que consolida <strong>ações de saúde</strong> e <strong>guias de exame/consulta</strong>. Os itens vêm de <strong>duas fontes combinadas</strong>, carregadas em paralelo na inicialização via <code>CarregaPlanoAcao</code>:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fonte</th><th>Origem</th><th>Conteúdo</th></tr></thead>
+              <tbody>
+                <tr><td><code>StrDailyScheduleList</code></td><td>Healthmap</td><td>Ações do plano de cuidado do beneficiário</td></tr>
+                <tr><td><code>StrSAEDailyScheduleList</code></td><td>SAE (Sistema de Autorização de Exames)</td><td>Guias de exame, consulta e internação</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:18px 0 8px;">Filtro ao selecionar a aba (<code>OnFilter</code> → <code>AcoesFilter.Exame</code>)</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fonte</th><th>Regra de filtro</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Healthmap<br><code>StrDailyScheduleList</code></td>
+                  <td>
+                    • Aceita <code>Dtype</code> = <strong>GuiaExame</strong> ou <strong>GuiaConsulta</strong> em <code>ListaProcedimentos.Current</code><br>
+                    • Status: por padrão só <strong>não realizadas</strong> (≠ "Executada" e ≠ "Realizada"); toggle "Realizadas" inverte<br>
+                    • Data: por padrão exibe até <strong>8 dias à frente</strong> — <code>Data &lt;= AddDays(CurrDate(), 8)</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>SAE<br><code>StrSAEDailyScheduleList</code></td>
+                  <td>
+                    • <code>Dtype</code> = <strong>GuiaExame</strong> ou <strong>GuiaConsulta</strong><br>
+                    • Exclui status <strong>"Cancelada"</strong> e <strong>"Liberada"</strong> — salvo se já tiverem data de execução preenchida<br>
+                    • Toggle "Realizadas" → só guias com <code>Status = "Realizada"</code> e <code>Dtype = "GuiaExame"</code>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:18px 0 8px;">Exibição de cada item na lista</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Elemento</th><th>Regra</th></tr></thead>
+              <tbody>
+                <tr><td>Ícone</td><td><code>user-doctor</code> — <strong>verde</strong> quando pendente, <strong>branco</strong> quando realizado</td></tr>
+                <tr><td>Data</td><td>Formato amigável ("hoje", "amanhã", <code>dd/MM</code>). Guias em rascunho usam <code>Data_solicitacao</code>; demais usam <code>Data</code> da ação</td></tr>
+                <tr><td>Nome</td><td><code>GuiaExame</code> → "Exames" · <code>GuiaConsulta</code> → "Consulta Médica" · sem <code>Dtype</code> → nome da ação (<code>Acao</code>)</td></tr>
+                <tr><td>Ícone de atraso</td><td>Exibido quando status = <strong>Atrasada</strong></td></tr>
+                <tr><td>Ícone de redirecionamento</td><td>Exibido quando a ação tem questionário vinculado</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:18px 0 8px;">Pop-up de detalhe (2 variantes)</div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <div class="oc-label">Variante 1 — Ação Healthmap (sem lista de procedimentos)</div>
+              <div class="oc-value" style="font-size:12px;">Status (Pendente/Atrasado/Realizado) com ícone e cor · data formatada · título e categoria · texto e imagem da dica de saúde · botão <strong>"Concluir ação"</strong> (só se ainda não realizada e salvar habilitado)</div>
+            </div>
+            <div class="overview-card">
+              <div class="oc-label">Variante 2 — Guia SAE (com lista de procedimentos)</div>
+              <div class="oc-value" style="font-size:12px;">Tipo ("Exames"/"Consulta") · status com cor (Liberada→azul, outros→verde, Cancelada→vermelho) · data <code>dd/MM</code> na cor do status · <code>Codigo_guia</code> · médico solicitante (<code>Nome_solicitante</code>) · lista de procedimentos com Qtd. Solicitada e Qtd. Aprovada</div>
+            </div>
+          </div>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:18px 0 8px;">Ordenação, período e toggle</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Controle</th><th>Comportamento</th></tr></thead>
+              <tbody>
+                <tr><td>Ordenação</td><td>Crescente por data (<code>By = Data, Ascending = True</code>)</td></tr>
+                <tr><td>Regra especial (JS)</td><td>Na <strong>mesma data</strong>, "Consulta Médica" é movida para <strong>antes</strong> de "Exames"</td></tr>
+                <tr><td>Filtro por período (<code>DatePickerRange</code>)</td><td>Define <code>InitialDate</code>/<code>EndDate</code>, ativa <code>IsFiltroData=True</code>, recarrega com <code>Data &gt;= InitialDate and Data &lt;= EndDate</code>, depois reseta a flag</td></tr>
+                <tr><td>Toggle "Realizadas" (<code>ChangeStatusFilterOnClick</code>)</td><td>Inverte <code>IsStatusRealizada</code> — False (padrão) = pendentes/atrasadas · True = realizadas/executadas</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout info">
+            <strong>📌 Conclusão de ação</strong>
+            O botão "Concluir ação" só aparece na Variante 1 (ação Healthmap) quando a ação ainda não foi realizada e o botão de salvar está habilitado. Guias SAE (Variante 2) são apenas informativas — o status vem do próprio SAE.
+          </div>
         </div>
       </div>
     </div>
@@ -3744,6 +4065,40 @@
             A plataforma é o principal canal para beneficiários de <strong>baixa complexidade</strong> — o atendimento de média/alta complexidade ocorre por outros canais assistenciais da Unimed POA.
           </div>
         </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Blocos da Tela de Perfil</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Bloco</th><th>Componente</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td>Dados pessoais</td><td><code>BlockDadosCliente</code> · <code>BlockPerfil</code></td><td>Nome, e-mail, telefone e <strong>foto de perfil</strong> (upload e exibição)</td></tr>
+                <tr><td>Ficha médica</td><td><code>BlockFichaMedica</code></td><td>Alergias, medicamentos, grupo sanguíneo, contatos de emergência</td></tr>
+                <tr><td>Riscos de saúde</td><td><code>BlockRiscos</code></td><td>Riscos do beneficiário (dimensões do Mapa de Saúde)</td></tr>
+                <tr><td>Missões</td><td><code>BlockMissoes</code></td><td>Missões do usuário (ver <a href="#ma-sec13">Módulo 13</a>)</td></tr>
+                <tr><td>Controle de tarefas</td><td><code>BlockControleTarefas</code></td><td>Acompanhamento das tarefas do usuário</td></tr>
+                <tr><td>Tarefas de artigo / áudio</td><td><code>BlockTarefaArtigo</code> · <code>BlockTarefaAudio</code></td><td>Conteúdos de trilhas (leitura e áudio)</td></tr>
+                <tr><td>Benefícios</td><td><code>BlockBeneficios</code></td><td>Benefícios disponíveis ao beneficiário</td></tr>
+                <tr><td>FAQ</td><td><code>BlockFAQ</code></td><td>Perguntas frequentes</td></tr>
+                <tr><td>Revogação de termo</td><td><code>BlockRevogarTermo</code></td><td>Revoga o termo aceito no Onboarding (<code>RevogarTermoUsuario</code>)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>💾 Salvamento</strong>
+            Dados pessoais e ficha médica são persistidos via <code>SalvarDadosPessoais</code> e <code>SalvarFichaMedica</code>. Alterações de contato (e-mail/telefone) sincronizam com o <strong>Dynamics 365 CRM</strong>.
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Ficha Médica em PDF</div>
+          <p>Tela dedicada à <strong>geração e visualização</strong> da ficha médica do beneficiário em formato <strong>PDF</strong>, com opção de <strong>exportar</strong> e <strong>compartilhar</strong>. Gerada a partir dos dados da base local OutSystems.</p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Código Promocional / Indicação</div>
+          <p>Validação e salvamento de códigos promocionais via <code>EnviarCodigoPromocional</code> — usado para vincular indicações e consultores externos (módulo Backoffice). Campo também presente no <a href="#ma-sec4-2">Onboarding 4.2</a>.</p>
+        </div>
       </div>
     </div>
 
@@ -3803,6 +4158,27 @@
         </div>
 
         <div class="subsection">
+          <div class="subsection-title">Registros por Tipo Clínico</div>
+          <p>Além dos hábitos, o beneficiário registra atividades de saúde classificadas por tipo (<code>RegistroGeral</code>, <code>RegistroDetalhe</code>, <code>RegistrosListagemPorTipo</code>):</p>
+          <div class="overview-grid">
+            <div class="overview-card"><div class="oc-label">🩺 Consulta</div><div class="oc-value" style="font-size:12px;">Consultas médicas realizadas</div></div>
+            <div class="overview-card"><div class="oc-label">🧘 Autocuidado</div><div class="oc-value" style="font-size:12px;">Ações de cuidado próprio</div></div>
+            <div class="overview-card"><div class="oc-label">🏥 Internações</div><div class="oc-value" style="font-size:12px;">Registros de internação</div></div>
+            <div class="overview-card"><div class="oc-label">🔬 Exame</div><div class="oc-value" style="font-size:12px;">Exames realizados</div></div>
+            <div class="overview-card"><div class="oc-label">📋 Assistencial</div><div class="oc-value" style="font-size:12px;">Atendimentos assistenciais</div></div>
+          </div>
+          <div class="callout info">
+            <strong>📅 Calendário de registros</strong>
+            Histórico com visualização por <strong>calendário</strong> (<code>Calendario</code>, <code>CardDiaCalendario</code>), com contagem e listagem de registros por período.
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Medicamentos — Detalhe de Cadastro</div>
+          <p>O cadastro (<code>AdicionarMedicamento</code>, <code>SalvarMedicamento</code>) inclui: <strong>nome</strong>, <strong>dosagem</strong>, <strong>dias da semana</strong>, <strong>período de tratamento</strong>, <strong>notas</strong> e marcação de <strong>uso contínuo</strong>. O beneficiário faz o <strong>registro diário de tomada</strong> e pode excluir medicamentos (<code>ExcluirMedicamento</code>). Pop-ups: <code>PopUpAdicionarNomeMedicamento</code>, <code>PopUpAdicionarRegistro</code>, <code>PopUpRegistrarMedicamento</code>, <code>PopUpCancelarCadastroMedicamento</code>.</p>
+        </div>
+
+        <div class="subsection">
           <div class="subsection-title">Link para Parceiro Aproveita</div>
           <p>A aba Registros inclui <strong>acesso direto ao app Aproveita</strong> (clube de descontos), reforçando o ecossistema de benefícios da Unimed POA.</p>
         </div>
@@ -3818,18 +4194,41 @@
     <div class="section-card" id="ma-sec12">
       <div class="section-header">
         <div class="section-number">12</div>
-        <h2>Roadmap — Comunidades</h2>
+        <h2>Módulo 8 — Comunidades (Hábitos)</h2>
       </div>
       <div class="section-body">
-        <p>Funcionalidade planejada para 2025 que transforma o Viver Bem em um <strong>ecossistema social</strong> dentro do app, com foco em <strong>engajamento</strong> e <strong>escala</strong> do autocuidado.</p>
+        <p>Tela de <strong>hábitos e comunidades</strong> (bloco <code>Habitos</code>) — reúne eventos de bem-estar, agenda, grupos de interesse e parceiros. A parte de eventos/programas integra com o <strong>Blog ViverBem</strong>; uma camada social ampliada está planejada como evolução (roadmap, ao final).</p>
 
-        <div class="callout info">
-          <strong>📌 Status atual</strong>
-          Telas conceituais em validação de MVP. Não há implementação em produção nesta data. Este registro é para contextualização do repasse.
+        <div class="subsection">
+          <div class="subsection-title">Implementado — Área de Hábitos <span class="tag">Blog ViverBem</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Recurso</th><th>Componente / Ação</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td>Agenda de atividades</td><td><code>BlockAgenda</code></td><td>Calendário de atividades do beneficiário</td></tr>
+                <tr><td>Eventos de bem-estar</td><td><code>BlockEvento</code> · <code>BlockMeusEventos</code></td><td>Listagem, busca e destaques (<code>ObterListarEventos</code>, <code>ObterProcurarEventos</code>, <code>ObterDestaquesEventos</code>)</td></tr>
+                <tr><td>Inscrição em eventos</td><td><code>IncluirUsuarioEvento</code> · <code>CancelarEvento</code></td><td>Inscrição e cancelamento de participação</td></tr>
+                <tr><td>Programas</td><td><code>ObterListarProgramas</code></td><td>Listagem de programas do Blog ViverBem</td></tr>
+                <tr><td>Grupos de interesse</td><td><code>BlockGrupo</code></td><td>Grupos temáticos</td></tr>
+                <tr><td>Caminhadas</td><td><code>Caminhadas</code></td><td>Atividades de caminhada</td></tr>
+                <tr><td>Filtro de período (mobile)</td><td><code>BlockFiltroPeriodoMobile</code></td><td>Filtro de período na visão mobile</td></tr>
+                <tr><td>Parceiros e benefícios</td><td><code>TemplateParceiros</code></td><td>Parceiros e benefícios (ex: Aproveita)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout info">
+            <strong>📌 Integração Blog ViverBem</strong>
+            Eventos, programas e participação são obtidos do <strong>Blog ViverBem</strong>. Demais itens (agenda, grupos, caminhadas, parceiros) são geridos na base local do OutSystems.
+          </div>
         </div>
 
         <div class="subsection">
-          <div class="subsection-title">Visão Estratégica</div>
+          <div class="subsection-title">🔭 Roadmap — Camada Social (planejada)</div>
+          <div class="callout info">
+            <strong>📌 Status</strong>
+            A evolução para um <strong>ecossistema social</strong> (feed, troféus, progresso coletivo, compartilhamento em redes) está em validação de MVP e não implementada em produção nesta data. Registro para contextualização do repasse.
+          </div>
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:14px 0 8px;">Visão Estratégica</div>
           <p>O modelo de Comunidades busca transformar o cuidado com a saúde em <strong>hábito coletivo</strong>, criando um ciclo de engajamento crescente:</p>
           <div class="table-wrap">
             <table>
@@ -3878,6 +4277,156 @@
       </div>
     </div>
 
+    <!-- SEC 13: MISSÕES -->
+    <div class="section-card" id="ma-sec13">
+      <div class="section-header">
+        <div class="section-number">13</div>
+        <h2>Módulo 13 — Missões</h2>
+      </div>
+      <div class="section-body">
+        <p><strong>Feature controlada por Setting.</strong> Trilhas de conhecimento compostas por tarefas (artigos, áudios, vídeos e questionários) que geram conquistas por nível. Toda a feature é ligada/desligada pelo setting <code>IsAtivarMissoes</code>.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Funcionamento</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Elemento</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td>Trilhas de conhecimento</td><td>Sequências de tarefas educativas: artigos, áudios, vídeos e questionários</td></tr>
+                <tr><td>Processamento de tarefas</td><td>Conclusão de tarefas e conquistas via <code>ProcessarTarefaUsuario</code></td></tr>
+                <tr><td>Componentes de tarefa</td><td><code>BlockTarefaArtigo</code> · <code>BlockTarefaAudio</code> (exibidos também no <a href="#ma-sec10">Perfil</a>)</td></tr>
+                <tr><td>Controle</td><td>Exibição da feature governada por <code>IsAtivarMissoes</code> (<a href="#ma-sec15">Settings</a>)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Níveis de Conquista</div>
+          <div class="overview-grid">
+            <div class="overview-card"><div class="oc-label">🥉 Bronze</div><div class="oc-value" style="font-size:12px;">Nível inicial de conquista</div></div>
+            <div class="overview-card"><div class="oc-label">🥈 Prata</div><div class="oc-value" style="font-size:12px;">Nível intermediário</div></div>
+            <div class="overview-card"><div class="oc-label">🥇 Ouro</div><div class="oc-value" style="font-size:12px;">Nível máximo</div></div>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <strong>🔀 Feature flag</strong>
+          Quando <code>IsAtivarMissoes = False</code>, o módulo de Missões não é exibido ao beneficiário. Útil para liberação gradual.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 14: ANALYTICS -->
+    <div class="section-card" id="ma-sec14">
+      <div class="section-header">
+        <div class="section-number">14</div>
+        <h2>Analytics &amp; Rastreamento</h2>
+      </div>
+      <div class="section-body">
+        <p>Instrumentação de uso da plataforma para acompanhamento de comportamento e telas.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ferramenta</th><th>Uso</th><th>Configuração</th></tr></thead>
+            <tbody>
+              <tr><td>Google Analytics 4 (GA4)</td><td>Rastreamento de telas (<code>GA4</code>)</td><td><code>GoogleAnalyticsId</code></td></tr>
+              <tr><td>Google Tag Manager (GTM)</td><td>Eventos customizados: Home, Meu Plano (<code>GTM_MeuPlano_Event</code>), Mude 1 Hábito e Quick Tour (<code>GTM_QuickTour_Event</code>)</td><td><code>GTMToken</code></td></tr>
+              <tr><td>Microsoft Clarity</td><td>Análise comportamental (heatmaps, gravações de sessão)</td><td><code>ClarityId</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Eventos GTM Mapeados</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Evento</th><th>Tela</th><th>Dados Enviados</th></tr></thead>
+              <tbody>
+                <tr><td><code>home_tab_click</code></td><td>Home</td><td>target_tab</td></tr>
+                <tr><td><code>plan_action_click</code></td><td>Meu Plano</td><td>action_name, action_category, status</td></tr>
+                <tr><td><code>mude1habito_*</code></td><td>Mude 1 Hábito</td><td>activity_name, partner_name, action_type</td></tr>
+                <tr><td><code>quicktour_*</code></td><td>Quick Tour</td><td>step_number, button_name</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 15: SETTINGS -->
+    <div class="section-card" id="ma-sec15">
+      <div class="section-header">
+        <div class="section-number">15</div>
+        <h2>Settings Configuráveis</h2>
+      </div>
+      <div class="section-body">
+        <p>Parâmetros de configuração do OutSystems ODC que controlam features, integrações e IDs de mapeamento com o Healthmap.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Flags e Tokens</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Setting</th><th>Tipo</th><th>Padrão</th><th>Descrição</th></tr></thead>
+              <tbody>
+                <tr><td><code>IsAtivarMissoes</code></td><td>Boolean</td><td>False</td><td>Ativa/desativa a feature de Missões</td></tr>
+                <tr><td><code>IsContingencia</code></td><td>Boolean</td><td>False</td><td>Habilita modo de contingência</td></tr>
+                <tr><td><code>IsVerificarApi</code></td><td>Boolean</td><td>True</td><td>Habilita verificação de API do Healthmap</td></tr>
+                <tr><td><code>GoogleAnalyticsId</code></td><td>Text</td><td>G-4NLLLJE6BH</td><td>ID de medição do Google Analytics</td></tr>
+                <tr><td><code>GTMToken</code></td><td>Text</td><td>GMT-XXXXXX</td><td>Token do GTM (varia por ambiente)</td></tr>
+                <tr><td><code>ClarityId</code></td><td>Text</td><td>rkhgxgfbcl</td><td>ID do ambiente Microsoft Clarity</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">IDs de Riscos do Mapa de Saúde (Integer)</div>
+          <p><code>Alimentacao</code> (177), <code>AtivdadeFisica</code> (176), <code>Sono</code> (178), <code>TempoDeQualidade</code> (179), <code>Social</code> (180), <code>MapaSaudeMental</code> (211) — IDs das 6 dimensões no Healthmap (ver <a href="#ma-sec5-1">Mapa de Saúde</a>).</p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">IDs de Questionários (Integer)</div>
+          <p><code>PerfilSociodemograficoId</code> (346), <code>PerfilEpidemiologicoId</code> (347), <code>PerfilEstiloDeVidaId</code> (363), <code>PerfilQualidadeDeVida</code> (355), <code>SaudeMental</code> (515), <code>CancerMama</code> (378), <code>FisioterapiaDorLombar</code> (368), <code>NeuroCirurgiaoDorLombar</code> (369) — IDs dos questionários no Healthmap.</p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">IDs de Questões (Long Integer)</div>
+          <p><code>PesoQuestaoId</code> (3847), <code>AlturaQuestaoId</code> (3848) — questões de Peso e Altura no Perfil Epidemiológico, usadas no tratamento <code>TratarPesoAltura</code>.</p>
+        </div>
+
+        <div class="callout info">
+          <strong>🏗️ Documento de Arquitetura</strong>
+          A referência técnica completa (estado global, ciclo de vida da Home, contratos de integração, modelo de dados, contingência e logs) está no documento <a href="#" onclick="loadProject('arq');window.scrollTo(0,0);return false;"><strong>Viver Bem — Arquitetura Técnica</strong></a>.
+        </div>
+      </div>
+    </div>
+
+    <!-- SEC 16: COMPONENTES DE UI -->
+    <div class="section-card" id="ma-sec16">
+      <div class="section-header">
+        <div class="section-number">16</div>
+        <h2>Layout e Componentes de UI</h2>
+      </div>
+      <div class="section-body">
+        <p>Componentes reutilizáveis que compõem a interface do Viver Bem.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Componente</th><th>Função</th></tr></thead>
+            <tbody>
+              <tr><td><code>LayoutViverBem</code></td><td>Layout principal — header + conteúdo + menu (rodapé mobile / lateral desktop)</td></tr>
+              <tr><td><code>AppHeader</code></td><td>Cabeçalho unificado com título, botão voltar e ações</td></tr>
+              <tr><td><code>AppFooterMenu</code></td><td>Menu de navegação (rodapé mobile / lateral desktop)</td></tr>
+              <tr><td><code>LoadingSpinner</code></td><td>Spinner de carregamento centralizado</td></tr>
+              <tr><td><code>SkeletonLoader</code></td><td>Placeholder de carregamento de conteúdo</td></tr>
+              <tr><td><code>TratamentoErro</code></td><td>Componente de exibição de erros</td></tr>
+              <tr><td><code>AvisoTabia</code></td><td>Aviso relacionado ao Tabia Health</td></tr>
+              <tr><td><code>CardBanner</code></td><td>Card reutilizável de campanha/missão com 3 variantes visuais</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content-ma -->
 
   <footer id="page-footer">
@@ -3898,6 +4447,1044 @@
   </footer>
 
 </div><!-- /main-ma -->
+
+<!-- ══════════ SIDEBAR — ARQUITETURA TÉCNICA ══════════ -->
+<aside id="sidebar-arq">
+  <div id="sidebar-logo">
+    <div class="org">Unimed POA</div>
+    <div class="title">Viver Bem — Arquitetura</div>
+    <span class="badge-ma">Técnico · v2.0</span>
+  </div>
+  <nav>
+    <div class="nav-section">Visão</div>
+    <a href="#arq-sec1">1. Visão Geral</a>
+    <div class="nav-section">Acesso &amp; Estado</div>
+    <a href="#arq-sec2">2. Controle de Acesso</a>
+    <a href="#arq-sec3">3. Variáveis de Cliente</a>
+    <a href="#arq-sec4">4. Settings</a>
+    <div class="nav-section">Fluxos</div>
+    <a href="#arq-sec5">5. Telas e Fluxos de UI</a>
+    <a href="#arq-sec6">6. Ciclo de Vida das Telas</a>
+    <div class="nav-section">Integrações</div>
+    <a href="#arq-sec7">7. Integrações Externas</a>
+    <a href="#arq-sec7-1" class="sub">7.1 ModeloAssistencial</a>
+    <a href="#arq-sec7-2" class="sub">7.2 HealthMapIS</a>
+    <a href="#arq-sec7-3" class="sub">7.3 Backoffice</a>
+    <a href="#arq-sec7-4" class="sub">7.4 CRM / Base de Vidas</a>
+    <a href="#arq-sec7-5" class="sub">7.5 Tabia</a>
+    <a href="#arq-sec7-6" class="sub">7.6 UniID</a>
+    <a href="#arq-sec7-7" class="sub">7.7–7.10 Demais</a>
+    <div class="nav-section">Plataforma</div>
+    <a href="#arq-sec8">8. Analytics &amp; Eventos</a>
+    <a href="#arq-sec9">9. Modelo de Dados</a>
+    <a href="#arq-sec10">10. Componentes de UI</a>
+    <a href="#arq-sec11">11. Modo de Contingência 🚧</a>
+    <a href="#arq-sec12">12. Rastreabilidade (Logs)</a>
+    <div class="nav-section">Inventário</div>
+    <a href="#arq-sec13">13. Actions e Structures</a>
+    <div class="nav-section">Controle</div>
+    <a href="#arq-sec14">14. O que mudou da v1.0</a>
+    <a href="#arq-sec15">15. Método e limites</a>
+  </nav>
+</aside>
+
+<div id="main-arq">
+
+  <header id="page-header-arq">
+    <div class="label">Documentação Técnica — Arquitetura</div>
+    <h1>Viver Bem — Arquitetura Técnica</h1>
+    <div class="subtitle">Estado, Ciclo de Vida, Contratos de Integração e Modelo de Dados</div>
+    <div class="meta">
+      <span class="chip"><span class="chip-icon">📋</span> Versão 2.0</span>
+      <span class="chip"><span class="chip-icon">📅</span> 11/11/2026</span>
+      <span class="chip"><span class="chip-icon">🏗️</span> OutSystems ODC</span>
+      <span class="chip chip-new"><span class="chip-icon">🔖</span> Revisão 4104</span>
+      <button id="btn-dashboard-arq" onclick="goHome()" title="Voltar ao dashboard">
+        ← Dashboard
+      </button>
+      <button id="btn-export-arq" onclick="exportPDF()" title="Exportar como PDF">
+        <span>📄</span> Exportar PDF
+      </button>
+    </div>
+  </header>
+
+  <div id="content-arq">
+
+    <!-- ARQ SEC 1 -->
+    <div class="section-card" id="arq-sec1">
+      <div class="section-header"><div class="section-number">1</div><h2>Visão Geral</h2></div>
+      <div class="section-body">
+        <p>ViverBem é uma <strong>web app OutSystems (ODC)</strong> para beneficiários da Unimed POA. Engaja o usuário numa jornada de saúde personalizada, integrando dados clínicos, plano de cuidado, questionários, registros de hábitos, medicamentos e eventos de bem-estar.</p>
+
+        <div class="num-grid">
+          <div class="num-card"><div class="n">4104</div><div class="l">Revisão lida<br>11/11/2026 13:49 UTC</div></div>
+          <div class="num-card"><div class="n">11</div><div class="l">Telas de produção<br>em 7 UI Flows</div></div>
+          <div class="num-card"><div class="n">83</div><div class="l">Actions próprias<br>64 server · 19 client</div></div>
+          <div class="num-card"><div class="n">72</div><div class="l">Blocos próprios</div></div>
+          <div class="num-card"><div class="n">81</div><div class="l">Service actions externas</div></div>
+          <div class="num-card"><div class="n">15</div><div class="l">Módulos produtores</div></div>
+          <div class="num-card"><div class="n">22</div><div class="l">Structures</div></div>
+          <div class="num-card"><div class="n">0</div><div class="l">Entidades locais</div></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Identificação do asset</div>
+          <div class="table-wrap"><table>
+            <tbody>
+              <tr><td style="width:28%"><strong>Nome</strong></td><td>Viver Bem (<code>ViverBem</code>)</td></tr>
+              <tr><td><strong>Descrição</strong></td><td>Aceleração Tecnológica da aplicação Viver Bem.</td></tr>
+              <tr><td><strong>Tipo</strong></td><td>WebApplication · CrossDevice</td></tr>
+              <tr><td><strong>Asset key</strong></td><td><code>29a908fb-4fe8-40f2-b52f-8c9e7fa2437c</code></td></tr>
+              <tr><td><strong>Revisão</strong></td><td>4104 — 2026-11-11T13:49:39Z</td></tr>
+              <tr><td><strong>Tenant</strong></td><td><code>unimedpoa.outsystems.dev</code></td></tr>
+              <tr><td><strong>Tema</strong></td><td><code>ViverBemTheme</code> (folha de estilo de ~115 KB)</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="callout info">
+          <strong>📎 Documento complementar</strong>
+          Este é o <strong>deep-dive de arquitetura</strong>. Para a visão funcional por módulo/tela (repasse), veja o documento <strong>Modelo Assistencial — Viver Bem</strong>. Para o inventário de APIs HealthMap por subsistema, veja <strong>Arquitetura — Integrações CBV × Healthmap</strong>.
+        </div>
+
+        <div class="callout ok">
+          <strong>✅ O que esta versão traz de novo</strong>
+          A v2.0 foi reconstruída a partir do <strong>modelo publicado da revisão 4104</strong>, lido pelo Context Service e pelo grafo XRE do ODC — não de um levantamento manual. As seções 5, 7, 9, 10, 12 e 13 foram <strong>reescritas</strong>; as 3, 4 e 11 foram <strong>herdadas da v1.0 e estão sinalizadas</strong> porque a plataforma não expõe esses dados. A seção 14 lista item a item o que mudou. A seção 15 diz exatamente o que a varredura cobriu e o que não cobriu.
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 2 -->
+    <div class="section-card" id="arq-sec2">
+      <div class="section-header"><div class="section-number">2</div><h2>Controle de Acesso</h2></div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title">Roles <span class="tag">verificado na rev 4104</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Role</th><th>Descrição</th><th>Uso</th></tr></thead>
+            <tbody>
+              <tr><td><code>ViverBem</code></td><td>Role principal</td><td><strong>Todas as telas</strong> exigem este papel — confirmado tela a tela no modelo</td></tr>
+              <tr><td><code>AcessoAmbienteControlado</code></td><td>Role para acesso em ambiente controlado em PRD</td><td>Não aparece vinculada a nenhuma tela no modelo</td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:12.5px;color:#5a7a96;">A aplicação não define outras roles próprias. O modelo traz um nó <code>IPermission</code> por tela.</p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Autenticação via UniID <span class="tag herda">herdado da v1.0</span></div>
+          <div class="callout warn">
+            <strong>⚠️ Não revalidado nesta varredura</strong>
+            A sequência abaixo veio da v1.0. O que a rev 4104 <em>confirma</em> é a existência das peças: as server actions <code>ObterURLAutenticacao</code>, <code>ObterToken</code>, <code>ObterCPFUsuarioLogado</code> e <code>OnGrantRoleEventLocal</code>, e as service/server actions <code>ObterAccessToken</code>, <code>ObterUsuarioExtraInfo</code> e <code>ObterUsuarioUniIDGrupos</code> do <code>AutenticacaoIS</code>. A <em>ordem</em> dos passos não foi re-traçada.
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:6%">#</th><th>Etapa</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Usuário acessa a aplicação sem sessão ativa</td></tr>
+              <tr><td>2</td><td>Aplicação redireciona para a URL de login do UniID</td></tr>
+              <tr><td>3</td><td>UniID retorna um token de acesso após autenticação</td></tr>
+              <tr><td>4</td><td>App usa o token para buscar o beneficiário na <strong>Base de Vidas</strong> e no <strong>HealthMap</strong></td></tr>
+              <tr><td>5</td><td>No logout, redireciona para a URL de logout do UniID</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 3 -->
+    <div class="section-card" id="arq-sec3">
+      <div class="section-header"><div class="section-number">3</div><h2>Variáveis de Cliente (Estado Global)</h2></div>
+      <div class="section-body">
+        <div class="callout warn">
+          <strong>⚠️ Conteúdo herdado da v1.0 — não revalidado</strong>
+          O Context Service e o grafo XRE do ODC <strong>não expõem as variáveis de cliente</strong> de um módulo. A lista abaixo é a da v1.0 e precisa de conferência no Service Studio. Há um indício forte de defasagem: <code>JornadaId</code> existia só para a rastreabilidade do GerenciadorDeLogs, que <strong>foi removido</strong> (ver seção 12) — essa variável provavelmente não existe mais.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Variável</th><th>Tipo</th><th>Descrição</th></tr></thead>
+          <tbody>
+            <tr><td><code>CpfInternalUser</code></td><td>Text</td><td>CPF do beneficiário logado</td></tr>
+            <tr><td><code>HmapAccessToken</code></td><td>Text</td><td>Token de acesso ao HealthMap (<code>Bearer ...</code>)</td></tr>
+            <tr><td><code>TokenHmap</code></td><td>Text</td><td>Token bruto do HealthMap</td></tr>
+            <tr><td><code>IdHealthMap</code></td><td>Long Integer</td><td>ID do beneficiário no HealthMap</td></tr>
+            <tr><td><code>InternalUsersId</code></td><td>Long Integer</td><td>ID do registro na tabela InternalUsers</td></tr>
+            <tr><td><code>Carteira</code></td><td>Text</td><td>Número da carteira do plano</td></tr>
+            <tr><td><code>ClassifacacaoCliente</code></td><td>Text</td><td>Classificação de risco do beneficiário</td></tr>
+            <tr><td><code>DescricaoLinhaCuidado</code></td><td>Text</td><td>Descrição da linha de cuidado</td></tr>
+            <tr><td><code>TokenCRMDynamics</code></td><td>Text</td><td>Token de acesso ao CRM Dynamics</td></tr>
+            <tr><td><code>VarCRMContacId</code></td><td>Text</td><td>ID do contato no CRM Dynamics</td></tr>
+            <tr><td><code>VarBuscaEmail</code></td><td>Email</td><td>E-mail obtido do CRM</td></tr>
+            <tr><td><code>VarBuscaTelefone</code></td><td>Text</td><td>Telefone obtido do CRM</td></tr>
+            <tr><td><code>UserName</code></td><td>Text</td><td>Nome do usuário logado</td></tr>
+            <tr><td><code>UserPhotoURL</code></td><td>Text</td><td>URL da foto de perfil</td></tr>
+            <tr><td><code>LastURL</code></td><td>Text</td><td>Última URL acessada</td></tr>
+            <tr class="linha-fora"><td><code>JornadaId</code></td><td>Long Integer</td><td>ID da jornada de log — <strong>provavelmente removida</strong> junto com o GerenciadorDeLogs</td></tr>
+            <tr><td><code>IsSemNotificacoes</code></td><td>Boolean</td><td>Usuário sem notificações</td></tr>
+            <tr><td><code>VarExisteQuestionarioParaResponder</code></td><td>Boolean</td><td>Há questionários pendentes</td></tr>
+            <tr><td><code>VarTotalAcoesParaHoje</code></td><td>Integer</td><td>Total de ações do plano para hoje</td></tr>
+            <tr><td><code>VarTotalAcoesConcluidas</code></td><td>Integer</td><td>Total de ações concluídas</td></tr>
+            <tr><td><code>VarTotalAcoesAtrasadas</code></td><td>Integer</td><td>Total de ações atrasadas</td></tr>
+            <tr><td><code>VisibleMessage_PlanoCuidado</code></td><td>Boolean</td><td>Visibilidade de mensagem no plano de cuidado</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 4 -->
+    <div class="section-card" id="arq-sec4">
+      <div class="section-header"><div class="section-number">4</div><h2>Settings (com valores)</h2></div>
+      <div class="section-body">
+        <div class="callout warn">
+          <strong>⚠️ Conteúdo herdado da v1.0 — não revalidado</strong>
+          Settings <strong>não são expostos</strong> nem pelo Context Service nem pelo grafo XRE. Foi testado: busca por <code>IsContingencia</code>, <code>IsAtivarMissoes</code>, <code>GoogleAnalyticsId</code>, <code>ClarityId</code>, <code>PerfilSociodemograficoId</code>, <code>PesoQuestaoId</code>, <code>GTMToken</code> e <code>IsVerificarApi</code> retorna <strong>zero resultados</strong> em ambas as fontes. Os valores abaixo precisam de conferência no portal do ODC.
+          <br><br>Dois indícios de que as flags continuam em uso: a structure <code>CodigosQuestionariosIniciaisStr</code> carrega exatamente os 8 códigos de questionário listados, e existe um parâmetro de saída <code>OutIsAtivarMissoes</code> no modelo.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Mapa de Saúde — IDs de riscos no HealthMap</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Setting</th><th>Valor</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>Alimentacao</code></td><td>177</td><td>Risco Alimentação</td></tr>
+              <tr><td><code>AtivdadeFisica</code></td><td>176</td><td>Risco Atividade Física</td></tr>
+              <tr><td><code>Sono</code></td><td>178</td><td>Risco Sono</td></tr>
+              <tr><td><code>TempoDeQualidade</code></td><td>179</td><td>Risco Tempo de Qualidade</td></tr>
+              <tr><td><code>Social</code></td><td>180</td><td>Risco Social</td></tr>
+              <tr><td><code>MapaSaudeMental</code></td><td>211</td><td>Risco Saúde Mental</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">IDs de Questionários no HealthMap</div>
+          <p style="font-size:12.5px;color:#5a7a96;">Os mesmos 8 questionários aparecem como atributos da structure <code>CodigosQuestionariosIniciaisStr</code> na rev 4104 — os <em>nomes</em> estão confirmados, os <em>valores</em> não.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Setting</th><th>Valor (v1.0)</th><th>Questionário</th><th>Atributo na structure</th></tr></thead>
+            <tbody>
+              <tr><td><code>PerfilSociodemograficoId</code></td><td>346</td><td>Perfil Sociodemográfico</td><td><code>SocioDemografico</code></td></tr>
+              <tr><td><code>PerfilEpidemiologicoId</code></td><td>347</td><td>Perfil Epidemiológico</td><td><code>Epidemiologico</code></td></tr>
+              <tr><td><code>PerfilEstiloDeVidaId</code></td><td>363</td><td>Estilo de Vida</td><td><code>EstiloDeVida</code></td></tr>
+              <tr><td><code>PerfilQualidadeDeVida</code></td><td>355</td><td>Qualidade de Vida</td><td><code>QualidadeDeVida</code></td></tr>
+              <tr><td><code>SaudeMental</code></td><td>515</td><td>Saúde Mental</td><td><code>SaudeMental</code></td></tr>
+              <tr><td><code>CancerMama</code></td><td>378</td><td>Câncer de Mama</td><td><code>CancerMama</code></td></tr>
+              <tr><td><code>FisioterapiaDorLombar</code></td><td>368</td><td>Fisioterapia / Dor Lombar</td><td><code>FisioterapiaDorLomba</code></td></tr>
+              <tr><td><code>NeuroCirurgiaoDorLombar</code></td><td>369</td><td>Neurocirurgião / Dor Lombar</td><td><code>NeuroCirurgiaoDorLombar</code></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Questões específicas &amp; Analytics</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Setting</th><th>Valor (v1.0)</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>PesoQuestaoId</code></td><td>3847</td><td>Questão "Peso" no Perfil Epidemiológico</td></tr>
+              <tr><td><code>AlturaQuestaoId</code></td><td>3848</td><td>Questão "Altura" no Perfil Epidemiológico</td></tr>
+              <tr><td><code>GoogleAnalyticsId</code></td><td>G-4NLLLJE6BH</td><td>ID de medição do GA4</td></tr>
+              <tr><td><code>GTMToken</code></td><td>GMT-XXXXXX</td><td>Token do GTM (varia por ambiente)</td></tr>
+              <tr><td><code>ClarityId</code></td><td>rkhgxgfbcl</td><td>ID do Microsoft Clarity</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Flags de Controle</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Setting</th><th>Padrão (v1.0)</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>IsAtivarMissoes</code></td><td>False</td><td>Ativa/desativa a feature de Missões</td></tr>
+              <tr><td><code>IsContingencia</code></td><td>False</td><td>Modo de contingência (Base de Vidas offline)</td></tr>
+              <tr><td><code>IsVerificarApi</code></td><td>True</td><td>Verificação de API do HealthMap</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 5 -->
+    <div class="section-card" id="arq-sec5">
+      <div class="section-header"><div class="section-number">5</div><h2>Telas e Fluxos de UI</h2></div>
+      <div class="section-body">
+        <div class="callout ok">
+          <strong>✅ Seção reescrita na rev 4104</strong>
+          Lida diretamente do modelo. <strong>Mudou bastante</strong> em relação à v1.0: o UI Flow <code>PlanoCuidado</code> e a tela <code>MeuPlano</code> <strong>não existem mais</strong>; entraram os flows <code>Autocuidado</code> e <code>AcoesViverMelhor</code>. O flow <code>Habitos</code> virou <code>Comunidades</code>. Os flows <code>Layouts</code>, <code>GenericComponents</code> e <code>QuickTour</code> não aparecem como UI Flows com telas.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">As 11 telas de produção, por UI Flow</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:17%">UI Flow</th><th style="width:19%">Tela</th><th style="width:34%">Parâmetros de entrada</th><th>Observação</th></tr></thead>
+            <tbody>
+              <tr><td rowspan="2"><code>Home</code></td><td><code>Home</code></td><td><code>InIsMid</code> : Boolean</td><td>Home em desenvolvimento para cadastro Unificado + Tabia</td></tr>
+              <tr><td><code>Onboarding</code></td><td><code>InEtapa</code> : Integer</td><td>Etapa 1 Cadastro · 2 Termo · 3 Avaliação Inicial · 4 Conclusão</td></tr>
+              <tr class="linha-nova"><td><code>Autocuidado</code></td><td><code>Autocuidado</code></td><td>—</td><td><span class="tag novo">novo flow</span> Mapa de saúde e indicadores</td></tr>
+              <tr class="linha-nova"><td><code>AcoesViverMelhor</code></td><td><code>AcoesViverMelhor</code></td><td><code>InActiveTabNumber</code> : Integer <strong>(obrigatório)</strong></td><td><span class="tag novo">novo flow</span> Sucessor funcional do antigo <code>MeuPlano</code></td></tr>
+              <tr><td rowspan="2"><code>Questionarios</code></td><td><code>QuestionarioDetail</code></td><td><code>InIdQuestionario</code> : Long Integer <strong>(obr.)</strong>, <code>InIsAcaoAutomonitTabia</code> : Boolean <strong>(obr.)</strong>, <code>IdHmap</code>, <code>DataNascimento</code>, <code>SexoBeneficiario</code>, <code>InIsAtualizar</code>, <code>InIsPlanoCuidado</code>, <code>InPlanoCuidadoId</code></td><td>Em desenvolvimento para receber questionário do Tabia</td></tr>
+              <tr><td><code>QuestionarioFinalizado</code></td><td><code>InIdHmap</code> : Long Integer <strong>(obr.)</strong></td><td>—</td></tr>
+              <tr><td rowspan="2"><code>PerfilUsuario</code></td><td><code>Perfil</code></td><td><code>InOpcaoSelecionada</code> : Integer</td><td>—</td></tr>
+              <tr><td><code>FichaMedicaPDF</code></td><td><code>InIsPDF</code> : Boolean <strong>(obr.)</strong></td><td>—</td></tr>
+              <tr><td rowspan="2"><code>RegistrosEMedicamentos</code></td><td><code>Registros</code></td><td>—</td><td>—</td></tr>
+              <tr class="linha-nova"><td><code>RegistrosNOVO</code></td><td>—</td><td><span class="tag novo">nova</span> Convive com <code>Registros</code> — duas telas ativas para o mesmo domínio</td></tr>
+              <tr><td><code>Comunidades</code></td><td><code>Comunidades</code></td><td><code>TabAtiva</code> : Integer</td><td>Era o flow <code>Habitos</code> na v1.0</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="callout warn">
+          <strong>⚠️ Ponto de atenção</strong>
+          <code>Registros</code> e <code>RegistrosNOVO</code> coexistem, ambas com a mesma data action <code>ObterRegistrosByInfoUserId</code>. Convém confirmar qual está alcançável em produção.
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 6 -->
+    <div class="section-card" id="arq-sec6">
+      <div class="section-header"><div class="section-number">6</div><h2>Ciclo de Vida das Telas (Data Actions)</h2></div>
+      <div class="section-body">
+        <p>A aplicação tem <strong>68 data actions</strong> no total; <strong>28</strong> estão no nível de tela e as demais vivem dentro dos blocos. Abaixo, as data actions declaradas em cada tela, lidas do modelo da rev 4104.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Home — ponto de entrada <span class="tag">verificado</span></div>
+          <pre class="tree"><strong>Home (4 data actions)</strong>
+  ├── AcessoViaUniid      — autenticação e carga do beneficiário
+  ├── ObterTokenHmap      — token de acesso ao HealthMap
+  ├── EnviarStatus        — atualização de status do cadastro
+  └── BuscaFoto           — foto de perfil
+
+<strong>Variáveis locais da tela</strong>
+  IsReady · IsNotificacoes · IsVoltar · IsPopUpExperiencia
+  IsPlanoCarregado · AtualizarStatus · UsuarioCBV</pre>
+          <div class="callout warn">
+            <strong>⚠️ Mudou em relação à v1.0</strong>
+            A v1.0 descrevia 6 etapas encadeadas (<code>AcessoViaUniid</code> → <code>ObterTokenHmap</code> → <code>GetInfoUsersInternalUsers</code> → <code>AtualizarUsuario</code> → <code>ObterPlanoAcao</code> → <code>GetRegistrosByInfoUserId</code>). Na rev 4104 a Home declara <strong>4</strong> data actions e as duas últimas migraram para as telas <code>AcoesViverMelhor</code> e <code>Registros</code>. A <em>ordem de execução</em> e os <em>OnAfterFetch</em> não foram re-traçados nesta varredura.
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Demais telas</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:22%">Tela</th><th style="width:8%">Qtd</th><th>Data actions</th></tr></thead>
+            <tbody>
+              <tr><td><code>QuestionarioDetail</code></td><td>11</td><td><code>GetQuestionario</code> · <code>BuscaCodigosQuestionarios</code> · <code>BuscaRespostasQuestionario</code> · <code>SalvarRespostasQuestionario</code> · <code>LimparRespostas</code> · <code>VerificaPesoAltura</code> · <code>GetUsuarioCadastroUnificado</code> · <code>AtualizaStatusUsuario</code> · <code>GetAcaoUsuarioTabia</code> · <code>RealizarAcaoMonitoramentoHmap</code> · <code>RealizaPlanoAcao</code></td></tr>
+              <tr><td><code>Onboarding</code></td><td>8</td><td><code>BuscaUsuarioCadastroUnificado</code> · <code>AtualizarUsuarioCadastroUnificado</code> · <code>GetTokenHmap</code> · <code>ObterPerfilUsuario</code> · <code>ObterValidacaoTermoPortalCliente</code> · <code>ObterDadosCRMDynamics</code> · <code>EnviaLinhaCuidado</code> · <code>SalvarCodigoIndicacao</code></td></tr>
+              <tr><td><code>Home</code></td><td>4</td><td><code>AcessoViaUniid</code> · <code>ObterTokenHmap</code> · <code>EnviarStatus</code> · <code>BuscaFoto</code></td></tr>
+              <tr><td><code>Autocuidado</code></td><td>1</td><td><code>GetMedicaoRisco</code></td></tr>
+              <tr><td><code>AcoesViverMelhor</code></td><td>1</td><td><code>GetUsuario</code></td></tr>
+              <tr><td><code>Registros</code></td><td>1</td><td><code>ObterRegistrosByInfoUserId</code></td></tr>
+              <tr><td><code>RegistrosNOVO</code></td><td>1</td><td><code>ObterRegistrosByInfoUserId</code></td></tr>
+              <tr><td><code>QuestionarioFinalizado</code></td><td>1</td><td><code>ObterQuestionariosRespondidos</code></td></tr>
+              <tr><td><code>Comunidades</code></td><td>0</td><td rowspan="3" style="vertical-align:middle">Sem data action no nível da tela — a carga acontece dentro dos blocos.</td></tr>
+              <tr><td><code>Perfil</code></td><td>0</td></tr>
+              <tr><td><code>FichaMedicaPDF</code></td><td>0</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 7 -->
+    <div class="section-card" id="arq-sec7">
+      <div class="section-header"><div class="section-number">7</div><h2>Integrações Externas</h2></div>
+      <div class="section-body">
+        <div class="callout ok">
+          <strong>✅ Seção reescrita na rev 4104</strong>
+          O Viver Bem consome <strong>81 service actions</strong> e <strong>35 server/client actions</strong> de <strong>15 módulos produtores</strong>. Cada nome e cada módulo abaixo saiu do grafo XRE e teve o produtor resolvido pelo Context Service — não é estimativa.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Panorama</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Módulo produtor</th><th style="width:10%">Qtd</th><th>Papel</th></tr></thead>
+            <tbody>
+              <tr><td><code>ModeloAssistencial</code></td><td>49</td><td>Banco interno, cadastro unificado, questionários, registros, medicamentos, ficha médica, ponte Tabia</td></tr>
+              <tr><td><code>System_</code></td><td>19</td><td>Lista, log e sessão — plataforma</td></tr>
+              <tr><td><code>Backoffice</code></td><td>14</td><td>Indicadores, missões, tarefas, conquistas, campanhas, códigos de indicação</td></tr>
+              <tr><td><code>HealthMapIS</code></td><td>12</td><td>Transporte HTTP para o HealthMap</td></tr>
+              <tr class="linha-nova"><td><code>OutSystemsUI</code></td><td>11</td><td><span class="tag novo">não estava na v1.0</span> Ações de UI (BottomSheet, Carousel, Layout)</td></tr>
+              <tr><td><code>BlogViverBemIS</code></td><td>7</td><td>Eventos, programas e usuários do Blog</td></tr>
+              <tr><td><code>ModeloAssistencialLibrary</code></td><td>5</td><td>CRM Dynamics e Base de Vidas</td></tr>
+              <tr><td><code>Text</code> (Forge)</td><td>4</td><td>Regex e manipulação de string</td></tr>
+              <tr><td><code>AutenticacaoIS</code></td><td>3</td><td>UniID — token, extra info e grupos</td></tr>
+              <tr class="linha-nova"><td><code>CMS</code></td><td>3</td><td><span class="tag novo">não estava na v1.0</span> Tags, imagens e arquivos de bucket</td></tr>
+              <tr><td><code>HTTP</code> (Forge)</td><td>3</td><td>Cookies e domínio da requisição</td></tr>
+              <tr class="linha-nova"><td><code>TabiaHealthISLibrary</code></td><td>3</td><td><span class="tag novo">integração direta</span> Questionários e eventos do Tabia</td></tr>
+              <tr class="linha-nova"><td><code>CommonLibrary</code></td><td>3</td><td><span class="tag novo">não estava na v1.0</span> Base64, idade, SHA-256</td></tr>
+              <tr class="linha-nova"><td><code>PortalDoClienteCS</code></td><td>2</td><td><span class="tag novo">não estava na v1.0</span> Termo de consentimento</td></tr>
+              <tr><td><code>BeneficiarioISLib</code></td><td>2</td><td>Base de Vidas — sessão mobile e família</td></tr>
+              <tr class="linha-nova"><td><code>GoogleTagManagerLibrary</code> · <code>BinaryDataClientSide</code> · <code>BinaryData</code></td><td>3</td><td><span class="tag novo">não estava na v1.0</span> GTM e conversão binária</td></tr>
+            </tbody>
+          </table></div>
+          <div class="callout danger">
+            <strong>🚫 Ausentes na rev 4104</strong>
+            <strong>SAE (Sistema de Autorização de Exames)</strong> — <code>ObterAcoesSAE</code> e <code>GetProcedimentos</code> têm <strong>zero</strong> ocorrências no modelo. A seção 7.4 da v1.0 está obsoleta.<br>
+            <strong>GerenciadorDeLogs</strong> — <code>IncluirJornada</code>, <code>IncluirDetalheJornada</code> e <code>ConcluirJornada</code> têm <strong>zero</strong> ocorrências. Ver seção 12.
+          </div>
+        </div>
+
+        <div class="subsection" id="arq-sec7-1">
+          <div class="subsection-title">7.1 ModeloAssistencial <span class="tag">49 service actions</span></div>
+          <p>Banco interno da plataforma. É de longe a maior dependência do Viver Bem.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:38%">Service action</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td colspan="2" style="background:var(--blue-light);font-weight:700;color:var(--blue-dark)">Cadastro Unificado <span class="tag novo">domínio novo</span></td></tr>
+              <tr><td><code>ObterCadastroUnificadoCBV</code></td><td>Obtém os dados do cadastro unificado CBV a partir do CPF</td></tr>
+              <tr><td><code>ObterCadastroUnificadoUnificadoByCPF</code></td><td>Busca usuário na tabela CadastroUnificado por CPF</td></tr>
+              <tr><td><code>CriarOuAtualizarUsuarioCadastroUnificado</code></td><td>Cria ou atualiza o usuário na tabela Cadastro Unificado</td></tr>
+              <tr><td><code>AtualizarCadastroUnificadoCBV</code></td><td>Atualiza os dados do cadastro unificado CBV</td></tr>
+              <tr><td><code>AtualizarDadosBaseVidasCadastroUsuarioCBV</code></td><td>Atualiza os dados da Base Vidas na tabela CadastroUsuarioCBV</td></tr>
+              <tr><td><code>AtualizarStatusAmbienteCadastroUsuarioCBV</code></td><td>Atualiza o status do usuário na tabela CadastroUsuarioCBV</td></tr>
+              <tr><td><code>EnviarTermoAceiteAmbienteCadastroUsuarioCBV</code></td><td>Envia o aceite do termo e ativa o beneficiário</td></tr>
+              <tr><td><code>MidUnimed_AtualizarCadastroCBV</code></td><td>Sincronização com o MidUnimed</td></tr>
+              <tr><td><code>ObterInternalUsersByCPF</code></td><td>Busca a InternalUsers por CPF</td></tr>
+
+              <tr><td colspan="2" style="background:var(--blue-light);font-weight:700;color:var(--blue-dark)">Questionários</td></tr>
+              <tr><td><code>ObterQuestionariosIniciais</code></td><td>Busca os questionários iniciais</td></tr>
+              <tr><td><code>ObterQuestionarioNew</code></td><td>Retorna o questionário no formato do novo bloco da lib</td></tr>
+              <tr><td><code>ObterQuestionarioOSTabia</code></td><td>Monta a estrutura de questionário Tabia a partir da base OS</td></tr>
+              <tr><td><code>ObterQuestoesQuestionario</code></td><td>Questões de um questionário</td></tr>
+              <tr><td><code>SalvarRespostasService</code></td><td>Salva as questões e opções selecionadas pelo usuário</td></tr>
+              <tr><td><code>EnviarQuestionarioHealthMap</code></td><td>Envio de questionário para o HealthMap por CPF</td></tr>
+              <tr><td><code>SalvarHistoricoQuestionario</code></td><td>Salva o histórico do questionário de forma genérica</td></tr>
+              <tr><td><code>SalvarHistoricoQuestionarioV2</code></td><td>Armazena o envio do questionário para o HealthMap</td></tr>
+              <tr><td><code>ObterHistoricoQuestionarios</code></td><td>Históricos salvos por parâmetros e por aplicação</td></tr>
+              <tr><td><code>AtualizarStatusQuestionarioQuestionario</code></td><td>Atualiza o status do questionário</td></tr>
+              <tr><td><code>ObterConfirmacaoQuestionariosRespondidos</code></td><td>Verifica se respondeu todos os questionários iniciais</td></tr>
+              <tr><td><code>VerificarQuestionarioNaoEnviadoService</code></td><td>Verifica questionário com erro de envio no histórico</td></tr>
+              <tr><td><code>VerificarQuestionarioRespondidoPorUsuarioService</code></td><td>Verifica resposta por CPF e id do questionário</td></tr>
+              <tr><td><code>VerificarQuestionariosRespondidosVoucher</code></td><td>Verifica resposta por Id (vouchers)</td></tr>
+
+              <tr><td colspan="2" style="background:var(--blue-light);font-weight:700;color:var(--blue-dark)">Tabia <span class="tag novo">domínio novo</span></td></tr>
+              <tr><td><code>VerificarUsuarioTabiaService</code></td><td>Verifica se o usuário é Tabia e preenche o Id do paciente</td></tr>
+              <tr><td><code>ObterTermoViverBemTabia</code></td><td>Retorna o termo do Tabia completo</td></tr>
+              <tr><td><code>ResponderTermoTabia</code></td><td>Responde o termo do Tabia</td></tr>
+              <tr><td><code>ObterEventosTabia</code></td><td>Eventos do Tabia</td></tr>
+
+              <tr><td colspan="2" style="background:var(--blue-light);font-weight:700;color:var(--blue-dark)">Ações Viver Melhor &amp; Plano de Cuidado</td></tr>
+              <tr><td><code>ObterAcoesViverMelhorByUsuario</code></td><td>Ações do usuário</td></tr>
+              <tr><td><code>CriarOuAtualizarAcoesViverMelhor</code></td><td>Cria ou atualiza ações</td></tr>
+              <tr><td><code>ExcluirAcaoViverMelhor</code></td><td>Exclui ação</td></tr>
+              <tr><td><code>RealizarAcaoPlanoCuidado</code></td><td>Marca ação do plano como realizada</td></tr>
+              <tr><td><code>ChamarEventoExecutarAcoesHmap</code></td><td>Chama o evento ExecutarAcoesEProgramarHmap</td></tr>
+
+              <tr><td colspan="2" style="background:var(--blue-light);font-weight:700;color:var(--blue-dark)">Registros &amp; Medicamentos</td></tr>
+              <tr><td><code>ObterRegistrosByInfoUserId</code></td><td>Registros por InfoUser</td></tr>
+              <tr><td><code>ObterRegistrosByCpf</code></td><td>Registros por CPF</td></tr>
+              <tr><td><code>CriarOuAtualizarRegistros</code></td><td>Cria ou atualiza registros do usuário</td></tr>
+              <tr><td><code>ObterRegistrosEntidade</code></td><td>Registros da entidade estática</td></tr>
+              <tr><td><code>ObterMedicamentosByUser</code></td><td>Medicamentos do usuário</td></tr>
+              <tr><td><code>CriarAtualizarMedicamentos</code></td><td>Cria ou atualiza medicamentos</td></tr>
+              <tr><td><code>CriarRegistroMedicamento</code></td><td>Cria registros de uso do medicamento</td></tr>
+              <tr><td><code>ExcluirMedicamento</code></td><td>Exclui medicamento</td></tr>
+
+              <tr><td colspan="2" style="background:var(--blue-light);font-weight:700;color:var(--blue-dark)">Perfil, Ficha Médica e Termos</td></tr>
+              <tr><td><code>ObterFichaMedica</code></td><td>Ficha médica pelo InfoUserId</td></tr>
+              <tr><td><code>IncluirAtualizarFichaMedica</code></td><td>Inclui ou atualiza a FichaMedica</td></tr>
+              <tr><td><code>ObterFotoPerfilUsuario</code></td><td>Foto de perfil pelo FotoPerfilId</td></tr>
+              <tr><td><code>ObterFotoUsuario</code></td><td>Foto do usuário</td></tr>
+              <tr><td><code>IncluirAtualizarFotoPerfil</code></td><td>Inclui ou atualiza a FotoPerfil</td></tr>
+              <tr><td><code>ObterTermoIdPortalCliente</code></td><td>Id do termo na tabela do portal do cliente</td></tr>
+              <tr><td><code>AceitarTermoAppPortalCliente</code></td><td>Aceita o termo no portal do cliente</td></tr>
+
+              <tr><td colspan="2" style="background:var(--blue-light);font-weight:700;color:var(--blue-dark)">CRM</td></tr>
+              <tr><td><code>EnviarDadosDynamicsCadastroUsuarioCBV</code></td><td>Envia e-mail e telefone para o CRM</td></tr>
+              <tr><td><code>EnviarPostLinhaCuidadoCadastroUsuarioCBV</code></td><td>Envia a notificação da Linha de Cuidado para o CRM</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection" id="arq-sec7-2">
+          <div class="subsection-title">7.2 HealthMapIS <span class="tag">Healthmap</span> <span class="tag">12 service actions</span></div>
+          <p>Camada de transporte HTTP para o HealthMap — sem lógica de negócio.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:32%">Service action</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>ObterTokenHmap</code></td><td>Requisita um novo token de autenticação ao Health Map</td></tr>
+              <tr><td><code>NewObterTokenHmap</code></td><td>Obtém ou renova o token, armazenando-o localmente para reutilização</td></tr>
+              <tr><td><code>ObterBeneficiarioPorIdExterno</code></td><td>Dados do beneficiário pelo identificador externo (CPF ou código externo)</td></tr>
+              <tr><td><code>AtualizarBeneficiario</code></td><td>Atualizar beneficiário</td></tr>
+              <tr><td><code>ObterGestorBeneficiario</code></td><td>Obter gestor do beneficiário</td></tr>
+              <tr><td><code>ObterMedicoRisco</code></td><td>Dados de risco do paciente conforme seu ID</td></tr>
+              <tr><td><code>ObterListaPlanoAcao</code></td><td>Plano de ação de um beneficiário</td></tr>
+              <tr><td><code>IncluirAvaliacaoUsuario</code></td><td>Retorna a avaliação do usuário</td></tr>
+              <tr><td><code>ObterTermoPorEmpresa</code></td><td>Termo de uso publicado para uma empresa</td></tr>
+              <tr><td><code>ObterAceiteTermo</code></td><td>Datas de aceite e revogação de termo</td></tr>
+              <tr><td><code>AceitarTermo</code></td><td>Aceita um termo de uso para um beneficiário</td></tr>
+              <tr><td><code>RevogarTermo</code></td><td>Revoga o aceite de um termo de uso</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection" id="arq-sec7-3">
+          <div class="subsection-title">7.3 Backoffice <span class="tag">14 service actions</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:32%">Service action</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>ListarMissaoAtiva</code></td><td>Lista as missões ativas</td></tr>
+              <tr><td><code>ObterProximaTarefaService</code></td><td>Primeira tarefa em ordem não concluída, por missão e usuário</td></tr>
+              <tr><td><code>ConcluirTarefaUsuario</code></td><td>Salva a tarefa (NoTrilhaUsuario) e obtém a conquista se for a última</td></tr>
+              <tr><td><code>ExcluirTarefaUsuarioService</code></td><td>Exclui a tarefa realizada do usuário</td></tr>
+              <tr><td><code>ListarConquistasUsuarioService</code></td><td>Lista todas as conquistas de um usuário</td></tr>
+              <tr><td><code>ListarCampanhaAtiva</code></td><td>Lista as campanhas ativas</td></tr>
+              <tr><td><code>CriarOuAtualizarIndicador</code></td><td>Cria ou atualiza indicador</td></tr>
+              <tr><td><code>CriarRegistrosIndicadores_Service</code></td><td>Cria registro de indicador</td></tr>
+              <tr><td><code>RecuperarDadosIndicadorPorCPF</code></td><td>Dados do indicador por CPF, para update</td></tr>
+              <tr><td><code>RecuperarDadosIndicadorPorHmap</code></td><td>Dados do indicador por Id HealthMap, para update</td></tr>
+              <tr><td><code>ObterCodigosIndicacao</code></td><td>Busca códigos de indicação</td></tr>
+              <tr><td><code>SalvarCodigoIndicacao</code></td><td>Salva código de indicação</td></tr>
+              <tr><td><code>ValidaCodigoIndicacao</code></td><td>Valida código de indicação</td></tr>
+              <tr><td><code>ObterRiscos</code></td><td>Obter riscos</td></tr>
+            </tbody>
+          </table></div>
+          <div class="callout info">
+            <strong>📌 Nomenclatura</strong>
+            A v1.0 citava <code>ObterMissoes</code>, <code>ObterTarefasMissao</code>, <code>SalvarTarefaUsuario</code>, <code>ObterConquistas</code> e <code>ObterCampanhas</code>. <strong>Nenhum desses nomes existe.</strong> Os nomes reais são os da tabela acima. Lembrando que, no Backoffice, a UI fala "missão/tarefa" mas as tabelas são <code>TrilhaConhecimento</code> / <code>NoTrilha</code>.
+          </div>
+        </div>
+
+        <div class="subsection" id="arq-sec7-4">
+          <div class="subsection-title">7.4 CRM Dynamics e Base de Vidas <span class="tag">Dynamics</span> <span class="tag">Unimed</span></div>
+          <p>Via <code>ModeloAssistencialLibrary</code> (server actions) e <code>BeneficiarioISLib</code>.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:26%">Action</th><th style="width:24%">Módulo</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>GerarCRMDynamics</code></td><td><code>ModeloAssistencialLibrary</code></td><td>Gera o registro de linha de cuidados no CRM a partir do CPF</td></tr>
+              <tr><td><code>PostLinhaCuidadoId</code></td><td><code>ModeloAssistencialLibrary</code></td><td>Cria uma linha de cuidados no CRM para o beneficiário</td></tr>
+              <tr><td><code>AlterarDadosDynamics</code></td><td><code>ModeloAssistencialLibrary</code></td><td>Altera dados de um contato no CRM Dynamics</td></tr>
+              <tr><td><code>GetBaseVidas</code></td><td><code>ModeloAssistencialLibrary</code></td><td>Obtém a base de vidas (beneficiários) da Unimed</td></tr>
+              <tr><td><code>ProcessaQuestionario</code></td><td><code>ModeloAssistencialLibrary</code></td><td>Ativa questões por pré-requisito e calcula fórmulas <em>(client action)</em></td></tr>
+              <tr><td><code>ObterControleSessaoMobile</code></td><td><code>BeneficiarioISLib</code></td><td>Obtém o beneficiário e o contratante</td></tr>
+              <tr class="linha-nova"><td><code>ObterFamilia</code></td><td><code>BeneficiarioISLib</code></td><td><span class="tag novo">nova</span> API <code>/beneficiario/v1/beneficiarios/{CPF}/familia/agrupados</code></td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:12.5px;color:#5a7a96;">A v1.0 citava <code>GetContacts</code>, <code>GetLinhaCuidadoId</code>, <code>PatchLinhaCuidadoClienteSemContato</code> e <code>EnviaMoniramento</code> — nenhum aparece no modelo da rev 4104 como dependência do Viver Bem.</p>
+        </div>
+
+        <div class="subsection" id="arq-sec7-5">
+          <div class="subsection-title">7.5 Tabia Health <span class="tag novo">integração direta nova</span></div>
+          <p>Na v1.0 o Tabia aparecia como uma nota de 3 operações genéricas. Na rev 4104 há uma library dedicada, além dos 4 service actions de ponte no <code>ModeloAssistencial</code> (seção 7.1) e da server action própria <code>MontarAnswersTabia</code>.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:30%">Server action</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>ResponderQuestionario</code></td><td>Responde pergunta individual</td></tr>
+              <tr><td><code>ObterRespostas</code></td><td>Obtém as respostas dos questionários do Tabia</td></tr>
+              <tr><td><code>EditarEvento</code></td><td>Edita evento para o paciente</td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:12.5px;color:#5a7a96;">Módulo: <code>TabiaHealthISLibrary</code>. No lado do Viver Bem, as actions próprias envolvidas são <code>AceitarTermoTabia</code>, <code>RevogarTermoUsuarioTabia</code>, <code>EnviarQuestionarioInicialTabia</code>, <code>EnviarQuestionarioTabiaAutomonitoramento</code>, <code>MontarAnswersTabia</code>, <code>CriarAcaoAutoMonitoramentoTabia</code> e <code>CriarAcaoAutoMonitoramentoTabiaDepara</code>.</p>
+        </div>
+
+        <div class="subsection" id="arq-sec7-6">
+          <div class="subsection-title">7.6 UniID / AutenticacaoIS <span class="tag">Auth</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:30%">Action</th><th style="width:14%">Tipo</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>ObterAccessToken</code></td><td>Service</td><td>Novo Access Token para o cookie — exige sessão OutSystems ativa</td></tr>
+              <tr><td><code>ObterUsuarioExtraInfo</code></td><td>Server</td><td>API <code>/controle-acesso-sistemas/v1/extraInfo</code></td></tr>
+              <tr><td><code>ObterUsuarioUniIDGrupos</code></td><td>Server</td><td>API <code>/uniIdUsuario/v1/usuarioGrupos</code></td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:12.5px;color:#5a7a96;">A v1.0 citava também <code>Login</code>, <code>Logout</code> e <code>PostAccessToken</code>. No modelo, login/logout são resolvidos pelas actions próprias <code>ObterURLAutenticacao</code> e <code>DoLogout</code> mais o <code>Logout</code> do <code>System_</code>.</p>
+        </div>
+
+        <div class="subsection" id="arq-sec7-7">
+          <div class="subsection-title">7.7–7.10 Demais integrações</div>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:14px 0 6px;">7.7 Blog ViverBem (<code>BlogViverBemIS</code>)</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:34%">Server action</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>ObterProcurarEventos</code></td><td>Api para procurar eventos</td></tr>
+              <tr><td><code>ObterEventoPorUsuarioId</code></td><td>Api para buscar evento por usuário id</td></tr>
+              <tr><td><code>IncluirParticipacaoEvento</code></td><td>Api para registrar participação em eventos</td></tr>
+              <tr><td><code>ExcluirEventoUsuario</code></td><td>Api para deletar evento por evento id e usuário id</td></tr>
+              <tr><td><code>ListarProgramas</code></td><td>Api para listar programas</td></tr>
+              <tr><td><code>ObterUsuarioPorCPF</code></td><td>Api para buscar usuário por cpf</td></tr>
+              <tr><td><code>IncluirUsuario</code></td><td>Api para criar usuário</td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:12.5px;color:#5a7a96;">A v1.0 citava <code>ObterListarEventos</code>, <code>ObterDestaquesEventos</code>, <code>ObterEventoById</code> e <code>ObterListarProgramas</code> — esses nomes não existem no modelo.</p>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:16px 0 6px;">7.8 CMS <span class="tag novo">nova</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:34%">Service action</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>ObterTags</code></td><td>Obter tags por slug de categoria</td></tr>
+              <tr><td><code>ObterUrlImagemPorId</code></td><td>Obter URL de imagem por id</td></tr>
+              <tr><td><code>ObterArquivoBucket</code></td><td>Faz o download do arquivo do bucket</td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:12.5px;color:#5a7a96;">Consumido pela client action própria <code>ObterIconePrograma</code>, que busca o ícone SVG de uma tag do CMS pelo nome do programa.</p>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:16px 0 6px;">7.9 Portal do Cliente (<code>PortalDoClienteCS</code>) <span class="tag novo">nova</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:40%">Service action</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>ObterStatusTermoConsentimento_OAPI</code></td><td>Aceite do usuário em um termo, por TermoConsentimentoKey e CPF</td></tr>
+              <tr><td><code>RevogarTermoConsentimento_OAPI</code></td><td>Revoga um termo de consentimento</td></tr>
+            </tbody>
+          </table></div>
+
+          <div class="subsection-title" style="font-size:13px;border:none;padding-bottom:0;margin:16px 0 6px;">7.10 Libraries utilitárias</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:26%">Módulo</th><th>Operações</th></tr></thead>
+            <tbody>
+              <tr><td><code>System_</code></td><td><code>ListAppend</code> · <code>ListAppendAll</code> · <code>ListClear</code> · <code>ListDistinct</code> · <code>ListFilter</code> · <code>ListIndexOf</code> · <code>ListRemove</code> · <code>ListSort</code> · <code>LogMessage</code> · <code>Logout</code> · <code>RequireScript</code></td></tr>
+              <tr><td><code>OutSystemsUI</code></td><td><code>BottomSheetOpen</code> · <code>BottomSheetClose</code> · <code>CarouselNext</code> · <code>CarouselPrevious</code> · <code>LayoutReady</code> · <code>LayoutDestroy</code> · <code>SetBottomBarActiveElement</code> · <code>FeedbackMessageClose</code> · <code>AddFavicon</code> · <code>SetLang</code> · <code>SkipToContent</code></td></tr>
+              <tr><td><code>Text</code> (Forge)</td><td><code>Regex_Replace</code> · <code>Regex_Search</code> · <code>String_Join</code> · <code>String_Split</code></td></tr>
+              <tr><td><code>HTTP</code> (Forge)</td><td><code>Request_GetCookie</code> · <code>Request_GetDomain</code> · <code>Response_SetCookie</code></td></tr>
+              <tr><td><code>CommonLibrary</code></td><td><code>AbrirArquivoBase64NovaAba</code> · <code>CalcularIdade</code> · <code>GerarHashSHA256</code></td></tr>
+              <tr><td><code>GoogleTagManagerLibrary</code></td><td><code>GoogleTagManager_LogEvent</code> — <code>dataLayer.push()</code></td></tr>
+              <tr><td><code>BinaryDataClientSide</code> · <code>BinaryData</code></td><td><code>BinaryToBase64</code> (server e client)</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 8 -->
+    <div class="section-card" id="arq-sec8">
+      <div class="section-header"><div class="section-number">8</div><h2>Analytics &amp; Eventos</h2></div>
+      <div class="section-body">
+        <div class="table-wrap"><table>
+          <thead><tr><th style="width:22%">Ferramenta</th><th style="width:26%">Client action própria</th><th>Rastreia</th></tr></thead>
+          <tbody>
+            <tr><td>Google Analytics 4</td><td><code>GA4(NomeTela)</code></td><td>Abertura de cada tela</td></tr>
+            <tr><td>Google Tag Manager</td><td><code>GTM_Home_Event</code> · <code>GTM_Mude1Habito_Event</code> · <code>GTM_PushUserId</code></td><td>Abas da Home, Mude 1 Hábito e identificação do usuário</td></tr>
+            <tr><td>Microsoft Clarity</td><td><code>Clarity(InClarityId)</code></td><td>Comportamento de navegação e interação</td></tr>
+          </tbody>
+        </table></div>
+        <p style="font-size:12.5px;color:#5a7a96;">As quatro client actions acima estão confirmadas no inventário da rev 4104. O disparo em si usa <code>GoogleTagManager_LogEvent</code> da <code>GoogleTagManagerLibrary</code>.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Payload dos eventos GTM <span class="tag">verificado nas structures</span></div>
+          <p>Os campos abaixo saíram das structures <code>GTMHomeStr</code> e <code>GTMMude1HabitoStr</code> da rev 4104.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:26%">Structure</th><th>Atributos</th></tr></thead>
+            <tbody>
+              <tr><td><code>GTMHomeStr</code></td><td><code>event</code> · <code>screen_name</code> · <code>target_tab</code> · <code>destination_tab</code> · <code>questionnaire_topic</code></td></tr>
+              <tr><td><code>GTMMude1HabitoStr</code></td><td><code>event</code> · <code>screen_name</code> · <code>activity_name</code> · <code>partner_name</code> · <code>action_type</code></td></tr>
+            </tbody>
+          </table></div>
+          <div class="callout warn">
+            <strong>⚠️ Divergência com a v1.0</strong>
+            A v1.0 listava os eventos <code>home_tab_click</code>, <code>plan_action_click</code>, <code>mude1habito_*</code> e <code>quicktour_*</code>. Os <em>nomes de evento</em> são valores em runtime e <strong>não aparecem no modelo</strong> — não foi possível confirmá-los. O que mudou com certeza: não existe mais nenhuma estrutura ou bloco de <strong>Quick Tour</strong>, então <code>quicktour_*</code> está obsoleto. Não há structure de <code>plan_action_click</code>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 9 -->
+    <div class="section-card" id="arq-sec9">
+      <div class="section-header"><div class="section-number">9</div><h2>Modelo de Dados</h2></div>
+      <div class="section-body">
+        <div class="callout ok">
+          <strong>✅ Confirmado na rev 4104: sem entidades locais</strong>
+          <code>context_entities</code> retorna <strong>zero</strong> entidades próprias. Todos os dados são persistidos em <strong>assets externos referenciados</strong>.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Produtores de entidades referenciadas <span class="tag">10 módulos</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:30%">Módulo</th><th>Papel</th></tr></thead>
+            <tbody>
+              <tr><td><code>ModeloAssistencial</code></td><td>Cadastro do beneficiário, questionários, registros, medicamentos, ficha médica, cadastro unificado</td></tr>
+              <tr><td><code>Backoffice</code></td><td>Indicadores, trilhas de conhecimento (missões), conquistas, campanhas, códigos de indicação</td></tr>
+              <tr><td><code>AutenticacaoIS</code> · <code>Autenticacao</code></td><td>Acesso e identidade</td></tr>
+              <tr class="linha-nova"><td><code>CMS</code></td><td><span class="tag novo">nova</span> Conteúdo, tags e mídia</td></tr>
+              <tr class="linha-nova"><td><code>AnexosSync</code></td><td><span class="tag novo">nova</span> Sincronização de anexos</td></tr>
+              <tr class="linha-nova"><td><code>UnimedArquivosUI</code></td><td><span class="tag novo">nova</span> UI de arquivos</td></tr>
+              <tr class="linha-nova"><td><code>OutSystemsCharts</code></td><td><span class="tag novo">nova</span> Gráficos</td></tr>
+              <tr><td><code>OutSystemsUI</code></td><td>Componentes de interface</td></tr>
+              <tr><td><code>(System)</code></td><td>Entidades de plataforma</td></tr>
+            </tbody>
+          </table></div>
+          <div class="callout info">
+            <strong>📌 Por que esta lista é menor do que a de integrações</strong>
+            <code>app_refs</code> no ODC indexa apenas o <em>kind</em> <code>entities</code>. Acoplamento por <strong>service action</strong> não aparece ali — por isso módulos como <code>HealthMapIS</code>, <code>TabiaHealthISLibrary</code>, <code>BlogViverBemIS</code> e <code>PortalDoClienteCS</code> estão na seção 7 mas não nesta tabela. As duas listas são complementares, não redundantes.
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Entidades mais citadas <span class="tag herda">nomes da v1.0, papéis confirmados pelas actions</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:26%">Entidade</th><th style="width:20%">Módulo</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>InternalUsers</code></td><td>ModeloAssistencial</td><td>Cadastro do beneficiário — acessada por <code>ObterInternalUsersByCPF</code></td></tr>
+              <tr><td><code>Info_Users</code></td><td>ModeloAssistencial</td><td>Complementares — chave de <code>ObterFichaMedica</code> e <code>ObterRegistrosByInfoUserId</code></td></tr>
+              <tr class="linha-nova"><td><code>CadastroUsuarioCBV</code> / <code>CadastroUnificado</code></td><td>ModeloAssistencial</td><td><span class="tag novo">novo</span> Cadastro unificado — 8 service actions dedicadas</td></tr>
+              <tr><td><code>FotoPerfil</code></td><td>ModeloAssistencial</td><td>Foto de perfil</td></tr>
+              <tr><td><code>FichaMedica</code></td><td>ModeloAssistencial</td><td>Alergias, medicamentos, grupo sanguíneo, contatos</td></tr>
+              <tr><td><code>Medicamentos</code> · <code>MedicamentoRegistros</code></td><td>ModeloAssistencial</td><td>Medicamentos e registros de tomada</td></tr>
+              <tr><td><code>Registros</code></td><td>ModeloAssistencial</td><td>Registros de saúde (água, sono, distância)</td></tr>
+              <tr><td><code>HistoricoQuestionario</code></td><td>ModeloAssistencial</td><td>Histórico de envio de questionários</td></tr>
+              <tr><td><code>Inciadores</code> · <code>RegistrosIndicadores</code></td><td>Backoffice</td><td>Indicadores de engajamento e histórico de ações</td></tr>
+              <tr><td><code>TrilhaConhecimento</code> · <code>NoTrilha</code></td><td>Backoffice</td><td>Missões e tarefas — a UI fala "missão/tarefa"</td></tr>
+              <tr><td><code>CodigosIndicacao</code></td><td>Backoffice</td><td>Códigos promocionais de indicação</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 10 -->
+    <div class="section-card" id="arq-sec10">
+      <div class="section-header"><div class="section-number">10</div><h2>Estrutura de Componentes de UI</h2></div>
+      <div class="section-body">
+        <div class="callout ok">
+          <strong>✅ Seção reescrita na rev 4104</strong>
+          <strong>72 blocos próprios</strong> e <strong>37 blocos referenciados</strong> de libraries, lidos do modelo. A v1.0 listava ~50 nomes, vários dos quais não existem mais.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Layouts</div>
+          <pre class="tree"><strong>LayoutViverBem</strong>        — layout principal
+<strong>LayoutBlank</strong>           — telas sem menu
+<strong>LayoutBaseSection</strong>     — seção base reutilizável
+<strong>HeaderComumMobile</strong>     — cabeçalho mobile
+<strong>BottomBar</strong> / <strong>BottomBarItem</strong> — menu inferior</pre>
+          <p style="font-size:12.5px;color:#5a7a96;">A v1.0 citava <code>LayoutViverBemMobile</code>, <code>AppHeader</code> e <code>AppFooterMenu</code>. <code>LayoutViverBemMobile</code> existe no tenant mas <strong>não aparece</strong> entre os blocos próprios alcançáveis; <code>AppHeader</code> e <code>AppFooterMenu</code> não existem — foram substituídos por <code>HeaderComumMobile</code> e <code>BottomBar</code>.</p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Os 72 blocos próprios, por domínio</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:20%">Domínio</th><th style="width:6%">Qtd</th><th>Blocos</th></tr></thead>
+            <tbody>
+              <tr><td>Layout e navegação</td><td>6</td><td><code>LayoutViverBem</code> · <code>LayoutBlank</code> · <code>LayoutBaseSection</code> · <code>HeaderComumMobile</code> · <code>BottomBar</code> · <code>BottomBarItem</code></td></tr>
+              <tr><td>Home e onboarding</td><td>9</td><td><code>BlockCarrosselBanners</code> · <code>CardBanner</code> · <code>BlockTermoViverBem_CBV</code> · <code>BlockQuestionarioInicial_CBV</code> · <code>BlockConclusaoOnBoarding_CBV</code> · <code>Termo</code> · <code>PopUpTermo</code> · <code>Notificacao</code> · <code>Notificacoes</code></td></tr>
+              <tr class="linha-nova"><td>Autocuidado e mapa de saúde</td><td>4</td><td><code>VisaoGeralAutocuidado</code> · <code>MapaSaudeV2</code> · <code>IndicadorSaude</code> · <code>BlockRiscos</code></td></tr>
+              <tr class="linha-nova"><td>Ações Viver Melhor</td><td>5</td><td><code>BlockAcoesViverMelhorHome</code> · <code>BlockAcoesViverMelhorDisponiveis</code> · <code>BlockAcoesViverMelhorRealizadas</code> · <code>CardExibicaoAcao</code> · <code>PlanoCuidadoPronto</code></td></tr>
+              <tr><td>Questionários</td><td>4</td><td><code>QuestionarioMonitoramentoTabia</code> · <code>QuestionariosConcluidos</code> · <code>PopUpQuestionarioIniciarNovo</code> · <code>PopUpFechar</code></td></tr>
+              <tr><td>Registros</td><td>9</td><td><code>RegistroGeral</code> · <code>RegistroDetalhe</code> · <code>RegistrosListagemPorTipo</code> · <code>RegistrosListagemPorTipoNOVO</code> · <code>CardRegistro</code> · <code>Calendario</code> · <code>CardDiaCalendario</code> · <code>PopUpAdicionarRegistro</code> · <code>BlockFiltroPeriodoMobile</code></td></tr>
+              <tr><td>Medicamentos</td><td>6</td><td><code>MedicamentosGeral</code> · <code>MeusMedicamentos</code> · <code>AdicionarMedicamento</code> · <code>PopUpAdicionarNomeMedicamento</code> · <code>PopUpRegistrarMedicamento</code> · <code>PopUpCancelarCadastroMedicamento</code></td></tr>
+              <tr><td>Perfil</td><td>6</td><td><code>BlockPerfil</code> · <code>BlockDadosCliente</code> · <code>BlockFichaMedica</code> · <code>BlockBeneficios</code> · <code>BlockRevogarTermoHmap</code> · <code>BlockRevogarTermoTabia</code></td></tr>
+              <tr class="linha-nova"><td>Missões e conquistas</td><td>6</td><td><code>BlockMissoes</code> · <code>BlockControleTarefas</code> · <code>BlockTarefaArtigo</code> · <code>BlockTarefaMidia</code> · <code>BlockTarefaQuestionario</code> · <code>BlockMinhasConquistas</code></td></tr>
+              <tr><td>Comunidades e eventos</td><td>8</td><td><code>BlockEvento</code> · <code>BlockMeusEventos</code> · <code>BlockAgenda</code> · <code>BlockGrupo</code> · <code>Caminhadas</code> · <code>TemplateParceiros</code> · <code>BlockCardEbook</code> · <code>CardLandingPage</code></td></tr>
+              <tr><td>Conteúdo</td><td>3</td><td><code>BlockTextoHTML</code> · <code>BlockVideoAudio</code> · <code>BlockCardConteudoSmallSkeleton</code></td></tr>
+              <tr><td>Genéricos</td><td>6</td><td><code>LoadingSpinner</code> · <code>LoadingSpinnerBlocoLocal</code> · <code>SkeletonLoader</code> (×2) · <code>TratamentoErro</code> · <code>Contigencia</code></td></tr>
+            </tbody>
+          </table></div>
+          <p style="font-size:12.5px;color:#5a7a96;">Há <strong>dois</strong> blocos chamados <code>SkeletonLoader</code> no modelo, em pastas diferentes — vale confirmar se a duplicidade é intencional.</p>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Blocos consumidos de libraries <span class="tag">37</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:24%">Origem</th><th>Blocos</th></tr></thead>
+            <tbody>
+              <tr><td><code>OutSystemsUI</code></td><td><code>LayoutTopMenu</code> · <code>BottomSheet</code> · <code>Tabs</code> · <code>TabsHeaderItem</code> · <code>TabsContentItem</code> · <code>Card</code> · <code>CardItem</code> · <code>Accordion</code> · <code>AccordionItem</code> · <code>Carousel</code> · <code>Gallery</code> · <code>Alert</code> · <code>Tag</code> · <code>Tooltip</code> · <code>ProgressBar</code> · <code>Pagination</code> · <code>Separator</code> · <code>MarginContainer</code> · <code>Columns3</code> · <code>ColumnsSmallRight</code> · <code>DatePicker</code> · <code>DropdownTags</code> · <code>InputWithIcon</code> · <code>ButtonLoading</code> · <code>PullToRefresh</code></td></tr>
+              <tr><td><code>OutSystemsCharts</code></td><td><code>ColumnChart</code> · <code>ChartXAxis</code> · <code>ChartYAxis</code> · <code>ChartLegend</code> · <code>ChartSeriesStyling</code></td></tr>
+              <tr class="linha-nova"><td>ModeloAssistencial Library</td><td><code>WBQuestionario</code> · <code>WBFormQuestionarioTabia</code> — blocos de questionário compartilhados</td></tr>
+              <tr><td>Utilitários</td><td><code>InlineSVG</code> · <code>IconsFontAwesome</code> · <code>HTML_Inject</code> · <code>MaskText</code> · <code>InputMasktPhone</code></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="callout danger">
+          <strong>🚫 Quick Tour saiu</strong>
+          A v1.0 listava 7 blocos de Quick Tour (<code>QuickTour</code>, <code>QuickTourHome</code>, <code>QuickTourMenu</code>, <code>QuickTourMeuPlano</code>, <code>QuickTourMudeUmHabito</code>, <code>QuickTourRegistros</code>, <code>QuickTourComunidades</code>). <strong>Nenhum existe</strong> na rev 4104 — busca por "QuickTour" no modelo retorna zero. Também saíram <code>AvisoTabia</code>, <code>HeaderLoading</code>, <code>PopUpAcao</code>, <code>PlanoCuidadoSkeleton</code>, <code>MapaSaude</code> (substituído por <code>MapaSaudeV2</code>) e <code>Questionarios</code>.
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 11 -->
+    <div class="section-card" id="arq-sec11">
+      <div class="section-header"><div class="section-number">11</div><h2>Modo de Contingência <span class="tag wip">🚧 Em andamento</span></h2></div>
+      <div class="section-body">
+        <div class="callout warn">
+          <strong>🚧 Conteúdo herdado da v1.0 — não revalidado</strong>
+          O comportamento abaixo veio da v1.0 e depende do setting <code>IsContingencia</code>, que a plataforma não expõe (seção 4). O que a rev 4104 <strong>confirma</strong>: o bloco <code>Contigencia</code> existe, a server action <code>ObterUsuarioBaseVidas</code> recebe o parâmetro de contingência, e existem <code>ObterStatusBaseVidas</code> e <code>ObterStatusAmbiente</code> tratando status por entidade estática.
+        </div>
+        <p>Quando o setting <code>IsContingencia = True</code> (Base de Vidas offline):</p>
+        <ul>
+          <li>A chamada à Base de Vidas é substituída por <code>ObterUsuarioExtraInfo</code> (UniID), que retorna apenas <strong>CPF e nome</strong>.</li>
+          <li>O beneficiário é criado com dados mínimos (<code>StatusBaseVidas = BaseVidasPendente</code>).</li>
+          <li>O plano de ação é carregado com token <code>"xpto"</code> (modo de teste).</li>
+          <li>O fluxo de aceite de termo e atualização de dados segue normalmente com os dados disponíveis.</li>
+        </ul>
+        <div class="subsection">
+          <div class="subsection-title">Pontos em aberto</div>
+          <ul>
+            <li>Critério de ativação/desativação da flag em produção — quem aciona e em que condição.</li>
+            <li>Uso do token <code>"xpto"</code> no plano de ação — confirmar se é definitivo ou placeholder de teste.</li>
+            <li>Reconciliação dos beneficiários com <code>StatusBaseVidas = BaseVidasPendente</code> após a Base de Vidas voltar.</li>
+            <li>Comportamento dos demais módulos (questionários, registros) durante a contingência.</li>
+            <li><strong>Novo:</strong> como o <strong>cadastro unificado</strong> e a sincronização <strong>MidUnimed</strong> se comportam em contingência — domínios que não existiam quando este tópico foi escrito.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 12 -->
+    <div class="section-card" id="arq-sec12">
+      <div class="section-header"><div class="section-number">12</div><h2>Rastreabilidade (Logs)</h2></div>
+      <div class="section-body">
+        <div class="callout ok">
+          <strong>✅ Seção reescrita — o GerenciadorDeLogs saiu</strong>
+          Busca no modelo da rev 4104 por <code>IncluirJornada</code>, <code>IncluirDetalheJornada</code> e <code>ConcluirJornada</code>: <strong>zero ocorrências</strong>, em qualquer tipo de nó. O acoplamento com o <code>GerenciadorDeLogs</code> foi <strong>removido</strong>.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Como é hoje</div>
+          <p>A rastreabilidade usa o <code>LogMessage</code> nativo do OutSystems, em <strong>44 pontos de chamada</strong> no modelo (versões server e client), gravando nos <strong>app logs</strong> do ODC.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:30%">Antes (v1.0)</th><th>Agora (rev 4104)</th></tr></thead>
+            <tbody>
+              <tr><td><code>IncluirJornada</code> (CPF, NomeAplicacao, Descricao)</td><td rowspan="3" style="vertical-align:middle"><code>LogMessage</code> — <em>Registers information that can be presented in the app logs</em>. Módulo <code>System_</code>.<br><br>O trio de jornada foi colapsado em chamadas únicas de log, consultáveis por <code>app_logs</code> no ODC.</td></tr>
+              <tr><td><code>IncluirDetalheJornada</code> (Atributo, Valor, JornadaId)</td></tr>
+              <tr><td><code>ConcluirJornada</code> (JornadaId)</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="callout info">
+          <strong>📌 Consequências</strong>
+          A variável de cliente <code>JornadaId</code> (seção 3) perdeu a razão de existir — confirmar remoção no Service Studio.<br>
+          Consultas de jornada que dependiam das tabelas do <code>GerenciadorDeLogs</code> precisam migrar para <code>app_logs</code>/<code>app_traces</code> do ODC.<br>
+          O conteúdo de cada mensagem (<code>Message</code> e <code>Category</code>) não está no modelo — só os pontos de chamada. Para auditar o que é gravado, use os logs do ambiente.
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 13 -->
+    <div class="section-card" id="arq-sec13">
+      <div class="section-header"><div class="section-number">13</div><h2>Inventário de Actions e Structures</h2></div>
+      <div class="section-body">
+        <div class="callout ok">
+          <strong>✅ Seção nova</strong>
+          Inventário completo das actions e structures próprias na rev 4104. Não existia na v1.0.
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Server actions próprias <span class="tag">64</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:24%">Grupo</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>Termo e aceite</td><td><code>AceitarTermoHealthMap</code> · <code>AceitarTermoTabia</code> · <code>AceitarTermoViverBem</code> · <code>RevogarTermoUsuarioHealthmap</code> · <code>RevogarTermoUsuarioTabia</code> · <code>TratarAceiteTermo</code> · <code>ObterValidacaoTermoPortalCliente</code></td></tr>
+              <tr class="linha-nova"><td>Cadastro unificado</td><td><code>SalvarUsuarioCadUnificadoNovo</code> · <code>AtivarUsuarioCadastroUnificado</code> · <code>AtualizarBeneficiarioInativo</code> · <code>CriarOuAtualizarIndicadoresV2</code></td></tr>
+              <tr class="linha-nova"><td>MidUnimed</td><td><code>MidUnimed_SincronizarBeneficiario</code> · <code>MidUnimed_TestarSincronizacao</code></td></tr>
+              <tr class="linha-nova"><td>Ações Viver Melhor / automonitoramento</td><td><code>CriarAcoesViverMelhorHome</code> · <code>CriarAcaoAutoMonitoramentoHome</code> · <code>CriarAcaoAutoMonitoramentoTabia</code> · <code>CriarAcaoAutoMonitoramentoTabiaDepara</code> · <code>CriarOuAtualizarAcoes</code></td></tr>
+              <tr><td>Questionários</td><td><code>EnviarQuestionarioInicialHealthMap</code> · <code>EnviarQuestionarioInicialTabia</code> · <code>EnviarQuestionarioTabiaAutomonitoramento</code> · <code>MontarAnswersTabia</code> · <code>ObterQuestionarioIdPorCategoria</code> · <code>AtualizarPesoAlturaFichaMedicaOnboarding</code> · <code>TratarPesoAltura</code> · <code>ProcessarTarefa</code></td></tr>
+              <tr><td>Mapa de saúde e risco</td><td><code>CalculaScoreRisco</code> · <code>BuscaIconeScore</code> · <code>BuscaTextoScore</code> · <code>FiltrarRegistroEntidade</code> · <code>NormalizarDescricaoRiscos</code> · <code>ObterMedicaoRisco</code> · <code>ObterPercentualRiscoSaudeUnitario</code> · <code>ObterStatusUnitarioMapaSaude</code> · <code>ObterTagStatusUnitarioMapaSaude</code></td></tr>
+              <tr><td>Beneficiário e classificação</td><td><code>ObterUsuarioBaseVidas</code> · <code>PerfilUsuario</code> · <code>ObterClassificacaoCliente</code> · <code>ObterStringClassificacaoCliente</code> · <code>RetornaLinhaCuidadoUsuario</code> · <code>RetornarIdade</code> · <code>RetornarSexoUsuario</code> · <code>RetornarStringSexoUsuario</code> · <code>ObterStatusBaseVidas</code> · <code>ObterStatusAmbiente</code></td></tr>
+              <tr><td>CRM Dynamics</td><td><code>BuscaDadosCRMDynamics</code> · <code>EnviaPostLinhaCuidado</code> · <code>CriarOuAtualizarIndicadorBackoffice</code> · <code>CriarOuAtualizarIndicadorBackofficeV2</code></td></tr>
+              <tr><td>Autenticação e sessão</td><td><code>ObterToken</code> · <code>ObterTokenHmapServer</code> · <code>ObterURLAutenticacao</code> · <code>ObterCodigoToken</code> · <code>ObterCPFUsuarioLogado</code> · <code>ObterDadosOnApplicationReady</code> · <code>OnGrantRoleEventLocal</code> · <code>IncluirCookie</code></td></tr>
+              <tr><td>Perfil, ficha e medicamentos</td><td><code>SalvarDadosPessoais</code> · <code>SalvarFichaMedica</code> · <code>SalvarMedicamento</code> · <code>DeletarMedicamento</code></td></tr>
+              <tr><td>Eventos e indicação</td><td><code>IncluirUsuarioEvento</code> · <code>CancelarEvento</code> · <code>EnviarCodigoPromocional</code></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Client actions próprias <span class="tag">19</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:24%">Grupo</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>Analytics</td><td><code>GA4</code> · <code>Clarity</code> · <code>GTM_Home_Event</code> · <code>GTM_Mude1Habito_Event</code> · <code>GTM_PushUserId</code></td></tr>
+              <tr><td>Feedback ao usuário</td><td><code>Toast</code> · <code>ToastPosicao</code> · <code>ToastTipo</code></td></tr>
+              <tr><td>Questionários</td><td><code>EnviarQuestionarioInicialTabia</code> · <code>SalvarHistoricoQuestionarioV2</code> · <code>VerificarPesoAltura</code></td></tr>
+              <tr><td>Interface e utilitários</td><td><code>AdicionarCss</code> · <code>FormatarHTML</code> · <code>ObterIconePrograma</code> · <code>Sleep</code> · <code>VerificaAmbiente</code></td></tr>
+              <tr><td>Sessão</td><td><code>DoLogout</code> · <code>ObterURLAutenticacao</code> · <code>OnGrantRoleEvent</code></td></tr>
+            </tbody>
+          </table></div>
+          <div class="callout info">
+            <strong>📌 Toast substituiu Message</strong>
+            A aplicação tem um trio próprio <code>Toast</code> / <code>ToastPosicao</code> / <code>ToastTipo</code>, com as structures <code>ToastPosicaoStr</code> (6 posições) e <code>ToastTipoStr</code> (Erro, Atenção, Sucesso, Info).
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Structures próprias <span class="tag">22</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:28%">Structure</th><th style="width:8%">Attrs</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td><code>IndicadoresStr</code></td><td>19</td><td>Estrutura da tabela de Indicadores</td></tr>
+              <tr><td><code>BannerStr</code></td><td>15</td><td>Banners das missões e campanhas</td></tr>
+              <tr><td><code>InformacoesRiscosStr</code></td><td>11</td><td>Informações relacionadas ao risco</td></tr>
+              <tr><td><code>CalendarioDia</code></td><td>9</td><td>Dia do calendário de registros</td></tr>
+              <tr><td><code>ParceiroInfo_Str</code></td><td>9</td><td>Exibição de parceiros</td></tr>
+              <tr><td><code>CodigosQuestionariosIniciaisStr</code></td><td>8</td><td>Códigos dos questionários iniciais</td></tr>
+              <tr><td><code>ContentItemMapaSaude</code></td><td>7</td><td>Item do mapa de saúde</td></tr>
+              <tr><td><code>LinhaComparacaoCadastro</code></td><td>6</td><td>Comparação antes/depois de cadastro (MidUnimed)</td></tr>
+              <tr><td><code>StatusCadastroCBVStr</code></td><td>6</td><td>Qual status precisa ser atualizado (Tabia, Hmap, Base Vidas, CRM, Linha de Cuidado, Ambiente)</td></tr>
+              <tr><td><code>ToastPosicaoStr</code></td><td>6</td><td>Constantes de posição do Toast</td></tr>
+              <tr><td><code>GTMHomeStr</code></td><td>5</td><td>Payload do evento GTM da Home</td></tr>
+              <tr><td><code>GTMMude1HabitoStr</code></td><td>5</td><td>Payload do evento GTM do Mude 1 Hábito</td></tr>
+              <tr><td><code>RespostaCodigoQuestionarioStr</code></td><td>5</td><td>JSON da tabela de Histórico Questionários</td></tr>
+              <tr><td><code>StrQuestionarioListItem</code></td><td>5</td><td>Item de lista de questionário</td></tr>
+              <tr><td><code>DadosMissaoExibicaoStr</code></td><td>4</td><td>Dados para exibição da missão</td></tr>
+              <tr><td><code>ToastTipoStr</code></td><td>4</td><td>Constantes de tipo do Toast</td></tr>
+              <tr><td><code>ScoreSaudeStr</code></td><td>3</td><td>Mapa de saúde V2</td></tr>
+              <tr><td><code>EventoComIconeStr</code></td><td>2</td><td>Evento com ícone SVG já resolvido</td></tr>
+              <tr><td><code>FiltroComunidadeStr</code></td><td>2</td><td>Filtro de comunidades</td></tr>
+              <tr><td><code>ListaRespostasStr</code></td><td>2</td><td>Respostas do histórico de questionário</td></tr>
+              <tr><td><code>MissaoTarefaStr</code></td><td>2</td><td>Dados da missão e da tarefa</td></tr>
+              <tr><td><code>InfoUserIdStr</code></td><td>1</td><td>Identificador de Info_Users</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 14 -->
+    <div class="section-card" id="arq-sec14">
+      <div class="section-header"><div class="section-number">14</div><h2>O que mudou da v1.0 para a v2.0</h2></div>
+      <div class="section-body">
+        <p>Comparação item a item entre o documento v1.0 e o modelo publicado da revisão 4104.</p>
+
+        <div class="subsection">
+          <div class="subsection-title">Saiu da aplicação <span class="tag fora">confirmado: zero ocorrências no modelo</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:26%">Item</th><th style="width:28%">Como estava na v1.0</th><th>Situação na rev 4104</th></tr></thead>
+            <tbody>
+              <tr class="linha-fora"><td><strong>GerenciadorDeLogs</strong></td><td>Seção 7.10 e seção 12 inteira — 3 service actions de jornada</td><td>Zero ocorrências. Substituído por <code>LogMessage</code> em 44 pontos</td></tr>
+              <tr class="linha-fora"><td><strong>SAE</strong></td><td>Seção 7.4 — <code>ObterAcoesSAE</code>, guias de exame/consulta/internação</td><td>Zero ocorrências de <code>ObterAcoesSAE</code> e <code>GetProcedimentos</code></td></tr>
+              <tr class="linha-fora"><td><strong>Quick Tour</strong></td><td>UI Flow + 7 blocos + eventos <code>quicktour_*</code></td><td>Zero ocorrências</td></tr>
+              <tr class="linha-fora"><td><strong>Tela <code>MeuPlano</code></strong></td><td>UI Flow <code>PlanoCuidado</code></td><td>Não existe como tela. <code>PlanoCuidado</code> sobrou como <em>pasta</em>, não como UI Flow</td></tr>
+              <tr class="linha-fora"><td><strong>Blocos descontinuados</strong></td><td><code>PopUpAcao</code>, <code>PlanoCuidadoSkeleton</code>, <code>MapaSaude</code>, <code>AvisoTabia</code>, <code>HeaderLoading</code>, <code>Questionarios</code></td><td>Nenhum existe. <code>MapaSaude</code> → <code>MapaSaudeV2</code></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Entrou na aplicação <span class="tag novo">não existia na v1.0</span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:26%">Item</th><th>O que é</th></tr></thead>
+            <tbody>
+              <tr class="linha-nova"><td><strong>Cadastro Unificado</strong></td><td>Domínio inteiro: 8 service actions no <code>ModeloAssistencial</code>, 4 server actions próprias, a structure <code>StatusCadastroCBVStr</code> e a tela <code>Onboarding</code> com 8 data actions</td></tr>
+              <tr class="linha-nova"><td><strong>Tabia como integração de 1ª classe</strong></td><td><code>TabiaHealthISLibrary</code> + 4 service actions de ponte + 7 actions próprias + blocos <code>QuestionarioMonitoramentoTabia</code>, <code>BlockRevogarTermoTabia</code> e <code>WBFormQuestionarioTabia</code></td></tr>
+              <tr class="linha-nova"><td><strong>MidUnimed</strong></td><td>Sincronização de beneficiário: <code>MidUnimed_SincronizarBeneficiario</code>, <code>MidUnimed_TestarSincronizacao</code>, <code>MidUnimed_AtualizarCadastroCBV</code> e a structure <code>LinhaComparacaoCadastro</code></td></tr>
+              <tr class="linha-nova"><td><strong>Telas <code>Autocuidado</code> e <code>AcoesViverMelhor</code></strong></td><td>Dois UI Flows novos, que juntos substituem o antigo <code>MeuPlano</code></td></tr>
+              <tr class="linha-nova"><td><strong>Missões e conquistas na UI</strong></td><td>6 blocos (<code>BlockMissoes</code>, <code>BlockControleTarefas</code>, 3 de tarefa, <code>BlockMinhasConquistas</code>) e 7 service actions do Backoffice</td></tr>
+              <tr class="linha-nova"><td><strong>CMS</strong></td><td>3 service actions (tags, imagens, bucket) + client action <code>ObterIconePrograma</code></td></tr>
+              <tr class="linha-nova"><td><strong>PortalDoClienteCS</strong></td><td>2 service actions de termo de consentimento</td></tr>
+              <tr class="linha-nova"><td><strong>Códigos de indicação</strong></td><td><code>EnviarCodigoPromocional</code> + 3 service actions do Backoffice</td></tr>
+              <tr class="linha-nova"><td><strong>Toast</strong></td><td>Trio de client actions próprias com 2 structures de constantes</td></tr>
+              <tr class="linha-nova"><td><strong><code>RegistrosNOVO</code></strong></td><td>Segunda tela de registros, convivendo com a original</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Nomes que a v1.0 trazia errados</div>
+          <p>A v1.0 citava operações que <strong>não existem</strong> com aquele nome. Correções:</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:36%">v1.0 dizia</th><th>Nome real na rev 4104</th></tr></thead>
+            <tbody>
+              <tr><td><code>ObterMissoes</code> · <code>ObterTarefasMissao</code> · <code>SalvarTarefaUsuario</code></td><td><code>ListarMissaoAtiva</code> · <code>ObterProximaTarefaService</code> · <code>ConcluirTarefaUsuario</code></td></tr>
+              <tr><td><code>ObterConquistas</code> · <code>ObterCampanhas</code></td><td><code>ListarConquistasUsuarioService</code> · <code>ListarCampanhaAtiva</code></td></tr>
+              <tr><td><code>ObterListarEventos</code> · <code>ObterDestaquesEventos</code> · <code>ObterEventoById</code> · <code>ObterListarProgramas</code></td><td>Não existem. O Blog expõe <code>ObterProcurarEventos</code>, <code>ObterEventoPorUsuarioId</code> e <code>ListarProgramas</code></td></tr>
+              <tr><td><code>GetMedicaoRisco</code> (HealthMapIS)</td><td><code>ObterMedicoRisco</code> — <code>GetMedicaoRisco</code> é o nome da <em>data action</em> da tela Autocuidado</td></tr>
+              <tr><td><code>GetBuscaTermoPublicadoPorEmpresa</code></td><td><code>ObterTermoPorEmpresa</code></td></tr>
+              <tr><td><code>PostResponderAvaliacao</code></td><td><code>IncluirAvaliacaoUsuario</code></td></tr>
+              <tr><td><code>GetGestorBeneficiario</code></td><td><code>ObterGestorBeneficiario</code></td></tr>
+              <tr><td><code>AceitarTermo</code> / <code>RevogarTermo</code> no Viver Bem</td><td>São do <code>HealthMapIS</code>. No Viver Bem: <code>AceitarTermoHealthMap</code>, <code>RevogarTermoUsuarioHealthmap</code></td></tr>
+              <tr><td><code>CarregarHome</code> · <code>ObterInfoUserInternalUser</code> · <code>AtualizarInternalUserByBaseVidas</code> · <code>IncluirAtualizarInfo_Users</code> · <code>IncluirAtualizarInternalUsers</code></td><td>Não existem no modelo. O equivalente hoje são <code>ObterInternalUsersByCPF</code>, <code>AtualizarDadosBaseVidasCadastroUsuarioCBV</code> e as actions de cadastro unificado</td></tr>
+              <tr><td><code>ObterPacientesTabia</code> / <code>ObterPacientes</code></td><td><code>VerificarUsuarioTabiaService</code></td></tr>
+              <tr><td><code>AppHeader</code> · <code>AppFooterMenu</code></td><td><code>HeaderComumMobile</code> · <code>BottomBar</code> / <code>BottomBarItem</code></td></tr>
+              <tr><td><code>GetContacts</code> · <code>GetLinhaCuidadoId</code> · <code>PatchLinhaCuidadoClienteSemContato</code> · <code>EnviaMoniramento</code></td><td>Não aparecem como dependência do Viver Bem</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">O que continua valendo</div>
+          <ul>
+            <li>A aplicação <strong>não tem entidades locais</strong> — confirmado: zero.</li>
+            <li><code>ViverBem</code> é a role de todas as telas; <code>AcessoAmbienteControlado</code> existe.</li>
+            <li>O HealthMap continua sendo o sistema de registro clínico, via <code>HealthMapIS</code>.</li>
+            <li>GA4, GTM e Clarity continuam instrumentados, pelas mesmas client actions.</li>
+            <li>O CRM Dynamics continua recebendo linha de cuidado e dados de contato.</li>
+            <li>O modo de contingência continua existindo (bloco <code>Contigencia</code>).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARQ SEC 15 -->
+    <div class="section-card" id="arq-sec15">
+      <div class="section-header"><div class="section-number">15</div><h2>Método, escopo e limites da varredura</h2></div>
+      <div class="section-body">
+        <div class="subsection">
+          <div class="subsection-title">De onde veio cada seção</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th style="width:12%">Seção</th><th style="width:22%">Origem</th><th>Observação</th></tr></thead>
+            <tbody>
+              <tr><td>1, 2 (roles)</td><td>Context Service</td><td><code>app_info</code>, <code>context_roles</code>, <code>context_themes</code></td></tr>
+              <tr><td>2 (fluxo UniID)</td><td>v1.0 + peças confirmadas</td><td>A ordem dos passos não foi re-traçada</td></tr>
+              <tr class="linha-fora"><td>3, 4</td><td>v1.0 — <strong>não revalidado</strong></td><td>Variáveis de cliente e settings não são expostos pela plataforma</td></tr>
+              <tr><td>5, 6</td><td>Grafo XRE</td><td><code>IMobileScreen</code>, <code>IDataAction</code>, <code>IPermission</code>, <code>IInputParameter</code></td></tr>
+              <tr><td>7</td><td>Grafo XRE + Context Service</td><td><code>ReferenceIServiceAction</code> / <code>ReferenceIServerAction</code>, com produtor resolvido via <code>context_search</code></td></tr>
+              <tr><td>8</td><td>Context Service + XRE</td><td>Client actions e structures; nomes de evento em runtime não são visíveis</td></tr>
+              <tr><td>9</td><td><code>app_refs</code> + <code>context_entities</code></td><td><code>app_refs</code> indexa só o kind <code>entities</code></td></tr>
+              <tr><td>10</td><td>Grafo XRE</td><td><code>IMobileBlock</code> e <code>ReferenceIMobileBlock</code></td></tr>
+              <tr class="linha-fora"><td>11</td><td>v1.0 — <strong>não revalidado</strong></td><td>Depende do setting <code>IsContingencia</code></td></tr>
+              <tr><td>12</td><td>Grafo XRE</td><td>Busca exaustiva por nome em 70.982 nós</td></tr>
+              <tr><td>13</td><td>Context Service</td><td><code>context_actions</code>, <code>context_structures</code></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Escopo técnico</div>
+          <div class="table-wrap"><table>
+            <tbody>
+              <tr><td style="width:30%"><strong>Fonte</strong></td><td>MCP do ODC em <code>unimedpoa.outsystems.dev</code>, revisão <strong>4104</strong></td></tr>
+              <tr><td><strong>Grafo XRE</strong></td><td>Root nas telas da aplicação · 5 páginas · 65,5 MB · <strong>70.982 nós</strong> e <strong>156.544 arestas</strong></td></tr>
+              <tr><td><strong>Recorte</strong></td><td>Esta página documenta as <strong>11 telas de produção</strong>. Telas de apoio ao desenvolvimento, que não sobem para PRD, ficaram fora de propósito</td></tr>
+              <tr><td><strong>Data da leitura</strong></td><td>11/11/2026</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Limites — o que esta varredura NÃO cobre</div>
+          <div class="callout warn">
+            <strong>⚠️ Leia antes de usar como referência definitiva</strong>
+            <ul style="margin:8px 0 0 0">
+              <li><strong>Valores de settings e variáveis de cliente</strong> — a plataforma não os expõe. Seções 3 e 4 são da v1.0.</li>
+              <li><strong>Ordem de execução</strong> — o grafo diz <em>o que</em> chama <em>o quê</em>, não a sequência nem as condições dos <code>If</code>. A seção 6 lista as data actions declaradas, não o encadeamento.</li>
+              <li><strong>Conteúdo das mensagens de log</strong> — só os pontos de chamada do <code>LogMessage</code>, não o texto nem a categoria.</li>
+              <li><strong>Literais e textos de UI</strong> — o XRE não traz valores de expressão. Nomes de evento GTM, por exemplo, ficaram sem confirmação.</li>
+              <li><strong>Alcançabilidade em produção</strong> — o modelo não diz se <code>RegistrosNOVO</code> está acessível a um beneficiário real. Depende de menu e role.</li>
+              <li><strong>Root nas telas</strong> — 20 das 64 server actions próprias não aparecem no grafo a partir das telas. São majoritariamente funções formatadoras (<code>RetornarIdade</code>, <code>BuscaIconeScore</code>, <code>ObterStatusBaseVidas</code>...). <strong>Isso não prova que sejam código morto</strong> — podem ser chamadas de dentro de expressões ou de outras server actions fora do recorte. Fica como item a verificar, não como conclusão.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-title">Itens a confirmar no Service Studio</div>
+          <ol>
+            <li>Lista real de variáveis de cliente e se <code>JornadaId</code> foi removida.</li>
+            <li>Valores atuais dos settings, em especial <code>IsAtivarMissoes</code>, <code>IsContingencia</code> e <code>IsVerificarApi</code>.</li>
+            <li>Se <code>Registros</code> ou <code>RegistrosNOVO</code> é a tela ativa em produção.</li>
+            <li>A duplicidade do bloco <code>SkeletonLoader</code>.</li>
+            <li>As 20 server actions sem nó no grafo a partir das telas.</li>
+            <li>Se o SAE foi removido de propósito ou se a integração migrou para outro ponto.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-arq -->
+
+  <footer id="page-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div>
+          <div class="brand-name">Fourge Tech</div>
+          <div class="brand-sub">Tecnologia &amp; Inovação</div>
+        </div>
+      </div>
+      <span class="footer-badge">Viver Bem — Arquitetura Técnica — v2.0 · rev 4104</span>
+    </div>
+    <div class="footer-bottom">
+      Documento gerado em 11/11/2026 &nbsp;|&nbsp; Unimed POA — Modelo Assistencial &nbsp;|&nbsp; Arquitetura Técnica
+      <br/>
+      &copy; 2026 <strong style="color:#6a8fa8">Fourge Tech</strong>. Todos os direitos reservados.
+    </div>
+  </footer>
+
+</div><!-- /main-arq -->
 
 <!-- SCROLL TOP -->
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -7384,13 +8971,13 @@ function closeChangelog() {
   // Sidebar toggle — abre o sidebar do projeto ativo
   function toggleSidebar() {
     const proj = sessionStorage.getItem('_p') || 'cbv';
-    const sbId = proj === 'ma' ? 'sidebar-ma' : proj === 'ja' ? 'sidebar-ja' : 'sidebar';
+    const sbId = proj === 'ma' ? 'sidebar-ma' : proj === 'ja' ? 'sidebar-ja' : proj === 'arq' ? 'sidebar-arq' : 'sidebar';
     const sb = document.getElementById(sbId);
     if (sb) sb.classList.toggle('open');
   }
   document.addEventListener('click', function(e) {
     const btn = document.getElementById('menu-toggle');
-    ['sidebar','sidebar-ma','sidebar-ja'].forEach(id => {
+    ['sidebar','sidebar-ma','sidebar-ja','sidebar-arq'].forEach(id => {
       const sidebar = document.getElementById(id);
       if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && btn && !btn.contains(e.target)) {
         sidebar.classList.remove('open');
@@ -7491,7 +9078,8 @@ const _projectNames = {
   automonitoramento:  'Automações — Automonitoramento',
   'automacoes-gerais': 'Automações Gerais',
   'cockpit-navegacao': 'Cockpit de Navegação',
-  'cockpit-navegacao-2': 'Cockpit de Navegação 2.0'
+  'cockpit-navegacao-2': 'Cockpit de Navegação 2.0',
+  arq:                'Viver Bem — Arquitetura Técnica'
 };
 function openProject(id) {
   _pendingProject = id;
@@ -7529,7 +9117,7 @@ let _guestMode = false;
   if (isGuest) {
     _guestMode = true;
     const _gp = params.get('projeto');
-    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'automacoes' ? 'automacoes' : _gp === 'automonitoramento' ? 'automonitoramento' : _gp === 'automacoes-gerais' ? 'automacoes-gerais' : _gp === 'cockpit-navegacao' ? 'cockpit-navegacao' : _gp === 'cockpit-navegacao-2' ? 'cockpit-navegacao-2' : 'cbv';
+    const guestProj = _gp === 'ma' ? 'ma' : _gp === 'ja' ? 'ja' : _gp === 'arq' ? 'arq' : _gp === 'automacoes' ? 'automacoes' : _gp === 'automonitoramento' ? 'automonitoramento' : _gp === 'automacoes-gerais' ? 'automacoes-gerais' : _gp === 'cockpit-navegacao' ? 'cockpit-navegacao' : _gp === 'cockpit-navegacao-2' ? 'cockpit-navegacao-2' : 'cbv';
     // Oculta overlays instantaneamente
     const ov = document.getElementById('auth-overlay');
     if (ov) { ov.classList.remove('show'); }
@@ -7573,6 +9161,7 @@ function loadProject(id) {
   const isAG   = id === 'automacoes-gerais';
   const isCN   = id === 'cockpit-navegacao';
   const isCN2  = id === 'cockpit-navegacao-2';
+  const isArq  = id === 'arq';
   // sidebar
   const sbCbv  = document.getElementById('sidebar');
   const sbMa   = document.getElementById('sidebar-ma');
@@ -7582,6 +9171,7 @@ function loadProject(id) {
   const sbAG   = document.getElementById('sidebar-automacoes-gerais');
   const sbCN   = document.getElementById('sidebar-cockpit-navegacao');
   const sbCN2  = document.getElementById('sidebar-cockpit-navegacao-2');
+  const sbArq  = document.getElementById('sidebar-arq');
   if (sbCbv)  sbCbv.style.display  = isCbv  ? '' : 'none';
   if (sbMa)   sbMa.style.display   = isMa   ? 'flex' : 'none';
   if (sbJa)   sbJa.style.display   = isJa   ? 'flex' : 'none';
@@ -7590,6 +9180,7 @@ function loadProject(id) {
   if (sbAG)   sbAG.style.display   = isAG   ? 'flex' : 'none';
   if (sbCN)   sbCN.style.display   = isCN   ? 'flex' : 'none';
   if (sbCN2)  sbCN2.style.display  = isCN2  ? 'flex' : 'none';
+  if (sbArq)  sbArq.style.display  = isArq  ? 'flex' : 'none';
   // main
   const mCbv  = document.getElementById('main');
   const mMa   = document.getElementById('main-ma');
@@ -7599,6 +9190,7 @@ function loadProject(id) {
   const mAG   = document.getElementById('main-automacoes-gerais');
   const mCN   = document.getElementById('main-cockpit-navegacao');
   const mCN2  = document.getElementById('main-cockpit-navegacao-2');
+  const mArq  = document.getElementById('main-arq');
   if (mCbv)  mCbv.style.display  = isCbv  ? 'block' : 'none';
   if (mMa)   mMa.style.display   = isMa   ? 'block' : 'none';
   if (mJa)   mJa.style.display   = isJa   ? 'block' : 'none';
@@ -7607,6 +9199,7 @@ function loadProject(id) {
   if (mAG)   mAG.style.display   = isAG   ? 'block' : 'none';
   if (mCN)   mCN.style.display   = isCN   ? 'block' : 'none';
   if (mCN2)  mCN2.style.display  = isCN2  ? 'block' : 'none';
+  if (mArq)  mArq.style.display  = isArq  ? 'block' : 'none';
   if (isAuto || isMon || isAG) mermaid.run();
 }
 
@@ -7690,6 +9283,17 @@ function _applyGuestUI(proj) {
       const exportBtn = document.getElementById('btn-export-cockpit-navegacao-2');
       meta.insertBefore(chip, exportBtn);
     }
+  } else if (proj === 'arq') {
+    const dashArq = document.getElementById('btn-dashboard-arq');
+    if (dashArq) dashArq.style.display = 'none';
+    const meta = document.querySelector('#page-header-arq .meta');
+    if (meta) {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-guest';
+      chip.innerHTML = '<span class="chip-icon">👁</span> Visitante';
+      const exportBtn = document.getElementById('btn-export-arq');
+      meta.insertBefore(chip, exportBtn);
+    }
   } else {
     // CBV (default)
     ['chip-version', 'chip-date', 'chip-status', 'btn-history', 'btn-dashboard'].forEach(id => {
@@ -7722,10 +9326,10 @@ function highlightCallout(n) {
 function goHome() {
   if (_guestMode) return;
   sessionStorage.removeItem('_p');
-  ['main','main-ma','main-ja','main-automacoes','main-automonitoramento','main-automacoes-gerais','main-cockpit-navegacao','main-cockpit-navegacao-2'].forEach(id => {
+  ['main','main-ma','main-ja','main-automacoes','main-automonitoramento','main-automacoes-gerais','main-cockpit-navegacao','main-cockpit-navegacao-2','main-arq'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
-  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes','sidebar-automonitoramento','sidebar-automacoes-gerais','sidebar-cockpit-navegacao','sidebar-cockpit-navegacao-2'].forEach(id => {
+  ['sidebar','sidebar-ma','sidebar-ja','sidebar-automacoes','sidebar-automonitoramento','sidebar-automacoes-gerais','sidebar-cockpit-navegacao','sidebar-cockpit-navegacao-2','sidebar-arq'].forEach(id => {
     const el = document.getElementById(id); if (el) el.style.display = 'none';
   });
   const ho = document.getElementById('home-overlay');
